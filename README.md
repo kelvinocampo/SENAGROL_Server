@@ -23,3 +23,10 @@ SENAGROL_Server/
 │── package.json
 │── README.md
 │── tsconfig.json -->
+
+## Integrantes del Proyecto
+1. Kevin Esneider Ocampo Osorio
+2. Samuel Torres
+3. Luisa Vargas
+4. Valerie Calle Loaiza
+5. Mariana Cardenas
