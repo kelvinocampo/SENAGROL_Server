@@ -55,8 +55,8 @@ Aunque este software está dirigido especialmente a agricultores, tendrá una in
   Archivo de configuración de TypeScript.
 
 ## Integrantes del Proyecto
-1. Kevin Esneider Ocampo Osorio
-2. Samuel Torres
-3. Luisa Vargas
+1. Kevin Esneider Ocampo Osorio (Scrum Master)
+2. Samuel Torres Ospina (Product Owner)
+3. Luisa Fernanda Vargas Barrera
 4. Valerie Calle Loaiza
-5. Mariana Cardenas
+5. Mariana Cardenas Rendon
