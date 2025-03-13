@@ -13,7 +13,7 @@ Aunque este software está dirigido especialmente a agricultores, tendrá una in
   Controladores responsables de recibir las solicitudes del cliente, procesarlas y devolver las respuestas adecuadas.
 
 - **DB/**  
-  Archivos relacionados con la base de datos, como migraciones y semillas, que facilitan la gestión de la estructura y los datos iniciales.
+  Archivos relacionados con la base de datos.
 
 - **Dto/**  
   Objetos de transferencia de datos (Data Transfer Objects) utilizados para transferir datos entre las diferentes capas de la aplicación.
@@ -31,7 +31,7 @@ Aunque este software está dirigido especialmente a agricultores, tendrá una in
   Contiene los repositorios que encapsulan la lógica de acceso a datos. Cada repositorio se encarga de interactuar con una entidad específica (por ejemplo, usuarios, productos) y proporciona métodos para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar).
 
 - **Routes/**  
-  Define las rutas de la aplicación, asociando las URL a los controladores correspondientes.
+  Define las rutas de la aplicación, configura middleware y asocia las URL a los controladores correspondientes.
 
 - **Services/**  
   Servicios que contienen la lógica de negocio de la aplicación. Utilizan los repositorios para acceder a los datos y realizar operaciones más complejas que pueden involucrar múltiples repositorios.
@@ -40,7 +40,7 @@ Aunque este software está dirigido especialmente a agricultores, tendrá una in
   Archivo que especifica qué archivos o carpetas deben ser ignorados por Git.
 
 - **app.ts**  
-  Archivo principal que inicializa la aplicación, configura middleware, rutas y otros componentes necesarios.
+  Archivo principal que inicializa la aplicación, rutas y otros componentes necesarios.
 
 - **package-lock.json**  
   Archivo que asegura que las mismas versiones de las dependencias se instalen en diferentes entornos.
