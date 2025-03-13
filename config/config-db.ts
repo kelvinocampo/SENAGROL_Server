@@ -1,0 +1,1 @@
+/* Este archivo es para configurar la base de datos */

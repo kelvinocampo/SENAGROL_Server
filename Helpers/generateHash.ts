@@ -1,0 +1,1 @@
+/* Este archivo es para generar el hash */
