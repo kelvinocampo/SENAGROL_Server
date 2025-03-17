@@ -77,6 +77,33 @@ CREATE TABLE IF NOT EXISTS producto(
     REFERENCES vendedor(id_vendedor)
 );
 
+DROP TABLE IF EXISTS compra;
+CREATE TABLE IF NOT EXISTS compra(
+    id_compra INT PRIMARY KEY AUTO_INCREMENT,
+    estado ENUM('Pendiente', 'Asignada', 'En Proceso', 'Completada'),
+    precio_transporte DECIMAL(10, 2),
+    precio_producto DECIMAL(10, 2),
+    cantidad INT,
+    fecha_compra DATETIME,
+    fecha_entrega DATETIME NULL
+
+    id_producto INT,
+    FOREIGN KEY (id_producto)
+    REFERENCES producto(id_producto),
+
+    id_vendedor INT,
+    FOREIGN KEY (id_vendedor)
+    REFERENCES vendedor(id_vendedor),
+
+    id_comprador INT,
+    FOREIGN KEY (id_comprador)
+    REFERENCES comprador(id_comprador),
+
+    id_transportador INT NULL,
+    FOREIGN KEY (id_transportador)
+    REFERENCES transportador(id_transportador)
+);
+
 DROP TABLE IF EXISTS chat;
 CREATE TABLE IF NOT EXISTS chat(
     id_chat INT PRIMARY KEY AUTO_INCREMENT,
