@@ -1,1 +1,2 @@
-/* Este archivo es para crear la base de datos */
+-- DROP DATABASE IF EXISTS senagrol;
+CREATE DATABASE IF NOT EXISTS senagrol;
