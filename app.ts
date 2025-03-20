@@ -1,10 +1,11 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import dotenv from "dotenv";
+import userRoutes from './routes/user';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 10101;
 
-app.use('/usuario');
+app.use('/usuario', userRoutes);
 app.use('/admin');
 app.use('/vendedor');
 app.use('/comprador');
