@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import IAService from "../services/IAService";
+import IAService from "../../services/IAService";
 
 const IAController = async (req: Request, res: Response) => {
     try {
         const { prompt } = req.body;
 
-        const responseIA = await IAService.request(prompt);
+        const responseIA = await IAService.responseIA(prompt);
 
         return res.status(200).json({
             status: 'response ok',

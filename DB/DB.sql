@@ -1,5 +1,6 @@
--- DROP DATABASE IF EXISTS senagrol;
+DROP DATABASE IF EXISTS senagrol;
 CREATE DATABASE IF NOT EXISTS senagrol;
+USE senagrol;
 
 DROP TABLE IF EXISTS usuario;
 CREATE TABLE IF NOT EXISTS usuario(
@@ -85,7 +86,7 @@ CREATE TABLE IF NOT EXISTS compra(
     precio_producto DECIMAL(10, 2),
     cantidad INT,
     fecha_compra DATETIME,
-    fecha_entrega DATETIME NULL
+    fecha_entrega DATETIME NULL,
 
     id_producto INT,
     FOREIGN KEY (id_producto)
@@ -131,9 +132,7 @@ CREATE TABLE IF NOT EXISTS mensaje(
     FOREIGN KEY (id_chat) 
     REFERENCES chat(id_chat),
 
-    id_user INT,
-    FOREIGN KEY (id_user)
-    REFERENCES usuario(id_user)
+    id_user INT
 );
 
 
