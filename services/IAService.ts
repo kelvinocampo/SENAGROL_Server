@@ -13,7 +13,7 @@ const chat = model.startChat({
     history: [
         {
             role: "user",
-            parts: [{ text: "No contestes con formato markdown" }],
+            parts: [{ text: "No contestes con formato markdown, ejemplo(/n, --, ```)." }],
         },
         {
             role: "model",
@@ -79,6 +79,7 @@ class IAService {
 
     static async generateSQL(prompt: string, id: string) {
         try {
+            // Paso 1: Generar la consulta SQL
             let IAprompt =
                 `Genera solo la consulta SQL sin formato markdown para la siguiente solicitud: "${prompt}".
                 Si necesitas mi id de usuario es ${id}
@@ -96,14 +97,21 @@ class IAService {
             let result = await chat.sendMessage(IAprompt);
             let responseText = result.response.text();
 
-            let SQLResponse = await IARepository.querySQL(await IAService.cleanSQLResponse(responseText));
+            // Paso 2: Ejecutar la consulta SQL en la base de datos
+            const SQLResponse = await IARepository.querySQL(await IAService.cleanSQLResponse(responseText));
 
+            // Paso 3: Formatear el resultado de la consulta
+            const formattedResults = IAService.formatSQLResponse(SQLResponse);
+
+            // Paso 4: Enviar el resultado formateado a la IA junto con la solicitud original
             IAprompt = `Esta es la respuesta de la base de datos:
-            ${SQLResponse[0]}.
-            Ahora responde la siguiente peticion:
+            ${formattedResults}.
+            Ahora responde la siguiente petición:
             ${prompt}.`;
             result = await chat.sendMessage(IAprompt);
             responseText = result.response.text();
+
+            // Paso 5: Devolver la respuesta de la IA
             return responseText;
         } catch (error) {
             if (error instanceof Error) {
@@ -125,6 +133,19 @@ class IAService {
         }
 
         return response;
+    }
+
+    static formatSQLResponse(results: any[]): string {
+        if (results.length === 0) {
+            return "No se encontraron resultados.";
+        }
+
+        // Convertir cada fila en una cadena legible
+        const formattedResults = results.map((row, index) => {
+            return `Fila ${index + 1}: ${JSON.stringify(row)}`;
+        }).join("\n");
+
+        return formattedResults;
     }
 }
 
