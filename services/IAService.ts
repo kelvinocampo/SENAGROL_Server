@@ -9,7 +9,7 @@ const { APIKEY = "" } = process.env;
 const genAI = new GoogleGenerativeAI(APIKEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-const chat = model.startChat({
+const globalHistory = {
     history: [
         {
             role: "user",
@@ -20,32 +20,39 @@ const chat = model.startChat({
             parts: [{ text: "Bien, entendido." }],
         },
     ],
-});
+};
 
 class IAService {
-    static async requestRegister(prompt: string, role: string, id: string) {
+    static async requestRegister(prompt: string, role: string, id: string, history: any[]) {
         try {
-            let IAprompt = `Es necesario acceder a la base de datos en base a esta peticion:
+            const localHistory = [...globalHistory.history, ...history];
+
+            const chat = model.startChat({ history: localHistory });
+
+            let IAprompt = `Es necesario acceder a la base de datos en base a esta petición:
             ${prompt},
             Contesta solo "SI" o "NO"`;
             let result = await chat.sendMessage(IAprompt);
             let responseText = result.response.text();
 
             if (responseText.trim() === "NO") {
-                responseText = await IAService.responseIA(prompt);
+                responseText = await IAService.responseIA(prompt, history);
             } else {
                 IAprompt = `Este usuario con el siguiente rol:
                 ${role}
-                tiene permiso para:
-                ${prompt},
+                ¿tiene permiso para acceder a lo solicitado:
+                ${prompt} ?,
                 Contesta solo "SI" o "NO"`;
                 result = await chat.sendMessage(IAprompt);
                 responseText = result.response.text();
 
+                console.log(responseText,IAprompt);
+                
+
                 if (responseText.trim() === "NO") {
                     responseText = "El usuario no tiene acceso a lo solicitado.";
                 } else {
-                    responseText = await IAService.generateSQL(prompt, id);
+                    responseText = await IAService.generateSQL(prompt, id, chat);
                 }
             }
 
@@ -61,8 +68,12 @@ class IAService {
         }
     }
 
-    static async responseIA(prompt: string) {
+    static async responseIA(prompt: string, history: any[]) {
         try {
+            const localHistory = [...globalHistory.history, ...history];
+
+            const chat = model.startChat({ history: localHistory });
+
             const result = await chat.sendMessage(prompt);
             const responseText = result.response.text();
             return responseText;
@@ -77,7 +88,7 @@ class IAService {
         }
     }
 
-    static async generateSQL(prompt: string, id: string) {
+    static async generateSQL(prompt: string, id: string, chat: any) {
         try {
             // Paso 1: Generar la consulta SQL
             let IAprompt =
