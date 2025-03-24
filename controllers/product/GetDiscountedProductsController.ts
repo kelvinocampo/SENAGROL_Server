@@ -13,3 +13,6 @@ const getDiscountedProducts = async (req: Request, res: Response) => {
 
 export default getDiscountedProducts;
 
+//Consulta la base de datos para obtener productos con descuento.
+
+//Devuelve la lista en formato JSON.
