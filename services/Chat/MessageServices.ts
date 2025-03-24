@@ -1,0 +1,29 @@
+import Message from "../../Dto/Chat/MessageDTO";
+import MessageRepository from "../../repositories/Chat/MessageRepository";
+import ChatRepository from "../../repositories/Chat/ChatRepository";
+
+class MessageService {
+    static async sendTextMessage(message: Message) {
+        try {
+            // 1. Verificar que el chat existe y el usuario tiene acceso
+            const chat = await ChatRepository.getChatById(message.id_chat);
+            if (!chat) {
+                throw new Error("Chat no encontrado");
+            }
+
+            // if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
+            //     throw new Error("No tienes permiso para enviar mensajes en este chat");
+            // }
+
+            // 3. Guardar en base de datos
+            const newMessage = await MessageRepository.createTextMessage(message);
+
+            return newMessage;
+        } catch (error: any) {
+            console.error("Error en MessageService:", error);
+            throw error;
+        }
+    }
+}
+
+export default MessageService;
