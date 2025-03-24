@@ -24,6 +24,28 @@ class MessageService {
             throw error;
         }
     }
+
+    static async updateTextMessage(message: Message, id_message: number) {
+        try {
+            // 1. Verificar que el chat existe y el usuario tiene acceso
+            const chat = await ChatRepository.getChatById(message.id_chat);
+            if (!chat) {
+                throw new Error("Chat no encontrado");
+            }
+
+            // if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
+            //     throw new Error("No tienes permiso para enviar mensajes en este chat");
+            // }
+
+            // 3. Editar en base de datos
+            const updateMessage = await MessageRepository.updateTextMessage(message, id_message);
+
+            return updateMessage;
+        } catch (error: any) {
+            console.error("Error en MessageService:", error);
+            throw error;
+        }
+    }
 }
 
 export default MessageService;
