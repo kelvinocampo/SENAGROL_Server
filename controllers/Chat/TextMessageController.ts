@@ -5,10 +5,10 @@ import Message from "../../Dto/Chat/MessageDTO";
 const textMessageController = async (req: Request, res: Response) => {
     try {
         const { id: userID, text } = req.body;
-        const { id: chatID } = req.params;
+        const { id_chat } = req.params;
 
         const result = await MessageService.sendTextMessage(
-            new Message(false, "texto", text, (new Date()), parseInt(chatID), parseInt(userID))
+            new Message(false, "texto", text, (new Date()), parseInt(id_chat), parseInt(userID))
         );
 
         return res.status(200).json({
