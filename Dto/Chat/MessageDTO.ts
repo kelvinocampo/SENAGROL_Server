@@ -1,6 +1,8 @@
+type tipoMSG = 'texto' | 'audio' | 'imagen';
+
 class Message {
     private _editado: boolean;
-    private _tipo: 'texto' | 'audio' | 'imagen';
+    private _tipo: tipoMSG;
     private _contenido: string;
     private _fecha_envio: Date;
     private _id_chat: number;
@@ -9,7 +11,7 @@ class Message {
     // Constructor
     constructor(
         editado: boolean,
-        tipo: string,
+        tipo: tipoMSG,
         contenido: string,
         fecha_envio: Date,
         id_chat: number,
@@ -39,7 +41,7 @@ class Message {
         return this._tipo;
     }
 
-    set tipo(value: string) {
+    set tipo(value: tipoMSG) {
         this._tipo = value;
     }
 
