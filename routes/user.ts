@@ -1,11 +1,10 @@
-mport express from "express";
-import verifyToken from "../middleware/VerifyToken";
-const router = express.Router();
+import { Router } from 'express';
+import * as usuarioController from '../controllers/User/usuarioController';
 
-router.post('/register');
-router.post('/login');
-router.post('/edit', verifyToken);
-router.post('/profile', verifyToken);
+const router = Router();
 
-export default router;  
+// Endpoint para editar la contraseña de recuperación
+router.patch('/password', usuarioController.editarPassword);
+
+export default router;
 
