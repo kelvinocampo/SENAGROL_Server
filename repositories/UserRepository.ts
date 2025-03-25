@@ -1,6 +1,6 @@
 import db from '../config/configDB';
-import logIn from '../Dto/LoginDto';
-import User from '../Dto/UserDto';
+import logIn from '../Dto/User/LoginDto';
+import User from '../Dto/User/UserDto';
 import bcrypt from 'bcryptjs';
 
 class UserRepository {
