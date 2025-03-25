@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import MessageService from "../../services/Chat/MessageServices";
 import Message from "../../Dto/Chat/MessageDTO";
 
-const UpdateTextMessageController = async (req: Request, res: Response) => {
+const deleteMessageController = async (req: Request, res: Response) => {
     try {
         const { id: userID } = req.body;
         const { id_chat, id_message } = req.params;
@@ -25,4 +25,4 @@ const UpdateTextMessageController = async (req: Request, res: Response) => {
     }
 }
 
-export default UpdateTextMessageController;
+export default deleteMessageController;
