@@ -1,8 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import bodyParser from 'body-parser';
-import userRoutes from "./routes/user";
-import productRoutes from "./routes/productoRoutes"; // Agregar rutas de productos
+
+import userRoutes from './routes/user';
+//import productRoutes from "./routes/product"; // Agregar rutas de productos
 import IARoute from './routes/IA';
 //import "./config/configDB";
 
@@ -16,7 +17,7 @@ app.use('/usuario', userRoutes);
 // app.use('/vendedor');
 // app.use('/comprador');
 // app.use('/transportador');
-app.use('/producto', productRoutes);
+// app.use('/producto');
 // app.use('/compra');
 // app.use('/chat');
 app.use('/IA', IARoute)

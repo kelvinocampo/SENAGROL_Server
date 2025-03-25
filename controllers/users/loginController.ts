@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import UserService from '../../services/UserServices';
 import generateToken from '../../Helpers/generateToken';
-import Login from "../../Dto/LoginDto";
+import Login from "../../Dto/User/LoginDto";
 
 let login = async (req: Request, res: Response) => {
   try {

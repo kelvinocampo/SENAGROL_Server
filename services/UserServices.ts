@@ -1,7 +1,7 @@
 import UserRepository from '../repositories/UserRepository';
-import User from '../Dto/UserDto';
+import User from '../Dto/User/UserDto';
 import generateHash from '../Helpers/generateHash';
-import Login from '../Dto/LoginDto';
+import Login from '../Dto/User/LoginDto';
 import generateToken from '../Helpers/generateToken';
 import bcrypt from 'bcrypt';
 
