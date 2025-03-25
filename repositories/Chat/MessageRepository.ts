@@ -70,7 +70,7 @@ class MessageRepository {
 
             // Verificar si se actualizó alguna fila
             if (result.affectedRows === 0) {
-                throw new Error('No se encontró el mensaje para actualizar');
+                throw new Error('No se encontró el mensaje para eliminar');
             }
 
             return { affectedRows: result.affectedRows };
@@ -105,7 +105,7 @@ class MessageRepository {
 
             // Verificar si se actualizó alguna fila
             if (result.affectedRows === 0) {
-                throw new Error('No se encontró el mensaje para actualizar');
+                throw new Error('No se encontró el chat para eliminar');
             }
 
             return { affectedRows: result.affectedRows };
