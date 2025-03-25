@@ -2,13 +2,14 @@ import { Request, Response } from "express";
 import MessageService from "../../services/Chat/MessageServices";
 import Message from "../../Dto/Chat/MessageDTO";
 
-const deleteChatController = async (req: Request, res: Response) => {
+const deleteMessageController = async (req: Request, res: Response) => {
     try {
         const { id: userID } = req.body;
-        const { id_chat } = req.params;
+        const { id_chat, id_message } = req.params;
 
-        const result = await MessageService.deleteChat(
+        const result = await MessageService.deleteMessage(
             parseInt(userID),
+            parseInt(id_message),
             parseInt(id_chat)
         );
 
@@ -24,4 +25,4 @@ const deleteChatController = async (req: Request, res: Response) => {
     }
 }
 
-export default deleteChatController;
+export default deleteMessageController;
