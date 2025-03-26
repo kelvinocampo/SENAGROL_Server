@@ -14,32 +14,31 @@ interface JwtPayload {
     iat: number
 }
 
-const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+// Extender Request para incluir `user`
+interface AuthenticatedRequest extends Request {
+    user?: { id_usuario: number };
+}
+const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     let authorization = req.header('Authorization');
 
     if (!authorization) {
-        return res.status(403).json(
-            { status: "The Authorization header is required" }
-        );
+        console.log("No Authorization header, permitiendo acceso público.");
+        return next();  // 🔹 Permite acceso sin autenticación
     }
 
     const token = authorization.split(' ')[1];
     if (!token) {
-        return res.status(401).json(
-            { status: 'You have not sent a token' }
-        );
+        return res.status(401).json({ status: 'You have not sent a token' });
     }
 
     try {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
-        req.body.id = decoded.data.id;
-        req.body.role = decoded.data.role;
+        req.user = { id_usuario: decoded.data.id };
         next();
     } catch (error) {
-        return res.status(403).json(
-            { status: 'Unauthorized' }
-        );
+        console.error("JWT Verification Error:", error);
+        return res.status(403).json({ error: "Token inválido o expirado", details: error });
     }
-}
+};
 
 export default verifyToken;
