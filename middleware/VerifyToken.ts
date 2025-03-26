@@ -5,7 +5,7 @@ dotenv.config();
 
 interface Data {
     id: number,
-    role: "admin" | "vendedor" | "transportador" | "comprador" | "vendedor transportador"
+    roles: "admin" | "vendedor" | "transportador" | "comprador" | "vendedor transportador"
 }
 
 interface JwtPayload {
@@ -16,7 +16,7 @@ interface JwtPayload {
 
 
 interface AuthenticatedRequest extends Request {
-    user?: { id_usuario: number };
+    user?: { id_user: number, roles: string };
 }
 
 const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -33,7 +33,7 @@ const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextF
 
     try {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
-        req.user = { id_usuario: decoded.data.id };
+        req.user = { id_user: decoded.data.id, roles: decoded.data.roles };
 
         next();
     } catch (error) {
