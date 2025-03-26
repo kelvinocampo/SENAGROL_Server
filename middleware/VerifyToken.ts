@@ -5,7 +5,7 @@ dotenv.config();
 
 interface Data {
     id: number,
-    role: "admin" | "vendedor" | "transportador" | "comprador" | "vendedor transportador"
+    // role: "admin" | "vendedor" | "transportador" | "comprador"
 }
 
 interface JwtPayload {
@@ -14,31 +14,32 @@ interface JwtPayload {
     iat: number
 }
 
-// Extender Request para incluir `user`
-interface AuthenticatedRequest extends Request {
-    user?: { id_usuario: number };
-}
-const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     let authorization = req.header('Authorization');
 
     if (!authorization) {
-        console.log("No Authorization header, permitiendo acceso público.");
-        return next();  // 🔹 Permite acceso sin autenticación
+        return res.status(403).json(
+            { status: "The Authorization header is required" }
+        );
     }
 
     const token = authorization.split(' ')[1];
     if (!token) {
-        return res.status(401).json({ status: 'You have not sent a token' });
+        return res.status(401).json(
+            { status: 'You have not sent a token' }
+        );
     }
 
     try {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
-        req.user = { id_usuario: decoded.data.id };
+        req.body.id = decoded.data.id;
+        // req.body.role = decoded.data.role;
         next();
     } catch (error) {
-        console.error("JWT Verification Error:", error);
-        return res.status(403).json({ error: "Token inválido o expirado", details: error });
+        return res.status(403).json(
+            { status: 'Unauthorized' }
+        );
     }
-};
+}
 
 export default verifyToken;
