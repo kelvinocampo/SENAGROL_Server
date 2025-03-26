@@ -3,7 +3,7 @@ import TransporterService from "../../services/TransporterService";
 import TransporterDto from "../../Dto/User/Transporter/TransporterDto";
 
 interface AuthenticatedRequest extends Request {
-  user?: { id_usuario: number }; // Ajusta según tu modelo de usuario
+  user?: { id_usuario: number }; 
 }
 
 let register = async (req: AuthenticatedRequest, res: Response) => {

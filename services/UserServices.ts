@@ -21,20 +21,27 @@ class UserService {
         if (!foundUser) {
             return { logged: false, status: "Usuario o contraseña incorrectos" };
         }
-
+    
         const isPasswordValid = await bcrypt.compare(user.password, foundUser.contraseña);
         if (!isPasswordValid) {
             return { logged: false, status: "Usuario o contraseña incorrectos" };
         }
-
-        // Obtener roles del usuario
+    
+        // 🔍 Obtener roles del usuario
         const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
-
+    
+        // ✅ Mostrar los roles en consola para depuración
+        console.log("User Roles from DB:", userRoles);
+    
         const TOKEN_DURATION = 60; 
         const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
-
-        return { logged: true, status: "Login exitoso", token, data: foundUser, roles: userRoles };
+    
+        // 📌 Agregar los roles al status
+        const statusMessage = `Login exitoso - Roles: ${userRoles.join(", ")}`;
+    
+        return { logged: true, status: statusMessage, token, data: foundUser, roles: userRoles };
     }
+    
 }
 
 export default UserService;
