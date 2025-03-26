@@ -11,9 +11,9 @@ class MessageService {
                 throw new Error("Chat no encontrado");
             }
 
-            // if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
-            //     throw new Error("No tienes permiso para enviar mensajes en este chat");
-            // }
+            if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
+                throw new Error("No tienes permiso para enviar mensajes en este chat");
+            }
 
             // 3. Guardar en base de datos
             const newMessage = await MessageRepository.createTextMessage(message);
@@ -33,9 +33,9 @@ class MessageService {
                 throw new Error("Chat no encontrado");
             }
 
-            // if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
-            //     throw new Error("No tienes permiso para enviar mensajes en este chat");
-            // }
+            if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
+                throw new Error("No tienes permiso para enviar mensajes en este chat");
+            }
 
             // 3. Editar en base de datos
             const updateMessage = await MessageRepository.updateTextMessage(message, id_message);
@@ -55,9 +55,9 @@ class MessageService {
                 throw new Error("Chat no encontrado");
             }
 
-            // if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
-            //     throw new Error("No tienes permiso para enviar mensajes en este chat");
-            // }
+            if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
+                throw new Error("No tienes permiso para enviar mensajes en este chat");
+            }
 
             // 3. Eliminar en base de datos
             const deleteMessage = await MessageRepository.deleteMessage(id_user, id_message, id_chat);
