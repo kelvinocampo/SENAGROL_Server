@@ -4,31 +4,32 @@ import generateToken from '../../Helpers/generateToken';
 import Login from "../../Dto/User/LoginDto";
 
 let login = async (req: Request, res: Response) => {
+  console.log("📌 Llega al controlador"); // Confirmar que la solicitud llega
+  
   try {
     const { identifier, password } = req.body; 
+    console.log("🔍 Identificador recibido:", identifier);
+    
     const login = await UserService.logIn(new Login(identifier, password));
+    console.log("✅ Respuesta de logIn:", login);
 
-    const TOKEN_DURATION = 60;
     if (login.logged) {
+      console.log("🔐 Generando token...");
       let token = generateToken(
         { id: login.data.id_usuario },
         process.env.KEY_TOKEN,
-        TOKEN_DURATION
+        60
       );
-      return res.status(200).json({
-        status: login.status,
-        token: token
-      });
+      console.log("✅ Token generado:", token);
+      return res.status(200).json({ status: login.status, token });
     }
     
-    return res.status(401).json({
-      status: login.status
-    });
+    console.log("❌ Login fallido:", login.status);
+    return res.status(401).json({ status: login.status });
 
   } catch (error: any) {
-    if (error && error.code == "ER_DUP_ENTRY") {
-      return res.status(500).json({ errorInfo: error.sqlMessage });
-    }
+    console.error("⚠️ Error en el login:", error);
+    return res.status(500).json({ error: "Error en el servidor" });
   }
 };
 

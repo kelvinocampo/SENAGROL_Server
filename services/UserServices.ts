@@ -27,11 +27,13 @@ class UserService {
             return { logged: false, status: "Usuario o contraseña incorrectos" };
         }
 
-        // Generar token
-        const TOKEN_DURATION = 60; 
-        const token = generateToken({ id: foundUser.id_usuario }, process.env.KEY_TOKEN, TOKEN_DURATION);
+        // Obtener roles del usuario
+        const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
 
-        return { logged: true, status: "Login exitoso", token, data: foundUser };
+        const TOKEN_DURATION = 60; 
+        const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
+
+        return { logged: true, status: "Login exitoso", token, data: foundUser, roles: userRoles };
     }
 }
 
