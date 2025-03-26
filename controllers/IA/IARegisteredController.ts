@@ -3,9 +3,10 @@ import IAService from "../../services/IAService";
 
 const IARegisteredController = async (req: Request, res: Response) => {
     try {
-        const { prompt, role, id, history = [] } = req.body;
+        const { id_user } = req.body.user;
+        const { prompt, role, history = [] } = req.body;
 
-        const responseIA = await IAService.requestRegister(prompt, role, id, history);
+        const responseIA = await IAService.requestRegister(prompt, role, id_user, history);
 
         return res.status(200).json({
             status: 'response ok',
