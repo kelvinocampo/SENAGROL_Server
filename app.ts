@@ -6,6 +6,7 @@ import userRoutes from './routes/user';
 import TransporterRoutes from './routes/transporter';
 //import productRoutes from "./routes/product"; // Agregar rutas de productos
 import IARoute from './routes/IA';
+import ChatRoutes from './routes/chat';
 
 dotenv.config();
 const app = express().use(bodyParser.json());
@@ -18,7 +19,7 @@ app.use('/usuario', userRoutes);
 app.use('/transportador', TransporterRoutes);
 // app.use('/producto');
 // app.use('/compra');
-// app.use('/chat');
+app.use('/chat', ChatRoutes);
 app.use('/IA', IARoute)
 
 app.listen(PORT, () => {
