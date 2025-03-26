@@ -1,12 +1,20 @@
-class Users{
-    private nombre: string;
-    private email: string;
-  
-    constructor(nombre: string,email: string) {
-        this.nombre = nombre;
-        this.email = email;
+class Login {
+    readonly identifier: string;
+    readonly email: string;
+    readonly username: string;
+    readonly password: string;
 
+    constructor(identifier: string, password: string) {
+        this.identifier = identifier;
+        if (identifier.includes('@')) {
+            this.email = identifier;
+            this.username = '';
+        } else {
+            this.username = identifier;
+            this.email = '';
+        }
+        this.password = password;
     }
 }
 
-/* hay que terminar este archivo  solo es un ensayo*/
+export default Login;
