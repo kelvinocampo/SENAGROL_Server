@@ -15,9 +15,16 @@ class UserRepository {
         UNION
         SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ?;
     `;
-        const result: any = await db.execute(sql, [userId, userId, userId, userId]);
-    
-        return result[0].map((row: any) => row.role);
+    const result: any = await db.execute(sql, [userId, userId, userId, userId]);
+
+    // ✅ Agregar console.log para verificar qué datos devuelve la consulta
+    console.log("Raw roles data:", result);
+
+    const roles = result[0].map((row: any) => row.role);
+    console.log("Processed roles:", roles);
+
+    return roles;
+
     }
 
     
@@ -42,13 +49,10 @@ class UserRepository {
     }
     
     static async logIn(user: logIn) {
-        console.log("llegue");
         
         const sql = 'SELECT id_usuario, contraseña FROM usuario WHERE correo = ?';
         const values = [user.email];
         const result: any = await db.execute(sql, values);
-    
-        console.log("🔍 Resultado de la consulta:", result);
     
         if (!result[0] || result[0].length === 0) {
             return { logged: false, status: "Invalid username or password" };
@@ -64,7 +68,7 @@ class UserRepository {
             return { logged: false, status: "Invalid username or password" };
         }
     
-        // Obtener roles
+       
         const roleQuery = `
             SELECT 'vendedor' AS role FROM vendedor WHERE id_usuario = ?
             UNION
@@ -77,7 +81,7 @@ class UserRepository {
         const roleResult: any = await db.execute(roleQuery, [userRecord.id_usuario, userRecord.id_usuario, userRecord.id_usuario, userRecord.id_usuario]);
     
         let roles = roleResult[0].map((row: any) => row.role);
-    
+   
         return { 
             logged: true, 
             status: "Successful authentication", 
