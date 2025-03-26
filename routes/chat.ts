@@ -15,10 +15,10 @@ import DeleteChatMiddleware from "../middleware/Chat/DeleteChat";
 import DeleteChatController from "../controllers/Chat/DeleteChat";
 const router = express.Router();
 
-router.post('/:id_chat/message/text', textMessageMiddleware.validatorParams, textMessageMiddleware.validator, textMessageController);
-router.delete('/:id_chat', DeleteChatMiddleware.validatorParams, DeleteChatMiddleware.validator, DeleteChatController);
+router.post('/:id_chat/message/text', verifyToken, textMessageMiddleware.validatorParams, textMessageMiddleware.validator, textMessageController);
+router.delete('/:id_chat', verifyToken, DeleteChatMiddleware.validatorParams, DeleteChatMiddleware.validator, DeleteChatController);
 
-router.put('/:id_chat/message/:id_message', UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);
-router.delete('/:id_chat/message/:id_message', DeleteMessageMiddleware.validatorParams, DeleteMessageMiddleware.validator, DeleteMessageController);
+router.put('/:id_chat/message/:id_message', verifyToken, UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);
+router.delete('/:id_chat/message/:id_message', verifyToken, DeleteMessageMiddleware.validatorParams, DeleteMessageMiddleware.validator, DeleteMessageController);
 
 export default router;
