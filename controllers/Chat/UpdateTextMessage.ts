@@ -4,11 +4,12 @@ import Message from "../../Dto/Chat/MessageDTO";
 
 const UpdateTextMessageController = async (req: Request, res: Response) => {
     try {
-        const { id: userID, text } = req.body;
+        const { id_user } = req.body.user;
+        const { text } = req.body;
         const { id_chat, id_message } = req.params;
 
         const result = await MessageService.updateTextMessage(
-            new Message(true, "texto", text, (new Date()), parseInt(id_chat), parseInt(userID)),
+            new Message(true, "texto", text, (new Date()), parseInt(id_chat), parseInt(id_user)),
             parseInt(id_message)
         );
 

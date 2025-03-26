@@ -3,11 +3,11 @@ import ChatService from "../../services/Chat/ChatServices";
 
 const deleteChatController = async (req: Request, res: Response) => {
     try {
-        const { id: userID } = req.body;
+        const { id_user } = req.body.user;
         const { id_chat } = req.params;
 
         const result = await ChatService.deleteChat(
-            parseInt(userID),
+            parseInt(id_user),
             parseInt(id_chat)
         );
 

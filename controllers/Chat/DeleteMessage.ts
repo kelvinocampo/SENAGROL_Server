@@ -4,11 +4,11 @@ import Message from "../../Dto/Chat/MessageDTO";
 
 const deleteMessageController = async (req: Request, res: Response) => {
     try {
-        const { id: userID } = req.body;
+        const { id_user } = req.body.user;
         const { id_chat, id_message } = req.params;
 
         const result = await MessageService.deleteMessage(
-            parseInt(userID),
+            parseInt(id_user),
             parseInt(id_message),
             parseInt(id_chat)
         );

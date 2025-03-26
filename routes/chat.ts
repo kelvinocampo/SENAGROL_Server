@@ -9,13 +9,12 @@ import UpdateTextMessageMiddleware from "../middleware/Chat/UpdateTextMessage";
 import UpdateTextMessageController from "../controllers/Chat/UpdateTextMessage";
 
 import DeleteMessageMiddleware from "../middleware/Chat/DeleteMessage";
-import DeleteMessageController from "../controllers/Chat/DeleteChat";
+import DeleteMessageController from "../controllers/Chat/DeleteMessage";
 
 import DeleteChatMiddleware from "../middleware/Chat/DeleteChat";
 import DeleteChatController from "../controllers/Chat/DeleteChat";
 const router = express.Router();
 
-// router.post('/:id_chat/message/text', verifyToken, textMessageMiddleware.validatorParams, textMessageMiddleware.validator, textMessageController);
 router.post('/:id_chat/message/text', textMessageMiddleware.validatorParams, textMessageMiddleware.validator, textMessageController);
 router.delete('/:id_chat', DeleteChatMiddleware.validatorParams, DeleteChatMiddleware.validator, DeleteChatController);
 
