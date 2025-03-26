@@ -1,7 +1,7 @@
 import { check, validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from "express";
-
 let validatorParams = [
+    
     check('identifier')
         .trim()
         .isLength({ max: 100 })
