@@ -24,10 +24,12 @@ const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextF
 
     if (!authorization) {
         return res.status(403).json({ status: "The Authorization header is required" });
+        return res.status(403).json({ status: "The Authorization header is required" });
     }
 
     const token = authorization.split(' ')[1];
     if (!token) {
+        return res.status(401).json({ status: 'You have not sent a token' });
         return res.status(401).json({ status: 'You have not sent a token' });
     }
 
@@ -39,7 +41,11 @@ const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextF
     } catch (error) {
         console.error("JWT Verification Error:", error);
         return res.status(403).json({ error: "Token inválido o expirado", details: error });
+        console.error("JWT Verification Error:", error);
+        return res.status(403).json({ error: "Token inválido o expirado", details: error });
     }
+};
 };
 
 export default verifyToken;
+

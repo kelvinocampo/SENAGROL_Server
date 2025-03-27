@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS comprador(
 DROP TABLE IF EXISTS vendedor;
 CREATE TABLE IF NOT EXISTS vendedor(
     id_vendedor INT PRIMARY KEY,
-
+    estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
     FOREIGN KEY (id_vendedor)
     REFERENCES usuario(id_usuario)
 );
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS transportador(
     tarjeta_propiedad_vehiculo VARCHAR(50),
     tipo_vehiculo VARCHAR(50),
     peso_vehiculo DECIMAL(10, 2),
-
+    estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
     FOREIGN KEY (id_transportador)
     REFERENCES usuario(id_usuario)
 );

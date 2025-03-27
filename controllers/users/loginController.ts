@@ -5,7 +5,7 @@ import Login from "../../Dto/User/LoginDto";
 
 let login = async (req: Request, res: Response) => {
   try {
-    const { identifier, password } = req.body;
+    const { identifier, password } = req.body; 
     
     const login = await UserService.logIn(new Login(identifier, password));
 
