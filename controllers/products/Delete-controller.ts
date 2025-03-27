@@ -1,28 +1,31 @@
 import { Request, Response } from "express";
-import db from "../../config/configDB"; 
+import ProductService from "../../services/ProductService";
 
-let deleteProduct = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
+interface AuthenticatedRequest extends Request {
+    user?: { id_usuario: number };
+}
 
-        if (!id) {
-            return res.status(400).json({ error: "Falta el ID del producto" });
+class DeleteProducts {
+    static async deleteProduct(req: AuthenticatedRequest, res: Response) {
+        try {
+            const userId = req.user?.id_usuario;
+            const { id } = req.params;
+
+            if (!userId) {
+                return res.status(401).json({ error: "Usuario no autenticado" });
+            }
+
+            if (!id) {
+                return res.status(400).json({ error: "Falta el ID del producto" });
+            }
+
+            const result = await ProductService.deleteProduct(userId, parseInt(id));
+            return res.status(200).json(result);
+
+        } catch (error: any) {
+            return res.status(403).json({ error: error.message });
         }
-
-
-        const deleteSql = `DELETE FROM producto WHERE id_producto = ?`;
-        const [result]: any = await db.execute(deleteSql, [id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Producto no encontrado" });
-        }
-
-        return res.status(200).json({ status: "Producto eliminado correctamente" });
-
-    } catch (error: any) {
-        console.error("Error al eliminar el producto:", error);
-        return res.status(500).json({ error: "Error interno del servidor" });
     }
-};
+}
 
-export default deleteProduct;
+export default DeleteProducts;

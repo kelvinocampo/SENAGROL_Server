@@ -1,80 +1,81 @@
-import db from "../config/configDB";
 import Product from "../Dto/Products/ProductsCreate";
-import ProductRepository from "../repositories/PruductRepository"
+import ProductRepository from "../repositories/PruductRepository";
 
-
-class ProductService { 
-
+class ProductService {
     //  Registrar un nuevo producto
     static async register(product: Product) {
-        const checkVendedor = `SELECT * FROM vendedor WHERE id_vendedor = ?`;
-        const [vendedorExistente]: any = await db.execute(checkVendedor, [product.userId]);
+        try {
+            // Verificar si el usuario es un vendedor antes de registrar el producto
+            const vendedor = await ProductRepository.findSellerById(product.userId);
+            if (!vendedor) {
+                return { success: false, message: "Acceso denegado. Solo los vendedores pueden registrar productos." };
+            }
 
-        if (vendedorExistente.length === 0) {
-            throw new Error("El vendedor no está registrado.");
+            // Si es vendedor, proceder con la creación del producto
+            await ProductRepository.createProduct(product);
+            return { success: true, message: "Producto registrado exitosamente." };
+
+        } catch (error) {
+            console.error("Error en ProductService.register:", error);
+            return { success: false, message: "Error interno del servidor." };
         }
-
-        const sql = `
-            INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, id_vendedor)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        const values = [
-            product.Nombre, 
-            product.Description,
-            product.latitud || null, 
-            product.longitud || null,
-            product.quantity || 0,
-            product.MinimumQuantity || 0,
-            product.imagen || null,
-            product.Precio || 0, 
-            product.Discount || 0,
-            product.userId
-        ];
-
-        await db.execute(sql, values);
     }
 
-    //   todos los productos
+    // Obtener todos los productos
     static async getAll() {
-        const sql = "SELECT * FROM producto";
-        const [products]: any = await db.execute(sql);
-        return products;
+        return await ProductRepository.getAll();
     }
 
-    
+    // Actualizar producto
+    static async updateProduct(id: number, productData: any) {
+        try {
+            const existingProduct = await ProductRepository.findById(id);
+            if (!existingProduct) {
+                return { success: false, message: "Producto no encontrado" };
+            }
 
+            const { Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagen, Discount } = productData;
 
-    //  Actualizar un producto 
-    
+            if (!Nombre || !Precio || !latitud || !longitud || !quantity || !MinimumQuantity || Discount === undefined) {
+                return { success: false, message: "Todos los campos son obligatorios para una actualización completa." };
+            }
+
+            const values = [Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagen, Discount];
+            await ProductRepository.update(id, values);
+            return { success: true, message: "Producto actualizado correctamente." };
+        } catch (error) {
+            console.error("Error en ProductService.updateProduct:", error);
+            return { success: false, message: "Error interno del servidor." };
+        }
+    }
 
  
     
-        static async updateProduct(id: number, productData: any) {
-            const existingProduct = await ProductRepository.findById(id);
-            if (!existingProduct) {
-                throw new Error("Producto no encontrado");
+        static async deleteProduct(userId: number, productId: number) {
+            // Verificar si el usuario es un vendedor
+            const isSeller = await ProductRepository.findSellerById(userId);
+            if (!isSeller) {
+                throw new Error("Solo los vendedores pueden eliminar productos.");
             }
     
-            const { Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagen, Discount } = productData;
-    
-            if (!Nombre || !Precio || !latitud || !longitud || !quantity || !MinimumQuantity || Discount === undefined) {
-                throw new Error("Todos los campos son obligatorios para una actualización completa.");
+            // Verificar si el producto existe y pertenece al vendedor
+            const productOwner = await ProductRepository.findProductOwner(productId);
+            if (!productOwner) {
+                throw new Error("Producto no encontrado.");
             }
     
-            const values = [Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagen, Discount];
-            await ProductRepository.update(id, values);
+            if (productOwner !== userId) {
+                throw new Error("No puedes eliminar un producto que no te pertenece.");
+            }
+    
+            // Eliminar el producto
+            await ProductRepository.deleteProduct(productId);
+            return { success: true, message: "Producto eliminado correctamente." };
         }
+    }
     
-    
-    
+ 
     
 
-    //  Eliminar un producto
-    static async delete(productId: number) {
-        const sql = "DELETE FROM producto WHERE id_producto = ?";
-        await db.execute(sql, [productId]);
-    }
-}
 
 export default ProductService;

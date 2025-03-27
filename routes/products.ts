@@ -18,7 +18,7 @@ const router = express.Router();
 router.get('/my_products', verifyToken,GetAllProducts);
 router.post('/create',verifyToken,CreateValidator.validatorParams,CreateValidator.validator, RegisterProducts);
 router.put('/edit/:id',verifyToken,UpdateValidator.validatorParams,UpdateValidator.validator, UpdateProducts);
-router.delete('/delete/:id',verifyToken, DeleteValidator.validatorParams, DeleteValidator.validator, DeleteProducts);
+router.delete('/delete/:id',verifyToken, DeleteValidator.validatorParams, DeleteValidator.validator, DeleteProducts.deleteProduct);
 
 
 export default router;  

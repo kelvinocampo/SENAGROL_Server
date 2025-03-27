@@ -9,6 +9,12 @@ class ProductRepository {
     }
 
     static async createProduct(product: Product) {
+        // Verificar si el usuario es un vendedor antes de registrar el producto
+        const vendedor = await this.findSellerById(product.userId);
+        if (!vendedor) {
+            throw new Error("Acceso denegado. Solo los vendedores pueden registrar productos.");
+        }
+
         const ProductSql = `
             INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, id_vendedor)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -45,10 +51,27 @@ class ProductRepository {
         `;
         await db.execute(updateSql, [...values, id]);
     }
+    static async getAll() {
+        const sql = "SELECT * FROM producto";
+        const [products]: any = await db.execute(sql);
+        return products;
+    }
 
 
+    // Obtener el vendedor de un producto específico
+    static async findProductOwner(productId: number) {
+        const query = `SELECT id_vendedor FROM producto WHERE id_producto = ?`;
+        const [result]: any = await db.execute(query, [productId]);
+        return result.length ? result[0].id_vendedor : null;
+    }
 
-
+    // Eliminar el producto si el vendedor es el dueño
+    static async deleteProduct(productId: number) {
+        const query = `DELETE FROM producto WHERE id_producto = ?`;
+        const [result]: any = await db.execute(query, [productId]);
+        return result;
+    }
+    
 }
 
 export default ProductRepository;

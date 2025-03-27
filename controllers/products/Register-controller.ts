@@ -2,18 +2,27 @@ import { Request, Response } from "express";
 import productDto from "../../Dto/Products/ProductsCreate";
 import ProductService from "../../services/ProductService";
 
-/* interface AuthenticatedRequest extends Request {
-    user?: { id_usuario: number };
-} */
+interface AuthenticatedRequest extends Request {
+    user?: { id_usuario: number, roles: string[] }; // Agregar roles
+}
 
-let registerProducts = async (req: Request, res: Response) => {
+let registerProducts = async (req: AuthenticatedRequest, res: Response) => {
     try {
+        const userId = req.user?.id_usuario;
+        const userRoles = req.user?.roles || [];
 
-        const userId = 1; // valor por defecto, asegurándote de que exista en la tabla "vendedor"
-       
+        // Validar que el usuario está autenticado
+        if (!userId) {
+            return res.status(401).json({ error: "Usuario no autenticado" });
+        }
 
+        // Validar que el usuario es un vendedor
+        if (!userRoles.includes("vendedor") && !userRoles.includes("vendedor ")) {
+            return res.status(403).json({ error: "Acceso denegado. Solo los vendedores pueden registrar productos." });
+        }
+
+        // Extraer datos del cuerpo de la petición
         const {
-            
             Nombre,
             Precio,
             Description,
@@ -29,7 +38,8 @@ let registerProducts = async (req: Request, res: Response) => {
             return res.status(400).json({ error: "Faltan datos obligatorios" });
         }
 
-        const newProduct = new productDto( userId,Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagen, Discount);
+        // Crear DTO y registrar producto
+        const newProduct = new productDto(userId, Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagen, Discount);
         await ProductService.register(newProduct);
 
         return res.status(201).json({ status: 'register ok' });

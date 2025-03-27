@@ -1,7 +1,7 @@
 import UserRepository from '../repositories/UserRepository';
-import User from '../Dto/UserDto';
+import User from '../Dto/User/UserDto';
 import generateHash from '../Helpers/generateHash';
-import Login from '../Dto/LoginDto';
+import Login from '../Dto/User/LoginDto';
 import generateToken from '../Helpers/generateToken';
 import bcrypt from 'bcryptjs';
 
@@ -11,13 +11,14 @@ class UserService {
         user.password = await generateHash(user.password);
         return await UserRepository.add(user);
     }
-    static async getByID(id:number) {
+
+    static async getByID(id: number) {
         return await UserRepository.getByID(id);
     }
-    
+
     static async logIn(user: Login) {
         const foundUser = await UserRepository.findByEmailOrUsername(user.identifier);
-       
+
         if (!foundUser) {
             return { logged: false, status: "Usuario o contraseña incorrectos" };
         }
@@ -27,14 +28,14 @@ class UserService {
             return { logged: false, status: "Usuario o contraseña incorrectos" };
         }
 
-        // Obtener roles del usuario
-        const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
+        const userRoles = (await UserRepository.getUserRoles(foundUser.id_usuario)).join(" ");
 
-        const TOKEN_DURATION = 60; 
+        const TOKEN_DURATION = 60;
         const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
 
         return { logged: true, status: "Login exitoso", token, data: foundUser, roles: userRoles };
     }
+
 }
 
 export default UserService;
