@@ -4,6 +4,9 @@ import bodyParser from 'body-parser';
 
 import userRoutes from './routes/user';
 import TransporterRoutes from './routes/transporter';
+import SellerRoutes from './routes/seller'; 
+
+
 
 //import productRoutes from "./routes/product"; // Agregar rutas de productos
 import IARoute from './routes/IA';
@@ -14,12 +17,12 @@ const app = express().use(bodyParser.json());
 const PORT = process.env.PORT || 10101;
 
 app.use('/usuario', userRoutes);
-
-
+app.use('/vendedor', SellerRoutes);
+app.use('/transportador', TransporterRoutes);
 // app.use('/admin');
-// app.use('/vendedor');
+
 // app.use('/comprador');
-app.use('/transportador',TransporterRoutes);
+
 // app.use('/producto');
 // app.use('/compra');
 // app.use('/chat');

@@ -17,7 +17,6 @@ class UserRepository {
     `;
     const result: any = await db.execute(sql, [userId, userId, userId, userId]);
 
-    // ✅ Agregar console.log para verificar qué datos devuelve la consulta
     console.log("Raw roles data:", result);
 
     const roles = result[0].map((row: any) => row.role);
@@ -31,16 +30,19 @@ class UserRepository {
     static async add(user: User) {
         const sql = `INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, cara, telefono) 
                      VALUES (?, ?, ?, ?, ?, ?)`;
-        const values = [
-            user.name, 
-            user.username, 
-            user.email, 
-            user.password, 
-            user.faceScan, 
-            user.phoneNumber
-        ];
-        return db.execute(sql, values);
+        const values = [user.name, user.username, user.email, user.password, user.faceScan, user.phoneNumber];
+    
+        const [result]: any = await db.execute(sql, values);
+    
+    
+        if (!result || typeof result.insertId !== "number") {
+            throw new Error("Error al insertar usuario: insertId no válido");
+        }
+    
+        return result; 
     }
+    
+    
 
     static async getByID(id: number) {
         const sql = 'SELECT * FROM usuario WHERE id_usuario = ?';

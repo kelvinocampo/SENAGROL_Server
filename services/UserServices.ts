@@ -1,17 +1,52 @@
-import UserRepository from '../repositories/UserRepository';
-import User from '../Dto/User/UserDto';
-import generateHash from '../Helpers/generateHash';
-import Login from '../Dto/User/LoginDto';
-import generateToken from '../Helpers/generateToken';
-import bcrypt from 'bcrypt';
-
+import UserRepository from "../repositories/UserRepository";
+import User from "../Dto/User/UserDto";
+import generateHash from "../Helpers/generateHash";
+import Login from "../Dto/User/LoginDto";
+import generateToken from "../Helpers/generateToken";
+import bcrypt from "bcrypt";
+import db from "../config/configDB"; 
 
 class UserService {
+    
     static async register(user: User) {
-        user.password = await generateHash(user.password);
-        return await UserRepository.add(user);
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+            
+            user.password = await generateHash(user.password);
+
+            const result = await UserRepository.add(user);
+            
+            const userId = result.insertId;
+            
+            if (!userId || typeof userId !== "number") {
+                throw new Error("ID de usuario no válido");
+            }
+            
+            
+
+            
+            if (!userId || typeof userId !== "number") {
+                throw new Error("ID de usuario no válido");
+            }
+
+            await connection.query(
+                `INSERT INTO comprador (id_comprador) VALUES (?)`, 
+                [userId]
+            );
+
+            await connection.commit(); 
+            return { success: true, status: "Usuario registrado como comprador" };
+        } catch (error) {
+            await connection.rollback(); 
+            console.error("Error en el registro:", error);
+            throw error;
+        } finally {
+            connection.release(); 
+        }
     }
-    static async getByID(id:number) {
+
+    static async getByID(id: number) {
         return await UserRepository.getByID(id);
     }
     
@@ -33,10 +68,9 @@ class UserService {
         const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
     
         const statusMessage = `Login exitoso - Roles: ${userRoles.join(", ")}`;
-    
+
         return { logged: true, status: statusMessage, token, data: foundUser, roles: userRoles };
     }
-    
 }
 
 export default UserService;
