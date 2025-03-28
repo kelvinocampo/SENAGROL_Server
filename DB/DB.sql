@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS compra(
 
     id_vendedor INT,
     FOREIGN KEY (id_vendedor)
-    REFERENCES vendedor(id_vendedor),
+    REFERENCES producto(id_vendedor),
 
     id_comprador INT,
     FOREIGN KEY (id_comprador)
