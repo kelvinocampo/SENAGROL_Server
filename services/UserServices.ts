@@ -36,7 +36,6 @@ class UserService {
         }
 
         const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
-
         const TOKEN_DURATION = 60;
         const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
 
