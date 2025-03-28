@@ -138,7 +138,11 @@ CREATE TABLE IF NOT EXISTS mensaje(
     id_user INT
 );
 
+INSERT INTO usuario (nombre,nombre_usuario,correo,contraseña,cara,telefono)
+VALUES ("admin","admin","admin@example.com","$2a$10$fGPt3cnV4miVQLMlBriZauklh/az2kVFVsMQWRepXdr/WGnRIJMgq", "https://github.com/kelvinocampo/SENAGROL_Server", "1234567890");
+-- $2a$10$fGPt3cnV4miVQLMlBriZauklh/az2kVFVsMQWRepXdr/WGnRIJMgq  = 12345678Ko@
 
+INSERT INTO administrador (id_administrador) VALUES (1);
 
 
 
