@@ -2,33 +2,30 @@ import express from "express";
 import dotenv from "dotenv";
 import bodyParser from 'body-parser';
 
-import userRoutes from './routes/user';
-import TransporterRoutes from './routes/transporter';
+import UserRoutes from './routes/user';
 import SellerRoutes from './routes/seller'; 
-
-
-
-//import productRoutes from "./routes/product"; // Agregar rutas de productos
+import ProductRoutes from "./routes/product";
 import TransporterRoutes from './routes/transporter';
-//import productRoutes from "./routes/product"; // Agregar rutas de productos
-import IARoute from './routes/IA';
+import IARoutes from './routes/IA';
 import ChatRoutes from './routes/chat';
+import AdminRoutes from  './routes/admin'
+import BuyerRoutes from  './routes/buyer'
+import BuyRoutes from './routes/buy'
 
 dotenv.config();
 const app = express().use(bodyParser.json());
 const PORT = process.env.PORT || 10101;
 
-app.use('/usuario', userRoutes);
+app.use('/usuario', UserRoutes);
 app.use('/vendedor', SellerRoutes);
 app.use('/transportador', TransporterRoutes);
-// app.use('/admin');
-
-// app.use('/comprador');
+app.use('/admin', AdminRoutes);
+app.use('/comprador', BuyerRoutes);
 app.use('/transportador', TransporterRoutes);
-// app.use('/producto');
-// app.use('/compra');
+app.use('/producto', ProductRoutes);
+app.use('/compra', BuyRoutes);
 app.use('/chat', ChatRoutes);
-app.use('/IA', IARoute)
+app.use('/IA', IARoutes)
 
 app.listen(PORT, () => {
     console.log("Servidor ejecutándose en el puerto: ", PORT);
