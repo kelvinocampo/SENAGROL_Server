@@ -1,14 +1,14 @@
 import { check, validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from "express";
+
 let validatorParams = [
-    
     check('identifier')
         .trim()
         .isLength({ max: 100 })
         .withMessage('El identificador no puede exceder los 100 caracteres.')
         .custom(value => {
             const isEmail = /\S+@\S+\.\S+/.test(value); // Verifica si es email
-            const isUsername = /^[a-zA-Z0-9_.-]+$/.test(value); // Verifica si es usuario
+            const isUsername = /^[a-zA-Z0-9_.-]+$/.test(value); // Verifica si es nombre usuario
             if (!isEmail && !isUsername) {
                 throw new Error('Debe proporcionar un usuario o correo válido.');
             }

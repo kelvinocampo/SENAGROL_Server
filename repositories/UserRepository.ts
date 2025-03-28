@@ -1,5 +1,7 @@
 import db from '../config/configDB';
+import logIn from '../Dto/User/LoginDto';
 import User from '../Dto/User/UserDto';
+import bcrypt from 'bcryptjs';
 
 class UserRepository {
 
@@ -15,23 +17,19 @@ class UserRepository {
     `;
         const result: any = await db.execute(sql, [userId, userId, userId, userId]);
 
-        const roles = result[0].map((row: any) => row.role);
-
+        const roles = (result[0].map((row: any) => row.role)).join(" ");
         return roles;
     }
 
+
     static async add(user: User) {
         const sql = `INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, cara, telefono) 
-                    VALUES (?, ?, ?, ?, ?, ?)`;
-        const values = [
-            user.name,
-            user.username,
-            user.email,
-            user.password,
-            user.faceScan,
-            user.phoneNumber
-        ];
-        return db.execute(sql, values);
+                     VALUES (?, ?, ?, ?, ?, ?)`;
+        const values = [user.name, user.username, user.email, user.password, user.faceScan, user.phoneNumber];
+
+        const [result]: any = await db.execute(sql, values);
+
+        return result.insertId;
     }
 
     static async getByID(id: number) {

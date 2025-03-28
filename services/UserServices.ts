@@ -1,15 +1,22 @@
-import UserRepository from '../repositories/UserRepository';
-import User from '../Dto/User/UserDto';
-import generateHash from '../Helpers/generateHash';
-import Login from '../Dto/User/LoginDto';
-import generateToken from '../Helpers/generateToken';
-import bcrypt from 'bcryptjs';
-
+import UserRepository from "../repositories/UserRepository";
+import User from "../Dto/User/UserDto";
+import generateHash from "../Helpers/generateHash";
+import Login from "../Dto/User/LoginDto";
+import generateToken from "../Helpers/generateToken";
+import bcrypt from "bcryptjs";
+import BuyerRepository from "../repositories/BuyerRepository";
 
 class UserService {
+
     static async register(user: User) {
+
         user.password = await generateHash(user.password);
-        return await UserRepository.add(user);
+
+        const id_user = await UserRepository.add(user);
+
+        const registerBuyer = await BuyerRepository.add(id_user)
+
+        return { success: true, status: "Usuario registrado" };
     }
 
     static async getByID(id: number) {
@@ -28,14 +35,12 @@ class UserService {
             return { logged: false, status: "Usuario o contraseña incorrectos" };
         }
 
-        const userRoles = (await UserRepository.getUserRoles(foundUser.id_usuario)).join(" ");
-
+        const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
         const TOKEN_DURATION = 60;
         const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
 
-        return { logged: true, status: "Login exitoso", token, data: foundUser, roles: userRoles };
+        return { logged: true, status: "Login exitoso", token: token };
     }
-
 }
 
 export default UserService;

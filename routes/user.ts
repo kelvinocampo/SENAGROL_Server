@@ -12,3 +12,4 @@ router.post('/edit', verifyToken);
 router.post('/profile', verifyToken);
 
 export default router;
+

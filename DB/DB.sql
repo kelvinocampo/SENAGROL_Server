@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS comprador(
 DROP TABLE IF EXISTS vendedor;
 CREATE TABLE IF NOT EXISTS vendedor(
     id_vendedor INT PRIMARY KEY,
-
+    estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
     FOREIGN KEY (id_vendedor)
     REFERENCES usuario(id_usuario)
 );
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS transportador(
     tarjeta_propiedad_vehiculo VARCHAR(50),
     tipo_vehiculo VARCHAR(50),
     peso_vehiculo DECIMAL(10, 2),
-
+    estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
     FOREIGN KEY (id_transportador)
     REFERENCES usuario(id_usuario)
 );
@@ -108,7 +108,10 @@ CREATE TABLE IF NOT EXISTS compra(
 DROP TABLE IF EXISTS chat;
 CREATE TABLE IF NOT EXISTS chat(
     id_chat INT PRIMARY KEY AUTO_INCREMENT,
-    bloqueado_por INT NULL,
+    bloqueado_user1 BOOLEAN NULL,
+    bloqueado_user2 BOOLEAN NULL,
+    eliminado_user1 BOOLEAN NULL,
+    eliminado_user2 BOOLEAN NULL,
     fecha_reciente DATETIME,
 
     id_user1 INT,
@@ -135,7 +138,11 @@ CREATE TABLE IF NOT EXISTS mensaje(
     id_user INT
 );
 
+INSERT INTO usuario (nombre,nombre_usuario,correo,contraseña,cara,telefono)
+VALUES ("admin","admin","admin@example.com","$2a$10$fGPt3cnV4miVQLMlBriZauklh/az2kVFVsMQWRepXdr/WGnRIJMgq", "https://github.com/kelvinocampo/SENAGROL_Server", "1234567890");
+-- $2a$10$fGPt3cnV4miVQLMlBriZauklh/az2kVFVsMQWRepXdr/WGnRIJMgq  = 12345678Ko@
 
+INSERT INTO administrador (id_administrador) VALUES (1);
 
 
 
