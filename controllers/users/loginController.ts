@@ -5,19 +5,13 @@ import Login from "../../Dto/User/LoginDto";
 
 let login = async (req: Request, res: Response) => {
   try {
-    const { identifier, password } = req.body; 
-    
+    const { identifier, password } = req.body;
+
     const login = await UserService.logIn(new Login(identifier, password));
 
     if (login.logged) {
-      let token = generateToken(
-        { id: login.data.id_usuario },
-        process.env.KEY_TOKEN,
-        60
-      );
-      return res.status(200).json({ status: login.status, token });
+      return res.status(200).json({ status: login.status, token: login.token });
     }
-    
     return res.status(401).json({ status: login.status });
 
   } catch (error: any) {
