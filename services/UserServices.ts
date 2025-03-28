@@ -4,43 +4,19 @@ import generateHash from "../Helpers/generateHash";
 import Login from "../Dto/User/LoginDto";
 import generateToken from "../Helpers/generateToken";
 import bcrypt from "bcryptjs";
-import db from "../config/configDB";
+import BuyerRepository from "../repositories/BuyerRepository";
 
 class UserService {
 
     static async register(user: User) {
-        const connection = await db.getConnection();
-        try {
-            await connection.beginTransaction();
 
-            user.password = await generateHash(user.password);
+        user.password = await generateHash(user.password);
 
-            const result = await UserRepository.add(user);
+        const id_user = await UserRepository.add(user);
 
-            const userId = result.insertId;
+        const registerBuyer = await BuyerRepository.add(id_user)
 
-            if (!userId || typeof userId !== "number") {
-                throw new Error("ID de usuario no válido");
-            }
-
-            if (!userId || typeof userId !== "number") {
-                throw new Error("ID de usuario no válido");
-            }
-
-            await connection.query(
-                `INSERT INTO comprador (id_comprador) VALUES (?)`,
-                [userId]
-            );
-
-            await connection.commit();
-            return { success: true, status: "Usuario registrado como comprador" };
-        } catch (error) {
-            await connection.rollback();
-            console.error("Error en el registro:", error);
-            throw error;
-        } finally {
-            connection.release();
-        }
+        return { success: true, status: "Usuario registrado" };
     }
 
     static async getByID(id: number) {

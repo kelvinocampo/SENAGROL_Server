@@ -29,12 +29,7 @@ class UserRepository {
 
         const [result]: any = await db.execute(sql, values);
 
-
-        if (!result || typeof result.insertId !== "number") {
-            throw new Error("Error al insertar usuario: insertId no válido");
-        }
-
-        return result;
+        return result.insertId;
     }
 
     static async getByID(id: number) {
