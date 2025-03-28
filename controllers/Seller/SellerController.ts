@@ -2,14 +2,11 @@ import { Request, Response } from "express";
 import VendedorService from "../../services/SellerServices";
 
 interface AuthenticatedRequest extends Request {
-  user?: { id_usuario: number };
+  user?: { id_user: number };
 }
-
-
   const SellerController = async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const userId = req.user?.id_usuario;
-
+      const userId = req.user?.id_user;
       if (!userId) {
         return res.status(401).json({ error: "Usuario no autenticado" });
       }

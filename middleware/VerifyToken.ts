@@ -21,7 +21,7 @@ interface AuthenticatedRequest extends Request {
 
 const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     let authorization = req.header('Authorization');
-
+   
     if (!authorization) {
         return res.status(403).json({ status: "The Authorization header is required" });
     }
@@ -33,13 +33,12 @@ const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextF
 
     try {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
-        req.body.user = { id_user: decoded.data.id, roles: decoded.data.roles };
-
+        req.user = { id_user: decoded.data.id, roles: decoded.data.roles };
         next();
     } catch (error) {
-        console.error("JWT Verification Error:", error);
         return res.status(403).json({ error: "Token inválido o expirado", details: error });
     }
+    
 };
 
 export default verifyToken;
