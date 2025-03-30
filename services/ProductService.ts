@@ -1,5 +1,5 @@
 import Product from "../Dto/Products/ProductsCreate";
-import ProductRepository from "../repositories/PruductRepository";
+import ProductRepository from "../repositories/ProductRepository";
 
 class ProductService {
     //  Registrar un nuevo producto

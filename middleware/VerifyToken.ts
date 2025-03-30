@@ -14,12 +14,7 @@ interface JwtPayload {
     iat: number
 }
 
-
-interface AuthenticatedRequest extends Request {
-    user?: { id_user: number, roles: string };
-}
-
-const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     let authorization = req.header('Authorization');
    
     if (!authorization) {

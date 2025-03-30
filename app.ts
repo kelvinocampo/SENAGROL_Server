@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 import bodyParser from 'body-parser';
 
 import UserRoutes from './routes/user';
-import SellerRoutes from './routes/seller'; 
+import SellerRoutes from './routes/seller';
 import ProductRoutes from "./routes/product";
 import TransporterRoutes from './routes/transporter';
 import IARoutes from './routes/IA';
 import ChatRoutes from './routes/chat';
-import AdminRoutes from  './routes/admin'
-import BuyerRoutes from  './routes/buyer'
+import AdminRoutes from './routes/admin'
+import BuyerRoutes from './routes/buyer'
 import BuyRoutes from './routes/buy'
 
 dotenv.config();

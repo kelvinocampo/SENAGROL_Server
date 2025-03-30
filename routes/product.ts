@@ -1,16 +1,25 @@
-import { Router } from 'express';
-import * as productoController from '../controllers/Producto/productoController';
 
-const router = Router();
+import express from "express";
+import GetAllProducts from "../controllers/products/GetAll-controller";
 
-// Endpoint para obtener productos con descuento
-router.get('/discount', productoController.getProductosConDescuento);
+import RegisterProducts from "../controllers/products/Register-controller";
+import CreateValidator from "../middleware/Products/CreateValidator";
 
-// Endpoint para obtener todos los productos (admin)
-router.get('/', productoController.getProductos);
+import UpdateProducts from "../controllers/products/Update-controller";
+import UpdateValidator from "../middleware/Products/UpdateValidator";
 
-// Endpoint para obtener información de un producto específico
-router.get('/:id', productoController.getProductoById);
+import DeleteProducts from "../controllers/products/Delete-controller";
+import DeleteValidator from "../middleware/Products/DeleteValidator";
+
+import verifyToken from "../middleware/VerifyToken";
+
+const router = express.Router();
+
+router.get('/my_products', verifyToken, GetAllProducts);
+router.post('/create', verifyToken, CreateValidator.validatorParams, CreateValidator.validator, RegisterProducts);
+router.put('/edit/:id', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateProducts);
+router.delete('/delete/:id', verifyToken, DeleteValidator.validatorParams, DeleteValidator.validator, DeleteProducts.deleteProduct);
+
 
 export default router;
 

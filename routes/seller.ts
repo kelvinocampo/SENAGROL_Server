@@ -1,11 +1,9 @@
 import express from "express";
-import SellerController from "../controllers/Seller/SellerController";
+import RequestSeller from "../controllers/Seller/RequestSeller";
 import verifyToken from "../middleware/VerifyToken";
 
 const router = express.Router();
 
-router.post('/requestSeller',verifyToken, SellerController);
-
-
+router.post('/requestSeller', verifyToken, RequestSeller);
 
 export default router;

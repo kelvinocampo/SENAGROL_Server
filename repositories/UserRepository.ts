@@ -23,9 +23,9 @@ class UserRepository {
 
 
     static async add(user: User) {
-        const sql = `INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, cara, telefono) 
-                     VALUES (?, ?, ?, ?, ?, ?)`;
-        const values = [user.name, user.username, user.email, user.password, user.faceScan, user.phoneNumber];
+        const sql = `INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, telefono) 
+                     VALUES (?, ?, ?, ?, ?)`;
+        const values = [user.name, user.username, user.email, user.password, user.phoneNumber];
 
         const [result]: any = await db.execute(sql, values);
 

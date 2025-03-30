@@ -30,13 +30,6 @@ let validatorParams = [
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
         .withMessage('La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un carácter especial.'),
 
-    check('faceScan')
-        .trim()
-        .isURL()
-        .withMessage('La foto debe ser una URL válida.')
-        .isLength({ max: 255 })
-        .withMessage('La URL de la foto no puede exceder los 255 caracteres.'),
-
     check('phone')
         .trim()
         .isLength({ min: 10, max: 15 })

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import ProductService from "../../services/ProductService";
-import ProductRepository from "../../repositories/PruductRepository"; // Asegurar que el repositorio maneje la validación del vendedor
+import ProductRepository from "../../repositories/ProductRepository"; // Asegurar que el repositorio maneje la validación del vendedor
 
 interface AuthenticatedRequest extends Request {
     user?: { id_usuario: number };

@@ -3,7 +3,6 @@ class User {
     private _username: string;
     private _email: string;
     private _password: string;
-    private _faceScan: string;
     private _phoneNumber: string;
 
     // Constructor
@@ -12,14 +11,12 @@ class User {
         username: string,
         email: string,
         password: string,
-        faceScan: string,
         phoneNumber: string
     ) {
         this._name = name;
         this._username = username;
         this._email = email;
         this._password = password;
-        this._faceScan = faceScan;
         this._phoneNumber = phoneNumber;
     }
 
@@ -56,14 +53,6 @@ class User {
 
     set password(password: string) {
         this._password = password;
-    }
-
-    get faceScan(): string {
-        return this._faceScan;
-    }
-
-    set faceScan(faceScan: string) {
-        this._faceScan = faceScan;
     }
 
     get phoneNumber(): string {

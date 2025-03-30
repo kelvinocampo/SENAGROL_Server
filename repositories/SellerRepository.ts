@@ -1,10 +1,26 @@
 import db from "../config/configDB";
-import SellerRepository from "../repositories/SellerRepository";
 
-class VendedorService {
+class SellerRepository {
     static async requestSeller(userId: number) {
-        const result = await SellerRepository.requestSeller(userId)
-        return result;
+        const [existingSeller]: any = await db.execute(
+            "SELECT estado FROM vendedor WHERE id_vendedor = ?", 
+            [userId]
+        );
+
+        if (existingSeller.length > 0) {
+            if (existingSeller[0].estado === 'Pendiente') {
+                return { success: false, message: "Ya tienes una solicitud pendiente." };
+            }
+            return { success: false, message: "Ya eres vendedor." };
+        }
+
+        // Insertar una nueva solicitud de vendedor
+        await db.execute(
+            "INSERT INTO vendedor (id_vendedor, estado) VALUES (?, 'Pendiente')", 
+            [userId]
+        );
+
+        return { success: true, message: "Solicitud enviada correctamente." };
     }
 
     static async aprobarSolicitud(adminId: number, userId: number) {
@@ -68,4 +84,4 @@ class VendedorService {
     }
 }
 
-export default VendedorService;
+export default SellerRepository;
