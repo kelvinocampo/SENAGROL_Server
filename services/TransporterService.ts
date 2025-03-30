@@ -5,6 +5,7 @@ import generateHash from '../Helpers/generateHash';
 
 class TransporterService {
     static async register(transporter: TransporterDto) {
+        // 1. Verificar si el usuario ya es transportador
         const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
         const [existingTransporter]: any = await db.execute(checkSql, [transporter.userId]);
 

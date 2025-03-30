@@ -33,7 +33,7 @@ const verifyToken = async (req: AuthenticatedRequest, res: Response, next: NextF
 
     try {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
-        req.user = { id_user: decoded.data.id, roles: decoded.data.roles };
+        req.body.user = { id_user: decoded.data.id, roles: decoded.data.roles };
         next();
     } catch (error) {
         return res.status(403).json({ error: "Token inválido o expirado", details: error });
