@@ -1,6 +1,6 @@
 import express from "express";
 import verifyToken from "../middleware/VerifyToken";
-import RegisterTransporterController from '../controllers/transporters/RegisterTransporterController';
+import RegisterTransporterController from '../controllers/transporters/RequestTransporterController';
 import RegisterValidator from '../middleware/transporter/RegisterValidator';
 const router = express.Router();
 

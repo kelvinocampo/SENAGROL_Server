@@ -2,14 +2,10 @@ import { Request, Response } from "express";
 import TransporterService from "../../services/TransporterService";
 import TransporterDto from "../../Dto/User/Transporter/TransporterDto";
 
-interface AuthenticatedRequest extends Request {
-  user?: { id_user: number }; 
-}
-
-let register = async (req: AuthenticatedRequest, res: Response) => {
+let register = async (req: Request, res: Response) => {
   try {
   
-    const userId = req.user?.id_user;
+    const userId = req.body.user?.id_user;
     if (!userId) {
       return res.status(401).json({ error: "Usuario no autenticado" });
     }
