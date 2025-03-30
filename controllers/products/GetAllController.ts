@@ -2,23 +2,9 @@ import { Request, Response } from "express";
 import ProductService from "../../services/ProductService";
 import ProductRepository from "../../repositories/ProductRepository"; // Asegurar que el repositorio maneje la validación del vendedor
 
-interface AuthenticatedRequest extends Request {
-    user?: { id_usuario: number };
-}
-
-const getAll = async (req: AuthenticatedRequest, res: Response) => {
+const getAll = async (req: Request, res: Response) => {
     try {
-        const userId = req.user?.id_usuario;
-
-        if (!userId) {
-            return res.status(401).json({ error: "Usuario no autenticado" });
-        }
-
-        // Verificar si el usuario es un vendedor
-        const isSeller = await ProductRepository.findSellerById(userId);
-        if (!isSeller) {
-            return res.status(403).json({ error: "Acceso denegado. Solo los vendedores pueden ver los productos." });
-        }
+        const userId = req.body.user?.id_user;
 
         // Obtener todos los productos
         const products = await ProductService.getAll();

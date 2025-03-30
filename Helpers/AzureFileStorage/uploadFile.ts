@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { connectStorage } from "../../config/azureStorage";
 
-export const uploadToAzure = async (file: Express.Multer.File): Promise<string | null> => {
+export const uploadToAzure = async (file: Express.Multer.File, type: "usuario" | "producto"): Promise<string> => {
     try {
-        if (!file) return null;
+        if (!file) return "";
 
         const blobName = `${uuidv4()}-${file.originalname}`;
-        const blockBlobClient = (connectStorage("producto")).getBlockBlobClient(blobName);
+        const blockBlobClient = (connectStorage(type)).getBlockBlobClient(blobName);
 
         await blockBlobClient.uploadData(file.buffer, {
             blobHTTPHeaders: { blobContentType: file.mimetype },
@@ -15,6 +15,6 @@ export const uploadToAzure = async (file: Express.Multer.File): Promise<string |
         return blockBlobClient.url;
     } catch (error) {
         console.error("Error subiendo archivo a Azure:", error);
-        return null;
+        return "";
     }
 };

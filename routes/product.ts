@@ -1,8 +1,8 @@
 
 import express from "express";
-import GetAllProducts from "../controllers/products/GetAll-controller";
+import GetAllProducts from "../controllers/products/GetAllController";
 
-import RegisterProducts from "../controllers/products/Register-controller";
+import RegisterProducts from "../controllers/products/RegisterController";
 import CreateValidator from "../middleware/Products/CreateValidator";
 
 import UpdateProducts from "../controllers/products/Update-controller";
@@ -12,11 +12,12 @@ import DeleteProducts from "../controllers/products/Delete-controller";
 import DeleteValidator from "../middleware/Products/DeleteValidator";
 
 import verifyToken from "../middleware/VerifyToken";
+import upload from "../middleware/multerConfig";
 
 const router = express.Router();
 
 router.get('/my_products', verifyToken, GetAllProducts);
-router.post('/create', verifyToken, CreateValidator.validatorParams, CreateValidator.validator, RegisterProducts);
+router.post('/create', verifyToken, upload.single("imagen"), CreateValidator.validatorParams, CreateValidator.validator, RegisterProducts);
 router.put('/edit/:id', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateProducts);
 router.delete('/delete/:id', verifyToken, DeleteValidator.validatorParams, DeleteValidator.validator, DeleteProducts.deleteProduct);
 

@@ -5,12 +5,6 @@ class ProductService {
     //  Registrar un nuevo producto
     static async register(product: Product) {
         try {
-            // Verificar si el usuario es un vendedor antes de registrar el producto
-            const vendedor = await ProductRepository.findSellerById(product.userId);
-            if (!vendedor) {
-                return { success: false, message: "Acceso denegado. Solo los vendedores pueden registrar productos." };
-            }
-
             // Si es vendedor, proceder con la creación del producto
             await ProductRepository.createProduct(product);
             return { success: true, message: "Producto registrado exitosamente." };
@@ -49,33 +43,27 @@ class ProductService {
         }
     }
 
- 
-    
-        static async deleteProduct(userId: number, productId: number) {
-            // Verificar si el usuario es un vendedor
-            const isSeller = await ProductRepository.findSellerById(userId);
-            if (!isSeller) {
-                throw new Error("Solo los vendedores pueden eliminar productos.");
-            }
-    
-            // Verificar si el producto existe y pertenece al vendedor
-            const productOwner = await ProductRepository.findProductOwner(productId);
-            if (!productOwner) {
-                throw new Error("Producto no encontrado.");
-            }
-    
-            if (productOwner !== userId) {
-                throw new Error("No puedes eliminar un producto que no te pertenece.");
-            }
-    
-            // Eliminar el producto
-            await ProductRepository.deleteProduct(productId);
-            return { success: true, message: "Producto eliminado correctamente." };
+
+
+    static async deleteProduct(userId: number, productId: number) {
+        // Verificar si el producto existe y pertenece al vendedor
+        const productOwner = await ProductRepository.findProductOwner(productId);
+        if (!productOwner) {
+            throw new Error("Producto no encontrado.");
         }
+
+        if (productOwner !== userId) {
+            throw new Error("No puedes eliminar un producto que no te pertenece.");
+        }
+
+        // Eliminar el producto
+        await ProductRepository.deleteProduct(productId);
+        return { success: true, message: "Producto eliminado correctamente." };
     }
-    
- 
-    
+}
+
+
+
 
 
 export default ProductService;
