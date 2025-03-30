@@ -3,7 +3,7 @@ import IAService from "../../services/IAService";
 
 const IARegisteredController = async (req: Request, res: Response) => {
     try {
-        const { id_user, role } = req.body.user;
+        const { id_user, role } = req.body;
         const { prompt, history = [] } = req.body;
 
         const responseIA = await IAService.requestRegister(prompt, role, id_user, history);

@@ -4,7 +4,7 @@ import Message from "../../Dto/Chat/MessageDTO";
 
 const deleteMessageController = async (req: Request, res: Response) => {
     try {
-        const { id_user } = req.body.user;
+        const { id_user } = req.body;
         const { id_chat, id_message } = req.params;
 
         const result = await MessageService.deleteMessage(

@@ -4,7 +4,7 @@ import Message from "../../Dto/Chat/MessageDTO";
 
 const UpdateTextMessageController = async (req: Request, res: Response) => {
     try {
-        const { id_user } = req.body.user;
+        const { id_user } = req.body;
         const { text } = req.body;
         const { id_chat, id_message } = req.params;
 

@@ -22,14 +22,14 @@ class ProductRepository {
         const productValues = [
             product.Nombre,
             product.Description,
-            product.latitud || null,
-            product.longitud || null,
-            product.quantity || 0,
-            product.MinimumQuantity || 0,
-            product.imagen || null,
-            product.Precio || 0,
-            product.Discount || 0,
-            product.userId || null
+            product.latitud,
+            product.longitud,
+            product.quantity,
+            product.MinimumQuantity,
+            product.imagen,
+            product.Precio,
+            product.Discount,
+            product.userId
         ];
 
         await db.execute(ProductSql, productValues);

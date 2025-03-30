@@ -8,7 +8,7 @@ interface AuthenticatedRequest extends Request {
 class DeleteProducts {
     static async deleteProduct(req: AuthenticatedRequest, res: Response) {
         try {
-            const userId = req.body.user?.id_user;
+            const userId = req.body.id_user;
             const { id } = req.params;
 
             const result = await ProductService.deleteProduct(userId, parseInt(id));

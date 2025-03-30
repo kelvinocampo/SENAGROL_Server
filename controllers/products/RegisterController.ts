@@ -3,13 +3,9 @@ import productDto from "../../Dto/Products/ProductsCreate";
 import ProductService from "../../services/ProductService";
 import { uploadToAzure } from "../../Helpers/AzureFileStorage/uploadFile";
 
-interface AuthenticatedRequest extends Request {
-    user?: { id_usuario: number, roles: string[] }; // Agregar roles
-}
-
-let registerProducts = async (req: AuthenticatedRequest, res: Response) => {
+let registerProducts = async (req: Request, res: Response) => {
     try {
-        const userId = req.body.user?.id_user;
+        const userId = req.body.id_user;
 
         // Extraer datos del cuerpo de la petición
         const {
@@ -20,11 +16,11 @@ let registerProducts = async (req: AuthenticatedRequest, res: Response) => {
             longitud,
             quantity,
             MinimumQuantity,
-            imagen,
             Discount
         } = req.body;
 
-        const imagenUrl = await uploadToAzure(imagen, "producto")
+        const imagenUrl = await uploadToAzure(req.file, "producto")
+        console.log(imagenUrl);
 
         // Crear DTO y registrar producto
         const newProduct = new productDto(userId, Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagenUrl, Discount);

@@ -3,7 +3,7 @@ import SellerServices from "../../services/SellerServices";
 
 const SellerController = async (req: Request, res: Response) => {
   try {
-    const userId = req.body.user.id_user;
+    const userId = req.body.id_user;
     if (!userId) {
       return res.status(401).json({ error: "Usuario no autenticado" });
     }

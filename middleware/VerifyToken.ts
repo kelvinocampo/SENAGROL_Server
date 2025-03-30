@@ -16,7 +16,7 @@ interface JwtPayload {
 
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     let authorization = req.header('Authorization');
-   
+
     if (!authorization) {
         return res.status(403).json({ status: "The Authorization header is required" });
     }
@@ -28,12 +28,15 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
 
     try {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
-        req.body.user = { id_user: decoded.data.id, roles: decoded.data.roles };
+        req.body.id_user = decoded.data.id;
+        req.body.roles = decoded.data.roles;
+        console.log(req.body);
+
         next();
     } catch (error) {
         return res.status(403).json({ error: "Token inválido o expirado", details: error });
     }
-    
+
 };
 
 export default verifyToken;

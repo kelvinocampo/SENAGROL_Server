@@ -4,8 +4,6 @@ import ProductRepository from "../../repositories/ProductRepository"; // Asegura
 
 const getAll = async (req: Request, res: Response) => {
     try {
-        const userId = req.body.user?.id_user;
-
         // Obtener todos los productos
         const products = await ProductService.getAll();
 
