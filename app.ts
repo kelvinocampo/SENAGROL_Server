@@ -14,6 +14,7 @@ import BuyRoutes from './routes/buy'
 
 dotenv.config();
 const app = express().use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 10101;
 
 app.use('/usuario', UserRoutes);

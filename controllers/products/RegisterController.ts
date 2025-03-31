@@ -19,7 +19,7 @@ let registerProducts = async (req: Request, res: Response) => {
             Discount
         } = req.body;
 
-        const imagenUrl = await uploadToAzure(req.file, "producto")
+        const { url: imagenUrl } = await uploadToAzure(req.file, "producto")
         console.log(imagenUrl);
 
         // Crear DTO y registrar producto
