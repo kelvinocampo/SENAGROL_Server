@@ -22,7 +22,6 @@ app.use('/vendedor', SellerRoutes);
 app.use('/transportador', TransporterRoutes);
 app.use('/admin', AdminRoutes);
 app.use('/comprador', BuyerRoutes);
-app.use('/transportador', TransporterRoutes);
 app.use('/producto', ProductRoutes);
 app.use('/compra', BuyRoutes);
 app.use('/chat', ChatRoutes);

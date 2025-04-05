@@ -2,7 +2,7 @@ import db from '../config/configDB';
 import TransporterDto from '../Dto/User/Transporter/TransporterDto';
 
 class TransporterRepository {
-    static async register(transporter: TransporterDto) {
+    static async register(transporter: TransporterDto, imageName: string) {
         // 1. Verificar si el usuario ya es transportador
         const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
         const [existingTransporter]: any = await db.execute(checkSql, [transporter.userId]);
@@ -26,8 +26,16 @@ class TransporterRepository {
         ];
 
         await db.execute(transporterSql, transporterValues);
+
+        // 3. Insertar imagen del vehículo en la tabla foto_vehiculo
+        const imageSql = `
+            INSERT INTO foto_vehiculo (foto, id_transportador)
+            VALUES (?, ?)
+        `;
+        const imageValues = [imageName, transporter.userId];
+
+        await db.execute(imageSql, imageValues);
     }
 }
 
 export default TransporterRepository;
-
