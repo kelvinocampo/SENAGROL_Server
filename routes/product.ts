@@ -23,7 +23,7 @@ router.post('/create',
     verifyToken,
     verifyRole(["vendedor"]),
     CreateValidator.validatorParams, CreateValidator.validator, RegisterProducts);
-router.put('/edit/:id', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateProducts);
+router.put('/edit/:id', verifyToken,  UpdateValidator.validatorParams, UpdateValidator.validator, UpdateProducts);
 router.delete('/delete/:id', verifyToken, DeleteValidator.validatorParams, DeleteValidator.validator, DeleteProducts.deleteProduct);
 
 

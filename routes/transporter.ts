@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/requestTransporter',
     upload.single("imagen"),
     verifyToken,
-    verifyRole(["Transporter"]),RegisterValidator.transporterValidatorParams, RegisterValidator.transporterValidator, RequestTransporterController);
+    verifyRole(["vendedor","comprador"]),RegisterValidator.transporterValidatorParams, RegisterValidator.transporterValidator, RequestTransporterController);
 router.post('/edit', verifyToken);
 router.post('/profile', verifyToken);
 
