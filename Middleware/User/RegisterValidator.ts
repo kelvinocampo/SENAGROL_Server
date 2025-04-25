@@ -35,7 +35,11 @@ let validatorParams = [
         .isLength({ min: 10, max: 15 })
         .withMessage('El número de teléfono debe tener entre 10 y 15 caracteres.')
         .matches(/^\d+$/)
-        .withMessage('El número de teléfono solo puede contener dígitos.')
+        .withMessage('El número de teléfono solo puede contener dígitos.'),
+
+    check('confirmPassword')
+        .custom((value, { req }) => value === req.body.password)
+        .withMessage('Las contraseñas no coinciden.')
 ];
 
 function validator(req: Request, res: Response, next: NextFunction) {

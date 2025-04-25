@@ -23,6 +23,10 @@ class UserService {
         return await UserRepository.getByID(id);
     }
 
+    static async UpdatePassword(password: string, id_user:number) {
+        return await UserRepository.UpdatePassword(password, id_user);
+    }
+
     static async logIn(user: Login) {
         const foundUser = await UserRepository.findByEmailOrUsername(user.identifier);
 
