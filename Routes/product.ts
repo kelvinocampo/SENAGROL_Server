@@ -2,7 +2,10 @@
 import express from "express";
 
 import GetAllProducts from "../Controllers/Product/GetAllController";
-import getProductsBySeller from "../Controllers/Product/GetBySellerController";
+
+import GetProductsBySeller from "../Controllers/Product/GetBySellerController";
+
+import GetProductsWithDiscount from "../Controllers/Product/GetWithDiscountController";
 
 import RegisterProducts from "../Controllers/Product/RegisterController";
 import CreateValidator from "../Middleware/Product/CreateValidator";
@@ -20,7 +23,8 @@ import verifyRole from "../Middleware/VerifyTokenData";
 const router = express.Router();
 
 router.get('/', GetAllProducts);
-router.get('/bySeller', getProductsBySeller);
+router.get('/my_products', verifyToken, verifyRole(["vendedor"]), GetProductsBySeller);
+router.get('/discount', GetProductsWithDiscount);
 router.post('/create',
     upload.single("imagen"),
     verifyToken,
