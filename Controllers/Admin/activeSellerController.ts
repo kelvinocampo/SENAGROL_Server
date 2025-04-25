@@ -1,11 +1,8 @@
 import { Request, Response } from "express";
 import AdminService from "../../Services/AdminService";
 
-interface AuthenticatedRequest extends Request {
-  user?: { id_user: number };
-}
 
-const activeSellerController = async (req: AuthenticatedRequest, res: Response) => {
+const activeSellerController = async (req: Request, res: Response) => {
   try {
     const { userId } = req.body;
 

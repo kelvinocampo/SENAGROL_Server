@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
 import ProductService from "../../Services/ProductService";
-import ProductRepository from "../../Repositories/ProductRepository"; // Asegurar que el repositorio maneje la validación del vendedor
 
 const getAll = async (req: Request, res: Response) => {
     try {
-        // Obtener todos los productos
         const products = await ProductService.getAll();
 
         return res.status(200).json({
