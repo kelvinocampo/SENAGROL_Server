@@ -20,6 +20,10 @@ class ProductService {
         return await ProductRepository.getAll();
     }
 
+    static async get(id_product:number) {
+        return await ProductRepository.get(id_product);
+    }
+
     static async getWithDiscount() {
         return await ProductRepository.getWithDiscount();
     }

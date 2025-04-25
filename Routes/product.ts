@@ -7,6 +7,8 @@ import GetProductsBySeller from "../Controllers/Product/GetBySellerController";
 
 import GetProductsWithDiscount from "../Controllers/Product/GetWithDiscountController";
 
+import GetInfoProduct from "../Controllers/Product/GetController";
+
 import RegisterProducts from "../Controllers/Product/RegisterController";
 import CreateValidator from "../Middleware/Product/CreateValidator";
 
@@ -25,6 +27,7 @@ const router = express.Router();
 router.get('/', GetAllProducts);
 router.get('/my_products', verifyToken, verifyRole(["vendedor"]), GetProductsBySeller);
 router.get('/discount', GetProductsWithDiscount);
+router.get('/get/:id', GetInfoProduct);
 router.post('/create',
     upload.single("imagen"),
     verifyToken,

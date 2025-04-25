@@ -46,6 +46,12 @@ class ProductRepository {
         return products;
     }
 
+    static async get(id_product:number) {
+        const sql = "SELECT * FROM producto WHERE id_producto = ?";
+        const [product]: any = await db.execute(sql, [id_product]);
+        return product;
+    }
+
     static async getWithDiscount() {
         const sql = "SELECT * FROM producto WHERE descuento > 0 ORDER BY descuento DESC";
         const [products]: any = await db.execute(sql);
