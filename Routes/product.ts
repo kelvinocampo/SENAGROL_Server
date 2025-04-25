@@ -1,11 +1,13 @@
 
 import express from "express";
+
 import GetAllProducts from "../Controllers/Product/GetAllController";
+import getProductsBySeller from "../Controllers/Product/GetBySellerController";
 
 import RegisterProducts from "../Controllers/Product/RegisterController";
 import CreateValidator from "../Middleware/Product/CreateValidator";
 
-import UpdateProducts from "../Controllers/Product/Update-controller";
+import UpdateProducts from "../Controllers/Product/UpdateController";
 import UpdateValidator from "../Middleware/Product/UpdateValidator";
 
 import DeleteProducts from "../Controllers/Product/DeleteController";
@@ -18,6 +20,7 @@ import verifyRole from "../Middleware/VerifyTokenData";
 const router = express.Router();
 
 router.get('/', GetAllProducts);
+router.get('/bySeller', getProductsBySeller);
 router.post('/create',
     upload.single("imagen"),
     verifyToken,

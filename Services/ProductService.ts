@@ -20,6 +20,10 @@ class ProductService {
         return await ProductRepository.getAll();
     }
 
+    static async getBySeller(id_user:number) {
+        return await ProductRepository.getBySeller(id_user);
+    }
+
     // Actualizar producto
     static async updateProduct(id: number, productData: any) {
         try {
