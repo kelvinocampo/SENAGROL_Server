@@ -60,7 +60,46 @@ class UserRepository {
         return null;
     }
 
+    static async update(id: number, updatedData: User) {
 
+        const fields = [];
+        const values = [];
+
+        if (updatedData.name) {
+            fields.push("nombre = ?");
+            values.push(updatedData.name);
+        }
+
+        if (updatedData.username) {
+            fields.push("nombre_usuario = ?");
+            values.push(updatedData.username);
+        }
+
+        if (updatedData.email) {
+            fields.push("correo = ?");
+            values.push(updatedData.email);
+        }
+
+        if (updatedData.phoneNumber) {
+            fields.push("telefono = ?");
+            values.push(updatedData.phoneNumber);
+        }
+
+        if (fields.length === 0) {
+            throw new Error("No se proporcionaron datos para actualizar");
+        }
+
+        const sql = `UPDATE usuario SET ${fields.join(", ")} WHERE id_usuario = ?`;
+        values.push(id);
+
+        const [result]: any = await db.execute(sql, values);
+
+        if (result.affectedRows > 0) {
+            return { success: true, status: "Perfil actualizado correctamente" };
+        } else {
+            return { success: false, status: "No se encontraron cambios o usuario no encontrado" };
+        }
+    }
 }
 
 export default UserRepository;

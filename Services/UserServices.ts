@@ -23,7 +23,7 @@ class UserService {
         return await UserRepository.getByID(id);
     }
 
-    static async UpdatePassword(password: string, id_user:number) {
+    static async UpdatePassword(password: string, id_user: number) {
         return await UserRepository.UpdatePassword(password, id_user);
     }
 
@@ -44,6 +44,18 @@ class UserService {
         const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
 
         return { logged: true, status: "Login exitoso", token: token };
+    }
+
+    static async updateUserProfile(id: number, updatedData: User) {
+        const user = await UserRepository.getByID(id);
+
+        if (!user) {
+            return { success: false, status: "Usuario no encontrado" };
+        }
+
+        const updatedUser = await UserRepository.update(id, updatedData);
+
+        return { success: true, status: "Perfil actualizado correctamente", user: updatedUser };
     }
 }
 
