@@ -9,11 +9,9 @@ import BuyerRepository from "../Repositories/BuyerRepository";
 class UserService {
 
     static async register(user: User) {
-
         user.password = await generateHash(user.password);
 
         const id_user = await UserRepository.add(user);
-
         const registerBuyer = await BuyerRepository.add(id_user)
 
         return { success: true, status: "Usuario registrado" };
@@ -21,6 +19,10 @@ class UserService {
 
     static async getByID(id: number) {
         return await UserRepository.getByID(id);
+    }
+
+    static async getAll() {
+        return await UserRepository.getAll();
     }
 
     static async UpdatePassword(password: string, id_user: number) {

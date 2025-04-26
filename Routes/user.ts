@@ -2,7 +2,7 @@ import express from "express";
 
 import verifyToken from "../Middleware/VerifyToken";
 
-import GetUserById from '../Controllers/User/GetUsuarioController';
+import GetUserById from '../Controllers/User/GetController';
 
 import UpdatePasswordController from '../Controllers/User/UpdatePasswordController';
 import UpdatePasswordValidator from '../Middleware/User/UpdatePasswordValidator';
@@ -22,6 +22,7 @@ router.post('/register', RegisterValidator.validatorParams, RegisterValidator.va
 router.post('/login', LoginValidator.validatorParams, LoginValidator.validator, LoginController);
 router.patch('/password', verifyToken, UpdatePasswordValidator.validatorParams, UpdatePasswordValidator.validator, UpdatePasswordController);
 router.get("/", verifyToken, GetUserById);
+router.get("/all", verifyToken, );
 router.put('/edit', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateUserProfile);
 
 export default router;

@@ -38,6 +38,11 @@ class UserRepository {
         return db.execute(sql, values);
     }
 
+    static async getAll() {
+        const sql = 'SELECT * FROM usuario';
+        return db.execute(sql);
+    }
+
     static async UpdatePassword(password: string, id_user: number,) {
         const sql = 'UPDATE usuario SET contraseña = ? WHERE id_usuario = ?';
         const values = [password, id_user];
