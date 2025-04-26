@@ -6,8 +6,8 @@ DROP TABLE IF EXISTS usuario;
 CREATE TABLE IF NOT EXISTS usuario(
     id_usuario INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100),
-    nombre_usuario VARCHAR(20),
-    correo VARCHAR(100),
+    nombre_usuario VARCHAR(20) UNIQUE,
+    correo VARCHAR(100) UNIQUE,
     contraseña VARCHAR(60),
     cara VARCHAR(255),
     telefono VARCHAR(15)
