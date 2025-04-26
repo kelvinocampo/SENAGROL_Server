@@ -14,16 +14,15 @@ import LoginValidator from '../Middleware/User/LoginValidator';
 import LoginController from "../Controllers/User/loginController";
 
 import UpdateUserProfile from "../Controllers/User/UpdateController";
+import UpdateValidator from '../Middleware/User/UpdateValidator';
 
 const router = express.Router();
 
 router.post('/register', RegisterValidator.validatorParams, RegisterValidator.validator, RegisterController);
 router.post('/login', LoginValidator.validatorParams, LoginValidator.validator, LoginController);
 router.patch('/password', verifyToken, UpdatePasswordValidator.validatorParams, UpdatePasswordValidator.validator, UpdatePasswordController);
-
-// Falta middleware
-router.put('/edit', verifyToken, UpdateUserProfile);
 router.get("/", verifyToken, GetUserById);
+router.put('/edit', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateUserProfile);
 
 export default router;
 
