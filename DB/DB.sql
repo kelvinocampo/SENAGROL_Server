@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS comprador(
     FOREIGN KEY (id_comprador)
     REFERENCES usuario(id_usuario)
     ON DELETE CASCADE
-);
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS vendedor;
 CREATE TABLE IF NOT EXISTS vendedor(
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS vendedor(
     FOREIGN KEY (id_vendedor)
     REFERENCES usuario(id_usuario)
     ON DELETE CASCADE
-);
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS transportador;
 CREATE TABLE IF NOT EXISTS transportador(
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS transportador(
     FOREIGN KEY (id_transportador)
     REFERENCES usuario(id_usuario)
     ON DELETE CASCADE
-);
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS foto_vehiculo;
 CREATE TABLE IF NOT EXISTS foto_vehiculo(
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS foto_vehiculo(
     FOREIGN KEY (id_transportador)
     REFERENCES transportador(id_transportador)
     ON DELETE CASCADE
-);
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS administrador;
 CREATE TABLE IF NOT EXISTS administrador(
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS administrador(
     FOREIGN KEY (id_administrador)
     REFERENCES usuario(id_usuario)
     ON DELETE CASCADE
-);
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS producto;
 CREATE TABLE IF NOT EXISTS producto(
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS producto(
     FOREIGN KEY (id_vendedor)
     REFERENCES vendedor(id_vendedor)
     ON DELETE CASCADE
-);
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS compra;
 CREATE TABLE IF NOT EXISTS compra(
