@@ -14,6 +14,19 @@ class ChatRepository {
         }
     }
 
+    static async getChats(id_user: number) {
+        try {
+            const [rows]: any = await db.execute(
+                'SELECT * FROM chat WHERE id_usuario = ?',
+                [id_user]
+            );
+            return rows[0] || null;
+        } catch (error) {
+            console.error("Error en ChatRepository:", error);
+            throw error;
+        }
+    }
+
     static async deleteChat(id_user: number, id_chat: number) {
         try {
             const query = `

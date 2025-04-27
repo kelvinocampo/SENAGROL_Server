@@ -14,8 +14,8 @@ import DeleteChatController from "../Controllers/Chat/DeleteChat";
 
 const router = express.Router();
 
+router.get('/', verifyToken, );
 router.delete('/:id_chat', verifyToken, DeleteChatController);
-
 router.post('/:id_chat/message/text', verifyToken, textMessageMiddleware.validatorParams, textMessageMiddleware.validator, textMessageController);
 router.put('/:id_chat/message/:id_message', verifyToken, UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);
 router.delete('/:id_chat/message/:id_message', verifyToken, DeleteMessageController);

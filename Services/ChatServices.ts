@@ -21,6 +21,16 @@ class ChatService {
             throw error;
         }
     }
+
+    static async getChats(id_user: number) {
+        try {
+            const getChats = await ChatRepository.getChats(id_user);
+
+            return getChats;
+        } catch (error: any) {
+            throw error;
+        }
+    }
 }
 
 export default ChatService;
