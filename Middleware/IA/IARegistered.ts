@@ -2,21 +2,6 @@ import { check, validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from "express";
 
 let validatorParams = [
-    check('user.id_user')
-        .trim()
-        .notEmpty()
-        .withMessage('El Token es requerido')
-        .isInt({ min: 1 })
-        .withMessage('El Token contiene datos invalidos')
-        .toInt(), // Convierte el valor a entero
-
-    check('user.roles')
-        .trim()
-        .notEmpty()
-        .withMessage('El Token es requerido')
-        .isIn(["admin", "vendedor", "transportador", "comprador", "vendedor transportador"])
-        .withMessage('El Token contiene datos invalidos'),
-
     check('prompt')
         .trim()
         .notEmpty()
