@@ -16,13 +16,15 @@ import LoginController from "../Controllers/User/loginController";
 import UpdateUserProfile from "../Controllers/User/UpdateController";
 import UpdateValidator from '../Middleware/User/UpdateValidator';
 
+import GetUsers from "../Controllers/User/GetAllController";
+
 const router = express.Router();
 
 router.post('/register', RegisterValidator.validatorParams, RegisterValidator.validator, RegisterController);
 router.post('/login', LoginValidator.validatorParams, LoginValidator.validator, LoginController);
 router.patch('/password', verifyToken, UpdatePasswordValidator.validatorParams, UpdatePasswordValidator.validator, UpdatePasswordController);
 router.get("/", verifyToken, GetUserById);
-router.get("/all", verifyToken, );
+router.get("/all", verifyToken, GetUsers);
 router.put('/edit', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateUserProfile);
 
 export default router;
