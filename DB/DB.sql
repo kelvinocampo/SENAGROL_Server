@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS comprador(
 
     FOREIGN KEY (id_comprador)
     REFERENCES usuario(id_usuario)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS vendedor;
@@ -27,6 +28,7 @@ CREATE TABLE IF NOT EXISTS vendedor(
     estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
     FOREIGN KEY (id_vendedor)
     REFERENCES usuario(id_usuario)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS transportador;
@@ -40,6 +42,7 @@ CREATE TABLE IF NOT EXISTS transportador(
     estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
     FOREIGN KEY (id_transportador)
     REFERENCES usuario(id_usuario)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS foto_vehiculo;
@@ -50,6 +53,7 @@ CREATE TABLE IF NOT EXISTS foto_vehiculo(
     id_transportador INT,
     FOREIGN KEY (id_transportador)
     REFERENCES transportador(id_transportador)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS administrador;
@@ -58,6 +62,7 @@ CREATE TABLE IF NOT EXISTS administrador(
 
     FOREIGN KEY (id_administrador)
     REFERENCES usuario(id_usuario)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS producto;
@@ -76,6 +81,7 @@ CREATE TABLE IF NOT EXISTS producto(
     id_vendedor INT,
     FOREIGN KEY (id_vendedor)
     REFERENCES vendedor(id_vendedor)
+    ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS compra;
