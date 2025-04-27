@@ -12,9 +12,14 @@ import DeleteMessageController from "../Controllers/Chat/DeleteMessage";
 
 import DeleteChatController from "../Controllers/Chat/DeleteChat";
 
+import GetChats from "../Controllers/Chat/GetAll";
+
+import GetChat from "../Controllers/Chat/Get";
+
 const router = express.Router();
 
-router.get('/', verifyToken, );
+router.get('/', verifyToken, GetChats);
+router.get('/:id_chat', verifyToken, GetChat);
 router.delete('/:id_chat', verifyToken, DeleteChatController);
 router.post('/:id_chat/message/text', verifyToken, textMessageMiddleware.validatorParams, textMessageMiddleware.validator, textMessageController);
 router.put('/:id_chat/message/:id_message', verifyToken, UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);

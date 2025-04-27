@@ -79,6 +79,20 @@ class MessageRepository {
             throw error;
         }
     }
+
+    static async getMessages(id_chat: number) {
+        try {
+            const query = `SELECT * FROM message WHERE id_chat = ?`;
+
+            // El resultado es un array donde el primer elemento contiene la información de la operación
+            const [result]: any = await db.execute(query, [id_chat]);
+
+            return result;
+        } catch (error) {
+            console.error("Error en MessageRepository:", error);
+            throw error;
+        }
+    }
 }
 
 export default MessageRepository;

@@ -1,4 +1,5 @@
 import ChatRepository from "../Repositories/ChatRepository";
+import MessageRepository from "../Repositories/MessageRepository";
 
 class ChatService {
     static async deleteChat(id_user: number, id_chat: number) {
@@ -25,6 +26,26 @@ class ChatService {
     static async getChats(id_user: number) {
         try {
             const getChats = await ChatRepository.getChats(id_user);
+
+            return getChats;
+        } catch (error: any) {
+            throw error;
+        }
+    }
+
+    static async getChat(id_user: number, id_chat: number) {
+        try {
+            // 1. Verificar que el chat existe y el usuario tiene acceso
+            const chat = await ChatRepository.getChatById(id_chat);
+            if (!chat) {
+                throw new Error("Chat no encontrado");
+            }
+
+            if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
+                throw new Error("No tienes permiso para acceder a este chat");
+            }
+
+            const getChats = await MessageRepository.getMessages(id_chat);
 
             return getChats;
         } catch (error: any) {
