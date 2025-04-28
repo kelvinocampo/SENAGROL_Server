@@ -4,9 +4,6 @@ import TransporterDto from "../../Dto/User/TransporterDto";
 
 let register = async (req: Request, res: Response) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-
     const userId = req.body.id_user;
     if (!userId) {
       return res.status(401).json({ error: "Usuario no autenticado" });
