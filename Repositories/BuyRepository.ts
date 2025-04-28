@@ -5,9 +5,9 @@ type TypeOwner = "transportador" | "comprador" | "vendedor";
 class BuyRepository {
     static async getByOwner(id_user: number, typeOwner: TypeOwner) {
         let whereSentence = "WHERE "
-        if (typeOwner === "transportador") whereSentence+="id_transportador = ?"
-        else if (typeOwner === "comprador") whereSentence+="id_comprador = ?"
-        else if (typeOwner === "vendedor") whereSentence+="id_vendedor = ?"
+        if (typeOwner === "transportador") whereSentence+="c.id_transportador = ?"
+        else if (typeOwner === "comprador") whereSentence+="c.id_comprador = ?"
+        else if (typeOwner === "vendedor") whereSentence+="c.id_vendedor = ?"
 
         const query = `
         SELECT 

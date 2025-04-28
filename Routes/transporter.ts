@@ -8,7 +8,7 @@ import verifyRole from "../Middleware/VerifyTokenData";
 
 import upload from "../Middleware/multerConfig";
 
-import GetTransports from "../Controllers/Transporter/GetTransporter";
+import GetTransports from "../Controllers/Transporter/GetTransports";
 
 const router = express.Router();
 
