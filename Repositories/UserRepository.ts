@@ -35,18 +35,32 @@ class UserRepository {
     static async getByID(id: number) {
         const sql = 'SELECT * FROM usuario WHERE id_usuario = ?';
         const values = [id];
-        return db.execute(sql, values);
+        return await db.execute(sql, values);
     }
 
     static async getAll() {
-        const sql = 'SELECT * FROM usuario';
+        const sql = `
+        SELECT u.*, 
+               CASE 
+                   WHEN a.id_administrador IS NOT NULL THEN 'Administrador'
+                   WHEN c.id_comprador IS NOT NULL THEN 'Comprador'
+                   WHEN v.id_vendedor IS NOT NULL THEN 'Vendedor'
+                   WHEN t.id_transportador IS NOT NULL THEN 'Transportador'
+                   ELSE 'Desconocido'
+               END AS rol
+        FROM usuario u
+        LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
+        LEFT JOIN comprador c ON u.id_usuario = c.id_comprador
+        LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor
+        LEFT JOIN transportador t ON u.id_usuario = t.id_transportador;
+        `;
         return db.execute(sql);
     }
 
     static async UpdatePassword(password: string, id_user: number,) {
         const sql = 'UPDATE usuario SET contraseña = ? WHERE id_usuario = ?';
         const values = [password, id_user];
-        return db.execute(sql, values);
+        return await db.execute(sql, values);
     }
 
     static async findByEmailOrUsername(identifier: string) {
