@@ -3,7 +3,7 @@ import UserService from "../../Services/UserServices";
 
 async function getUserById(req: Request, res: Response) {
     try {
-        const userId = req.params.id_user;
+        const userId = req.body.id_user;
 
         const userProfile = await UserService.getByID(parseInt(userId));
 
