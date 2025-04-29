@@ -26,6 +26,7 @@ class UserService {
     }
 
     static async UpdatePassword(password: string, id_user: number) {
+        password = await generateHash(password);
         return await UserRepository.UpdatePassword(password, id_user);
     }
 
