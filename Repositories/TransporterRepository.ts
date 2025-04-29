@@ -45,6 +45,16 @@ class TransporterRepository {
 
         await db.execute(imageSql, imageValues);
     }
+
+    static async getTransporters() {
+        const query = `
+        SELECT u.* FROM transportador t
+        JOIN usuario u ON u.id_usuario = t.id_usuario
+        WHERE t.estado = 'Activo';
+        `;
+        const result = await db.execute(query);
+        return result[0];
+    }
 }
 
 export default TransporterRepository;

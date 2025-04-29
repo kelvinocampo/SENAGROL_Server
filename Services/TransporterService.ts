@@ -12,6 +12,11 @@ class TransporterService {
         const result = await BuyRepository.getByOwner(id_user, "transportador");
         return result;
     }
+
+    static async getTransporters() {
+        const result = await TransporterRepository.getTransporters();
+        return result;
+    }
 }
 
 export default TransporterService;
