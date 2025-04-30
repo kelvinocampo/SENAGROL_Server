@@ -35,7 +35,8 @@ class UserRepository {
     static async getByID(id: number) {
         const sql = 'SELECT * FROM usuario WHERE id_usuario = ?';
         const values = [id];
-        return await db.execute(sql, values);
+        const [result]: any = await db.execute(sql, values);
+        return result;
     }
 
     static async getAll() {

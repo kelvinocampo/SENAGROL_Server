@@ -2,7 +2,7 @@ import db from '../Config/configDB';
 import TransporterDto from '../Dto/User/TransporterDto';
 
 class TransporterRepository {
-    static async register(transporter: TransporterDto, imageName: string) {
+    static async register(transporter: TransporterDto, imagesName: string[]) {
         // 0. Verificar si ya es transportador
         const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
         const [existingTransporter]: any = await db.execute(checkSql, [transporter.userId]);
@@ -14,11 +14,9 @@ class TransporterRepository {
         // 1. Eliminar otros roles si existen
         const deleteAdminSql = `DELETE FROM administrador WHERE id_administrador = ?`;
         const deleteBuyerSql = `DELETE FROM comprador WHERE id_comprador = ?`;
-        const deleteSellerSql = `DELETE FROM vendedor WHERE id_vendedor = ?`;
 
         await db.execute(deleteAdminSql, [transporter.userId]);
         await db.execute(deleteBuyerSql, [transporter.userId]);
-        await db.execute(deleteSellerSql, [transporter.userId]);
 
         // 2. Insertar en la tabla de transportadores
         const transporterSql = `
@@ -34,16 +32,24 @@ class TransporterRepository {
             transporter.vehicleWeight
         ];
 
-        await db.execute(transporterSql, transporterValues);
+        const [result] = await db.execute(transporterSql, transporterValues);
 
+        imagesName.forEach(async (imageName) => {
+            await this.registerImage(imageName, transporter.userId);
+        });
+
+        return result
+    }
+
+    static async registerImage(imageName: string, id_user: number) {
         // 3. Insertar imagen del vehículo en la tabla foto_vehiculo
         const imageSql = `
-            INSERT INTO foto_vehiculo (foto, id_transportador)
-            VALUES (?, ?)
-        `;
-        const imageValues = [imageName, transporter.userId];
+                INSERT INTO foto_vehiculo (foto, id_transportador)
+                VALUES (?, ?)
+            `;
+        const imageValues = [imageName, id_user];
 
-        await db.execute(imageSql, imageValues);
+        return await db.execute(imageSql, imageValues);
     }
 
     static async getTransporters() {

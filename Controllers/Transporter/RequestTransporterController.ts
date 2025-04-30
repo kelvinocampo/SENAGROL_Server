@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import TransporterService from "../../Services/TransporterService";
 import TransporterDto from "../../Dto/User/TransporterDto";
+import { uploadToAzure } from "../../Helpers/uploadFile";
 
 let register = async (req: Request, res: Response) => {
   try {
@@ -24,9 +25,19 @@ let register = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Imagen del vehículo no proporcionada" });
     }
 
-    const imageName = req.file.filename;
+    const imagesNames : string[] = [];
+    const files = req.files as {
+      [fieldname: string]: Express.Multer.File[];
+    };
 
-    const transporterId = await TransporterService.register(newTransporter, imageName);
+    if (files?.images) {
+      for (const image of files.images) {
+        const url = await uploadToAzure(image, "usuario");
+        imagesNames.push(url.url);
+      }
+    }
+
+    const transporterId = await TransporterService.register(newTransporter, imagesNames);
 
     return res.status(201).json({ success: true, transporterId });
   } catch (error: any) {
