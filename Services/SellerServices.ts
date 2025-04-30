@@ -1,9 +1,15 @@
 import db from "../Config/configDB";
+import BuyRepository from "../Repositories/BuyRepository";
 import SellerRepository from "../Repositories/SellerRepository";
 
 class VendedorService {
     static async requestSeller(userId: number) {
         const result = await SellerRepository.requestSeller(userId)
+        return result;
+    }
+    
+    static async getSells(id_user: number) {
+        const result = await BuyRepository.getByOwner(id_user, "vendedor")
         return result;
     }
 
