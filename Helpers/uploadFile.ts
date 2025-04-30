@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { connectStorage } from "../Config/azureStorage";
+import { AZURE_CONTAINER_NAME, connectStorage } from "../Config/azureStorage";
 
 /**
  * Sube un archivo a Azure Blob Storage con manejo robusto de errores
@@ -9,7 +9,7 @@ import { connectStorage } from "../Config/azureStorage";
  */
 export const uploadToAzure = async (
     file: Express.Multer.File | undefined,
-    containerName: string
+    containerName: AZURE_CONTAINER_NAME
 ): Promise<{ url: string, blobName: string }> => {
     // Validaciones iniciales
     if (!file || !file.buffer || file.buffer.length === 0) {

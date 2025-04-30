@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const { AZURE_STORAGE_CONNECTION_STRING = "" } = process.env;
-type AZURE_CONTAINER_NAME = "usuario" | "producto";
+export type AZURE_CONTAINER_NAME = "usuario" | "producto";
 
 if (!AZURE_STORAGE_CONNECTION_STRING) {
     throw new Error("Falta la cadena de conexión de Azure Storage");
