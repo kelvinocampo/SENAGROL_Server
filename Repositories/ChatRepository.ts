@@ -19,12 +19,15 @@ class ChatRepository {
             const [rows]: any = await db.execute(
                 `
                 SELECT * 
-                FROM chat 
-                WHERE (id_user1 = ? OR id_user2 = ?) 
-                AND 
                 CASE 
-                    WHEN id_user1 = ? THEN bloqueado_user1 = 0 
-                    WHEN id_user2 = ? THEN bloqueado_user2 = 0
+                    WHEN id_user1 = ? AND bloqueado_user1 = 1 THEN "Bloqueado" AS estado
+                    WHEN id_user2 = ? AND bloqueado_user2 = 1 THEN "Bloqueado" AS estado
+                END
+                FROM chat 
+                WHERE (id_user1 = ? OR id_user2 = ?) AND
+                CASE 
+                    WHEN id_user1 = ? THEN eliminado_user1 = 0 
+                    WHEN id_user2 = ? THEN eliminado_user2 = 0
                 END
                 ORDER BY fecha_reciente DESC
                 `,
