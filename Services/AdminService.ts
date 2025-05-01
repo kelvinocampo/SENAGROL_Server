@@ -13,6 +13,10 @@ class Adminservice {
         const result = await AdminRepository.CreateAdmin(id_new_admin)
         return result
     }
+    static async deleteUser(id_delete_user: number) {
+        const result = await AdminRepository.deleteUser(id_delete_user)
+        return result
+    }
 }
 
 export default Adminservice;

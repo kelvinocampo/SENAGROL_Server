@@ -46,6 +46,16 @@ class AdminRepository {
         return result;
     }
 
+    static async deleteUser(id_delete_user: number) {
+        const query = `
+            DELETE FROM usuario WHERE id_usuario = ?
+        `;
+        const values = [id_delete_user];
+
+        const [result] = await db.execute(query,values);
+        return result;
+    }
+
 }
 
 export default AdminRepository;
