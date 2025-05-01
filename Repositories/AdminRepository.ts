@@ -1,7 +1,7 @@
 import db from "../Config/configDB";
 
 class AdminRepository {
-    static async ActiveSeller( userId: number) {
+    static async ActiveSeller(userId: number) {
         const [solicitud]: any = await db.execute(
             "SELECT * FROM vendedor WHERE id_vendedor = ? AND estado = 'Pendiente'",
             [userId]
@@ -36,6 +36,15 @@ class AdminRepository {
         return { success: true, message: "Usuario aprobado como transportador." };
     }
 
+    static async CreateAdmin(id_new_admin: number) {
+        const query = `
+            INSERT INTO administrador(id_administrador) VALUES (?)
+        `;
+        const values = [id_new_admin];
+
+        const [result] = await db.execute(query,values);
+        return result;
+    }
 
 }
 

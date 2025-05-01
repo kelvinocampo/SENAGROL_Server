@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
-const verifyRole = (requiredRoles: string[]): RequestHandler => {
+type RequiredRoles = "comprador" | "vendedor" | "administrador" | "transportador";
+
+const verifyRole = (requiredRoles: RequiredRoles[]): RequestHandler => {
     return (req: Request, res: Response, next: NextFunction) => {
         try {
             // Verificar que el usuario está autenticado
