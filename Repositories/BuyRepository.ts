@@ -51,6 +51,16 @@ class BuyRepository {
         const [result]: any = await db.execute(query, [id_user])
         return result;
     }
+
+    static async assignTransporter(id_user:number, id_compra:number, id_transportador:number, precio_transporte:number){
+        const query = `
+        UPDATE compra
+        SET id_transportador = ?, estado = ?, precio_transporte = ?
+        WHERE id_compra = ?
+        `
+        const [result]: any = await db.execute(query, [id_transportador,"Asignada", id_compra])
+        return result;
+    }
 }
 
 export default BuyRepository;
