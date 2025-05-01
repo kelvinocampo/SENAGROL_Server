@@ -16,8 +16,7 @@ class ChatRepository {
 
     static async getChats(id_user: number) {
         try {
-            const [rows]: any = await db.execute(
-                `
+            const query = `
                 SELECT * 
                 CASE 
                     WHEN id_user1 = ? AND bloqueado_user1 = 1 THEN "Bloqueado" AS estado
@@ -30,8 +29,11 @@ class ChatRepository {
                     WHEN id_user2 = ? THEN eliminado_user2 = 0
                 END
                 ORDER BY fecha_reciente DESC
-                `,
-                [id_user, id_user, id_user, id_user]
+                `
+            const values = Array(6).fill(id_user);
+            const [rows]: any = await db.execute(
+                query,
+                values
             );
             return rows[0] || null;
         } catch (error) {
