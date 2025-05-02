@@ -43,10 +43,16 @@ class UserService {
         }
 
         const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
-        const TOKEN_DURATION = 60;
-        const token = generateToken({ id: foundUser.id_usuario, roles: userRoles }, process.env.KEY_TOKEN, TOKEN_DURATION);
 
-        return { logged: true, status: "Login exitoso", token: token };
+        const SECRET_KEY = process.env.KEY_TOKEN;
+        if (!SECRET_KEY) {
+            throw new Error("La clave KEY_TOKEN no está definida.");
+        }
+
+        const accessToken = generateToken({ id: foundUser.id_usuario, roles: userRoles }, SECRET_KEY, 60);
+        const refreshToken = generateToken({ id: foundUser.id_usuario, roles: userRoles }, SECRET_KEY, 60 * 24 * 7);
+
+        return { logged: true, status: "Login exitoso", accessToken: accessToken, refreshToken: refreshToken };
     }
 
     static async updateUserProfile(id: number, updatedData: User) {
