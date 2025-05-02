@@ -5,6 +5,7 @@ import Login from "../Dto/User/LoginDto";
 import generateToken from "../Helpers/generateToken";
 import bcrypt from "bcryptjs";
 import BuyerRepository from "../Repositories/BuyerRepository";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 class UserService {
 
@@ -53,6 +54,21 @@ class UserService {
         const refreshToken = generateToken({ id: foundUser.id_usuario, roles: userRoles }, SECRET_KEY, 60 * 24 * 7);
 
         return { logged: true, status: "Login exitoso", accessToken: accessToken, refreshToken: refreshToken };
+    }
+
+    static async refreshAccessToken(refreshToken: string) {
+        const SECRET_KEY = process.env.KEY_TOKEN;
+        if (!SECRET_KEY) {
+            throw new Error("La clave KEY_TOKEN no está definida.");
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.KEY_TOKEN as string) as JwtPayload
+        const { id, roles } = decoded.data;
+
+
+        const accessToken = generateToken({ id: id, roles: roles }, SECRET_KEY, 60);
+
+        return { logged: true, status: "Login exitoso", accessToken: accessToken };
     }
 
     static async updateUserProfile(id: number, updatedData: User) {

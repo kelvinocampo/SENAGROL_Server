@@ -11,17 +11,20 @@ import RegisterController from '../Controllers/User/RegisterController';
 import RegisterValidator from '../Middleware/User/RegisterValidator';
 
 import LoginValidator from '../Middleware/User/LoginValidator';
-import LoginController from "../Controllers/User/loginController";
+import LoginController from "../Controllers/User/LoginController";
 
 import UpdateUserProfile from "../Controllers/User/UpdateController";
 import UpdateValidator from '../Middleware/User/UpdateValidator';
 
 import GetUsers from "../Controllers/User/GetAllController";
 
+import RefreshAccessToken from "../Controllers/User/RefreshTokenController";
+
 const router = express.Router();
 
 router.post('/register', RegisterValidator.validatorParams, RegisterValidator.validator, RegisterController);
 router.post('/login', LoginValidator.validatorParams, LoginValidator.validator, LoginController);
+router.post('/refresh', RefreshAccessToken);
 router.patch('/password', verifyToken, UpdatePasswordValidator.validatorParams, UpdatePasswordValidator.validator, UpdatePasswordController);
 router.get("/", verifyToken, GetUserById);
 router.get("/all", verifyToken, GetUsers);
