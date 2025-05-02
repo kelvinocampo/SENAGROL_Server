@@ -48,6 +48,20 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario;
+        WHERE despublicado = 0
+        `;
+        const [products]: any = await db.execute(sql);
+        return products;
+    }
+
+    static async getAllAdmin() {
+        const sql = `
+        SELECT 
+            p.*, 
+            u.nombre AS nombre_vendedor
+        FROM producto p
+        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
+        JOIN usuario u ON v.id_vendedor = u.id_usuario;
         `;
         const [products]: any = await db.execute(sql);
         return products;
@@ -68,13 +82,30 @@ class ProductRepository {
     }
 
     static async getWithDiscount() {
-        const sql = "SELECT * FROM producto WHERE descuento > 0 ORDER BY descuento DESC";
+        const sql = `
+        SELECT 
+            p.*,
+            u.nombre AS nombre_vendedor
+        FROM producto p
+        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
+        JOIN usuario u ON v.id_vendedor = u.id_usuario
+        WHERE descuento > 0 
+        ORDER BY descuento DESC
+        `;
         const [products]: any = await db.execute(sql);
         return products;
     }
 
     static async getBySeller(id_user: number) {
-        const sql = "SELECT * FROM producto WHERE id_vendedor = ?";
+        const sql = `
+        SELECT 
+            p.*,
+            u.nombre AS nombre_vendedor
+        FROM producto p
+        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
+        JOIN usuario u ON v.id_vendedor = u.id_usuario 
+        WHERE id_vendedor = ?
+        `;
         const [products]: any = await db.execute(sql, [id_user]);
         return products;
     }

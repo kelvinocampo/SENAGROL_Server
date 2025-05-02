@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS producto(
     imagen VARCHAR(255),
     precio_unidad DECIMAL(10, 2),
     descuento DECIMAL(5, 2),
+    despublicado BOOLEAN DEFAULT 0,
 
     id_vendedor INT,
     FOREIGN KEY (id_vendedor)

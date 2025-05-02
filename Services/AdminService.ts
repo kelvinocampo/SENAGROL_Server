@@ -1,5 +1,6 @@
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import AdminRepository from "../Repositories/AdminRepository";
+import ProductRepository from "../Repositories/ProductRepository";
 
 class Adminservice {
     static async ActiveSeller(userId: number) {
@@ -20,6 +21,10 @@ class Adminservice {
     }
     static async deactivateRole(id_deactivate_user: number, role: string) {
         const result = await AdminRepository.deactivateRole(id_deactivate_user, role as RequiredRoles)
+        return result
+    }
+    static async getProducts() {
+        const result = await ProductRepository.getAllAdmin()
         return result
     }
 }

@@ -7,14 +7,16 @@ import CreateAdmin from "../Controllers/Admin/CreateAdmin";
 import DeleteUser from "../Controllers/Admin/DeleteUser";
 import DeactivateRole from "../Controllers/Admin/DeactivateRole";
 import DeactivateRoleValidator from "../Middleware/Admin/DeactivateRoleValidator";
+import GetProducts from "../Controllers/Admin/GetProducts";
 const router = express.Router();
 
 router.post('/approveRequestSeller', verifyToken, activeSellerController);
 router.post('/approveRequestTransporter', verifyToken, activeTransporterController);
 router.post('/usuarios/:id_new_admin', verifyToken, verifyRole(["administrador"]), CreateAdmin);
 router.delete('/usuarios/:id_delete_user', verifyToken, verifyRole(["administrador"]), DeleteUser);
-router.delete('/usuarios/:role/:id_deactivate_user', 
+router.patch('/usuarios/:role/:id_deactivate_user', 
     verifyToken, verifyRole(["administrador"]), DeactivateRoleValidator.validatorParams, DeactivateRoleValidator.validator,
     DeactivateRole);
+router.get('/products', verifyToken, verifyRole(["administrador"]), GetProducts);
 
 export default router;
