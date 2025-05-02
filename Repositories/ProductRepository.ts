@@ -41,13 +41,28 @@ class ProductRepository {
     }
 
     static async getAll() {
-        const sql = "SELECT * FROM producto";
+        const sql = `
+        SELECT 
+            p.*, 
+            u.nombre AS nombre_vendedor
+        FROM producto p
+        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
+        JOIN usuario u ON v.id_vendedor = u.id_usuario;
+        `;
         const [products]: any = await db.execute(sql);
         return products;
     }
 
     static async get(id_product:number) {
-        const sql = "SELECT * FROM producto WHERE id_producto = ?";
+        const sql = `
+        SELECT 
+            p.*, 
+            u.nombre AS nombre_vendedor
+        FROM producto p
+        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
+        JOIN usuario u ON v.id_vendedor = u.id_usuario;
+        WHERE id_producto = ?
+        `;
         const [product]: any = await db.execute(sql, [id_product]);
         return product;
     }

@@ -47,7 +47,6 @@ class UserRepository {
                    WHEN c.id_comprador IS NOT NULL THEN 'Comprador'
                    WHEN v.id_vendedor IS NOT NULL THEN 'Vendedor'
                    WHEN t.id_transportador IS NOT NULL THEN 'Transportador'
-                   ELSE 'Desconocido'
                END AS rol
         FROM usuario u
         LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
