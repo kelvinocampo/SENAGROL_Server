@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 
-type RequiredRoles = "comprador" | "vendedor" | "administrador" | "transportador";
+export type RequiredRoles = "comprador" | "vendedor" | "administrador" | "transportador";
 
 const verifyRole = (requiredRoles: RequiredRoles[]): RequestHandler => {
     return (req: Request, res: Response, next: NextFunction) => {

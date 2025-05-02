@@ -1,4 +1,5 @@
 import db from "../Config/configDB";
+import { RequiredRoles } from "../Middleware/VerifyTokenData";
 
 class AdminRepository {
     static async ActiveSeller(userId: number) {
@@ -42,7 +43,7 @@ class AdminRepository {
         `;
         const values = [id_new_admin];
 
-        const [result] = await db.execute(query,values);
+        const [result] = await db.execute(query, values);
         return result;
     }
 
@@ -52,10 +53,19 @@ class AdminRepository {
         `;
         const values = [id_delete_user];
 
-        const [result] = await db.execute(query,values);
+        const [result] = await db.execute(query, values);
         return result;
     }
 
+    static async deactivateRole(id_deactivate_user: number, role: RequiredRoles) {
+        const query = `
+            DELETE FROM ${role} WHERE id_${role} = ?
+        `;
+        const values = [id_deactivate_user];
+
+        const [result] = await db.execute(query, values);
+        return result;
+    }
 }
 
 export default AdminRepository;

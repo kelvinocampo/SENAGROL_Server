@@ -1,3 +1,4 @@
+import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import AdminRepository from "../Repositories/AdminRepository";
 
 class Adminservice {
@@ -15,6 +16,10 @@ class Adminservice {
     }
     static async deleteUser(id_delete_user: number) {
         const result = await AdminRepository.deleteUser(id_delete_user)
+        return result
+    }
+    static async deactivateRole(id_deactivate_user: number, role: string) {
+        const result = await AdminRepository.deactivateRole(id_deactivate_user, role as RequiredRoles)
         return result
     }
 }
