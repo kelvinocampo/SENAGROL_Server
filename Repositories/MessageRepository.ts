@@ -2,7 +2,7 @@ import db from "../Config/configDB";
 import Message from "../Dto/Chat/MessageDTO";
 
 class MessageRepository {
-    static async createTextMessage(message: Message) {
+    static async createMessage(message: Message) {
         try {
             const query = `
                 INSERT INTO mensaje 
@@ -32,7 +32,7 @@ class MessageRepository {
             UPDATE message
             SET editado = ?,
                 contenido = ?
-            WHERE id_mensaje = ?
+            WHERE id_mensaje = ? AND tipo = "texto"
         `;
 
             // El resultado es un array donde el primer elemento contiene la información de la operación

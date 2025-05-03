@@ -3,7 +3,7 @@ import MessageRepository from "../Repositories/MessageRepository";
 import ChatRepository from "../Repositories/ChatRepository";
 
 class MessageService {
-    static async sendTextMessage(message: Message) {
+    static async sendMessage(message: Message) {
         try {
             // 1. Verificar que el chat existe y el usuario tiene acceso
             const chat = await ChatRepository.getChatById(message.id_chat);
@@ -16,7 +16,7 @@ class MessageService {
             }
 
             // 3. Guardar en base de datos
-            const newMessage = await MessageRepository.createTextMessage(message);
+            const newMessage = await MessageRepository.createMessage(message);
 
             return newMessage;
         } catch (error: any) {
