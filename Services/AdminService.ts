@@ -32,6 +32,10 @@ class Adminservice {
         const result = await BuyRepository.getAllAdmin()
         return result
     }
+    static async unpublishProduct(id_producto: number) {
+        const result = await ProductRepository.unpublishProduct(id_producto)
+        return result
+    }
 }
 
 export default Adminservice;

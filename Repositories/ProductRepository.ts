@@ -47,7 +47,7 @@ class ProductRepository {
             u.nombre AS nombre_vendedor
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario;
+        JOIN usuario u ON v.id_vendedor = u.id_usuario
         WHERE despublicado = 0
         `;
         const [products]: any = await db.execute(sql);
@@ -61,7 +61,7 @@ class ProductRepository {
             u.nombre AS nombre_vendedor
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario;
+        JOIN usuario u ON v.id_vendedor = u.id_usuario
         `;
         const [products]: any = await db.execute(sql);
         return products;
@@ -74,8 +74,8 @@ class ProductRepository {
             u.nombre AS nombre_vendedor
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario;
-        WHERE id_producto = ?
+        JOIN usuario u ON v.id_vendedor = u.id_usuario
+        WHERE id_producto = ? AND despublicado = 0
         `;
         const [product]: any = await db.execute(sql, [id_product]);
         return product;
@@ -89,7 +89,7 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE descuento > 0 
+        WHERE descuento > 0 AND despublicado = 0
         ORDER BY descuento DESC
         `;
         const [products]: any = await db.execute(sql);
@@ -124,6 +124,15 @@ class ProductRepository {
         return result;
     }
 
+    static async unpublishProduct(id_producto: number) {
+        const query = `
+        UPDATE producto
+        SET despublicado = 1
+        WHERE id_producto = ?
+        `;
+        const [result]: any = await db.execute(query, [id_producto]);
+        return result;
+    }
 }
 
 export default ProductRepository;
