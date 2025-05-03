@@ -2,7 +2,7 @@ import mysql from 'mysql2';
 import dotenv from "dotenv";
 dotenv.config();
 
-const { DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE, ssl_mode } = process.env;
+const { DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
 
 // Creación del pool de conexiones
 const db = mysql.createPool({
