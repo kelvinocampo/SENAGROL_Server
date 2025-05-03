@@ -1,3 +1,4 @@
+import { query } from "express";
 import db from "../Config/configDB";
 
 class ChatRepository {
@@ -75,6 +76,44 @@ class ChatRepository {
             console.error("Error en MessageRepository:", error);
             throw error;
         }
+    }
+
+    static async blockChat(id_user: number, id_chat: number) {
+        const query = `
+            UPDATE chat
+            SET 
+                bloqueado_user1 = CASE 
+                    WHEN id_user1 = ? THEN true
+                    ELSE bloqueado_user1
+                END,
+                bloqueado_user2 = CASE 
+                    WHEN id_user2 = ? THEN true
+                    ELSE bloqueado_user2
+                END
+            WHERE id_chat = ?;
+        `
+        const values = [id_user, id_user, id_chat]
+        const [result] = await db.execute(query, values)
+        return result
+    }
+
+    static async unblockChat(id_user: number, id_chat: number) {
+        const query = `
+            UPDATE chat
+            SET 
+                bloqueado_user1 = CASE 
+                    WHEN id_user1 = ? THEN false
+                    ELSE bloqueado_user1
+                END,
+                bloqueado_user2 = CASE 
+                    WHEN id_user2 = ? THEN false
+                    ELSE bloqueado_user2
+                END
+            WHERE id_chat = ?;
+        `
+        const values = [id_user, id_user, id_chat]
+        const [result] = await db.execute(query, values)
+        return result
     }
 }
 

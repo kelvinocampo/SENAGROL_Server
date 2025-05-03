@@ -11,13 +11,55 @@ class ChatService {
             }
 
             if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
-                throw new Error("No tienes permiso para enviar mensajes en este chat");
+                throw new Error("No tienes permiso para eliminar este chat");
             }
 
             // 3. Eliminar en base de datos
             const deleteChat = await ChatRepository.deleteChat(id_user, id_chat);
 
             return deleteChat;
+        } catch (error: any) {
+            throw error;
+        }
+    }
+
+    static async blockChat(id_user: number, id_chat: number) {
+        try {
+            // 1. Verificar que el chat existe y el usuario tiene acceso
+            const chat = await ChatRepository.getChatById(id_chat);
+            if (!chat) {
+                throw new Error("Chat no encontrado");
+            }
+
+            if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
+                throw new Error("No tienes permiso para bloquear este chat");
+            }
+
+            // 3. Bloquear en base de datos
+            const blockChat = await ChatRepository.blockChat(id_user, id_chat);
+
+            return blockChat;
+        } catch (error: any) {
+            throw error;
+        }
+    }
+
+    static async unblockChat(id_user: number, id_chat: number) {
+        try {
+            // 1. Verificar que el chat existe y el usuario tiene acceso
+            const chat = await ChatRepository.getChatById(id_chat);
+            if (!chat) {
+                throw new Error("Chat no encontrado");
+            }
+
+            if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
+                throw new Error("No tienes permiso para bloquear este chat");
+            }
+
+            // 3. Desbloquear en base de datos
+            const unblockChat = await ChatRepository.unblockChat(id_user, id_chat);
+
+            return unblockChat;
         } catch (error: any) {
             throw error;
         }

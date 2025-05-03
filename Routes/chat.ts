@@ -19,6 +19,8 @@ import GetChat from "../Controllers/Chat/Get";
 import ImageMessageController from "../Controllers/Chat/ImageMessage";
 import upload from "../Middleware/multerConfig";
 import AudioMessageController from "../Controllers/Chat/AudioMessage";
+import BlockChatController from "../Controllers/Chat/BlockChat";
+import UnblockChatController from "../Controllers/Chat/UnblockChat";
 
 const router = express.Router();
 
@@ -30,5 +32,7 @@ router.post('/:id_chat/message/image', upload.single("imagen"), verifyToken, Ima
 router.post('/:id_chat/message/image', upload.single("audio"), verifyToken, AudioMessageController);
 router.put('/:id_chat/message/:id_message', verifyToken, UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);
 router.delete('/:id_chat/message/:id_message', verifyToken, DeleteMessageController);
+router.patch("/block/:id_chat", verifyToken, BlockChatController)
+router.patch("/block/:id_chat", verifyToken, UnblockChatController)
 
 export default router;
