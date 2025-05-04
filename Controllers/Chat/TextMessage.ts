@@ -8,7 +8,7 @@ const textMessageController = async (req: Request, res: Response) => {
         const { text } = req.body;
         const { id_chat } = req.params;
 
-        const result = await MessageService.sendTextMessage(
+        const result = await MessageService.sendMessage(
             new Message(false, "texto", text, (new Date()), parseInt(id_chat), parseInt(id_user))
         );
 
