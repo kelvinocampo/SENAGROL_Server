@@ -18,17 +18,19 @@ class ChatRepository {
     static async getChats(id_user: number) {
         try {
             const query = `
-                SELECT * 
+                SELECT chat.* ,
                 CASE 
-                    WHEN id_user1 = ? AND bloqueado_user1 = 1 THEN "Bloqueado" AS estado
-                    WHEN id_user2 = ? AND bloqueado_user2 = 1 THEN "Bloqueado" AS estado
-                END
+                    WHEN id_user1 = ? AND bloqueado_user1 = 1 THEN "Bloqueado"
+                    WHEN id_user2 = ? AND bloqueado_user2 = 1 THEN "Bloqueado"
+                    ELSE "Activo"
+                END AS estado
                 FROM chat 
-                WHERE (id_user1 = ? OR id_user2 = ?) AND
-                CASE 
-                    WHEN id_user1 = ? THEN eliminado_user1 = 0 
-                    WHEN id_user2 = ? THEN eliminado_user2 = 0
-                END
+                WHERE
+                (id_user1 = ? OR id_user2 = ?) AND
+                (
+                    (id_user1 = ? AND eliminado_user1 = 0) OR
+                    (id_user2 = ? AND eliminado_user2 = 0)
+                )
                 ORDER BY fecha_reciente DESC
                 `
             const values = Array(6).fill(id_user);
@@ -36,7 +38,7 @@ class ChatRepository {
                 query,
                 values
             );
-            return rows[0] || null;
+            return rows;
         } catch (error) {
             console.error("Error en ChatRepository:", error);
             throw error;

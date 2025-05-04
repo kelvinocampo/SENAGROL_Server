@@ -54,7 +54,8 @@ class UserRepository {
         LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor
         LEFT JOIN transportador t ON u.id_usuario = t.id_transportador;
         `;
-        return db.execute(sql);
+        const [result] = await db.execute(sql)
+        return result;
     }
 
     static async UpdatePassword(password: string, id_user: number,) {

@@ -6,6 +6,6 @@ import GetSells from "../Controllers/Seller/GetSells";
 const router = express.Router();
 
 router.post('/requestSeller', verifyToken, RequestSeller);
-router.post('/my_sells', verifyToken, GetSells);
+router.get('/my_sells', verifyToken, GetSells);
 
 export default router;
