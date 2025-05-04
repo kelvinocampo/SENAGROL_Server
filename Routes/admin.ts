@@ -12,11 +12,11 @@ import GetSales from "../Controllers/Admin/GetSales";
 import UnpublishProduct from "../Controllers/Admin/UnpublishProduct";
 const router = express.Router();
 
-router.post('/approveRequestSeller', verifyToken, activeSellerController);
-router.post('/approveRequestTransporter', verifyToken, activeTransporterController);
+router.post('/approveRequestSeller', verifyToken, verifyRole(["administrador"]), activeSellerController);
+router.post('/approveRequestTransporter', verifyToken, verifyRole(["administrador"]), activeTransporterController);
 router.post('/usuarios/:id_new_admin', verifyToken, verifyRole(["administrador"]), CreateAdmin);
 router.delete('/usuarios/:id_delete_user', verifyToken, verifyRole(["administrador"]), DeleteUser);
-router.patch('/usuarios/:role/:id_deactivate_user', 
+router.patch('/usuarios/:role/:id_deactivate_user',
     verifyToken, verifyRole(["administrador"]), DeactivateRoleValidator.validatorParams, DeactivateRoleValidator.validator,
     DeactivateRole);
 router.get('/products', verifyToken, verifyRole(["administrador"]), GetProducts);

@@ -55,12 +55,20 @@ class TransporterRepository {
     static async getTransporters() {
         const query = `
         SELECT 
-            u.*
+            u.id_usuario,
+            u.nombre,
+            u.nombre_usuario,
+            u.correo,
+            u.cara,
+            u.telefono,
+            t.tipo_vehiculo,
+            t.peso_vehiculo,
             GROUP_CONCAT(fv.foto SEPARATOR ',') AS fotos
         FROM transportador t
-        JOIN usuario u ON u.id_usuario = t.id_usuario
+        JOIN usuario u ON u.id_usuario = t.id_transportador
         JOIN foto_vehiculo fv ON fv.id_transportador = t.id_transportador
-        WHERE t.estado = 'Activo';
+        WHERE t.estado = 'Activo'
+        GROUP BY u.id_usuario
         `;
         const result = await db.execute(query);
         return result[0];
