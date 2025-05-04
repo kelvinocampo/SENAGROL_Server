@@ -59,7 +59,10 @@ class AdminRepository {
 
     static async deactivateRole(id_deactivate_user: number, role: RequiredRoles) {
         const query = `
-            DELETE FROM ${role} WHERE id_${role} = ?
+            UPDATE ${role} 
+            SET estado = "Pendiente" 
+            WHERE id_${role} = ?
+            AND estado = 'Activo'
         `;
         const values = [id_deactivate_user];
 

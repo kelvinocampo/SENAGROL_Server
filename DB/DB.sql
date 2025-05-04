@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS usuario(
 DROP TABLE IF EXISTS comprador;
 CREATE TABLE IF NOT EXISTS comprador(
     id_comprador INT PRIMARY KEY,
+    estado ENUM('Pendiente', 'Activo') DEFAULT 'Pendiente',
 
     FOREIGN KEY (id_comprador)
     REFERENCES usuario(id_usuario)
@@ -59,6 +60,7 @@ CREATE TABLE IF NOT EXISTS foto_vehiculo(
 DROP TABLE IF EXISTS administrador;
 CREATE TABLE IF NOT EXISTS administrador(
     id_administrador INT PRIMARY KEY,
+    estado ENUM('Pendiente', 'Asignada', 'En Proceso', 'Completada'),
 
     FOREIGN KEY (id_administrador)
     REFERENCES usuario(id_usuario)
