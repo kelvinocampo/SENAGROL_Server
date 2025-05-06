@@ -4,19 +4,12 @@ import TransporterDto from '../Dto/User/TransporterDto';
 class TransporterRepository {
     static async register(transporter: TransporterDto, imagesName: string[]) {
         // 0. Verificar si ya es transportador
-        const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
+        const checkSql = `SELECT * FROM transportador WHERE id_transportador = ? AND estado = `;
         const [existingTransporter]: any = await db.execute(checkSql, [transporter.userId]);
 
         if (existingTransporter.length > 0) {
             throw new Error("El usuario ya está registrado como transportador");
         }
-
-        // 1. Eliminar otros roles si existen
-        const deleteAdminSql = `DELETE FROM administrador WHERE id_administrador = ?`;
-        const deleteBuyerSql = `DELETE FROM comprador WHERE id_comprador = ?`;
-
-        await db.execute(deleteAdminSql, [transporter.userId]);
-        await db.execute(deleteBuyerSql, [transporter.userId]);
 
         // 2. Insertar en la tabla de transportadores
         const transporterSql = `

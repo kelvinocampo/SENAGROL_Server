@@ -23,7 +23,7 @@ class Adminservice {
         if (result.affectedRows == 0) return { message: `Usuario con la ID ${id_delete_user} no encontrado` }
     }
     static async deactivateRole(id_deactivate_user: number, role: string) {
-        const result: any = await AdminRepository.deactivateRole(id_deactivate_user, role as RequiredRoles)
+        const result: any = await AdminRepository.deactivateRole(id_deactivate_user, role as Omit<RequiredRoles, "comprador">)
         if (result.affectedRows > 0) return { message: `Usuario ya no posee el rol indicado` }
         if (result.affectedRows == 0) return { message: `Usuario no encontrado con el rol indicado` }
     }

@@ -15,15 +15,6 @@ class SellerRepository {
             return { success: false, message: "Ya eres vendedor." };
         }
     
-        // Eliminar otros roles si existen
-        const deleteAdminSql = `DELETE FROM administrador WHERE id_administrador = ?`;
-        const deleteBuyerSql = `DELETE FROM comprador WHERE id_comprador = ?`;
-        const deleteTransporterSql = `DELETE FROM transportador WHERE id_transportador = ?`;
-    
-        await db.execute(deleteAdminSql, [userId]);
-        await db.execute(deleteBuyerSql, [userId]);
-        await db.execute(deleteTransporterSql, [userId]);
-    
         // Insertar nueva solicitud de vendedor con estado 'Pendiente'
         await db.execute(
             "INSERT INTO vendedor (id_vendedor, estado) VALUES (?, 'Pendiente')", 
