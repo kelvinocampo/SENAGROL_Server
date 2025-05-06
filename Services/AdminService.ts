@@ -2,8 +2,9 @@ import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import AdminRepository from "../Repositories/AdminRepository";
 import BuyRepository from "../Repositories/BuyRepository";
 import ProductRepository from "../Repositories/ProductRepository";
+import UserRepository from "../Repositories/UserRepository";
 
-class Adminservice {
+class AdminService {
     static async ActiveSeller(userId: number) {
         const result = await AdminRepository.ActiveSeller(userId)
         return result
@@ -31,6 +32,10 @@ class Adminservice {
         const result = await ProductRepository.getAllAdmin()
         return result
     }
+    static async getUsers() {
+        const result = await UserRepository.getAllAdmin()
+        return result
+    }
     static async getSales() {
         const result = await BuyRepository.getAllAdmin()
         return result
@@ -41,4 +46,4 @@ class Adminservice {
     }
 }
 
-export default Adminservice;
+export default AdminService;

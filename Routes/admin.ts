@@ -10,6 +10,7 @@ import DeactivateRoleValidator from "../Middleware/Admin/DeactivateRoleValidator
 import GetProducts from "../Controllers/Admin/GetProducts";
 import GetSales from "../Controllers/Admin/GetSales";
 import UnpublishProduct from "../Controllers/Admin/UnpublishProduct";
+import GetUsersAdmin from "../Controllers/Admin/GetAllUsersController";
 const router = express.Router();
 
 router.post('/approveRequestSeller', verifyToken, verifyRole(["administrador"]), activeSellerController);
@@ -21,6 +22,7 @@ router.patch('/usuarios/:role/:id_deactivate_user',
     DeactivateRole);
 router.get('/products', verifyToken, verifyRole(["administrador"]), GetProducts);
 router.get('/sales', verifyToken, verifyRole(["administrador"]), GetSales);
+router.get('/usuarios', verifyToken, verifyRole(["administrador"]), GetUsersAdmin);
 router.get('/products/unpublish/:id_producto', verifyToken, verifyRole(["administrador"]), UnpublishProduct);
 
 export default router;
