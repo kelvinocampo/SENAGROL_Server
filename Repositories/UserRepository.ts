@@ -41,18 +41,26 @@ class UserRepository {
 
     static async getAll() {
         const sql = `
-        SELECT u.*, 
-               CASE 
-                   WHEN a.id_administrador IS NOT NULL THEN 'Administrador'
-                   WHEN c.id_comprador IS NOT NULL THEN 'Comprador'
-                   WHEN v.id_vendedor IS NOT NULL THEN 'Vendedor'
-                   WHEN t.id_transportador IS NOT NULL THEN 'Transportador'
-               END AS rol
-        FROM usuario u
-        LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
-        LEFT JOIN comprador c ON u.id_usuario = c.id_comprador
-        LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor
-        LEFT JOIN transportador t ON u.id_usuario = t.id_transportador;
+            SELECT 
+                u.*,
+                GROUP_CONCAT(DISTINCT 
+                    CASE 
+                        WHEN a.id_administrador IS NOT NULL AND a.estado = 'Activo' THEN 'Administrador'
+                        WHEN c.id_comprador IS NOT NULL AND c.estado = 'Activo' THEN 'Comprador'
+                        WHEN v.id_vendedor IS NOT NULL AND v.estado = 'Activo' THEN 'Vendedor'
+                        WHEN t.id_transportador IS NOT NULL AND t.estado = 'Activo' THEN 'Transportador'
+                    END
+                SEPARATOR ', ') AS roles
+            FROM usuario u
+            LEFT JOIN administrador a ON u.id_usuario = a.id_administrador AND a.estado = 'Activo'
+            LEFT JOIN comprador c ON u.id_usuario = c.id_comprador AND c.estado = 'Activo'
+            LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor AND v.estado = 'Activo'
+            LEFT JOIN transportador t ON u.id_usuario = t.id_transportador AND t.estado = 'Activo'
+            WHERE (a.id_administrador IS NOT NULL)
+            OR (c.id_comprador IS NOT NULL)
+            OR (v.id_vendedor IS NOT NULL)
+            OR (t.id_transportador IS NOT NULL)
+            GROUP BY u.id_usuario;
         `;
         const [result] = await db.execute(sql)
         return result;
