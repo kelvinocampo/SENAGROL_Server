@@ -1,19 +1,17 @@
 import db from '../Config/configDB';
-import logIn from '../Dto/User/LoginDto';
 import User from '../Dto/User/UserDto';
-import bcrypt from 'bcryptjs';
 
 class UserRepository {
 
     static async getUserRoles(userId: number) {
         const sql = `
-        SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = ?
+        SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = ? AND estado = 'Activo'
         UNION
-        SELECT 'administrador' AS role FROM administrador WHERE id_administrador = ?
+        SELECT 'administrador' AS role FROM administrador WHERE id_administrador = ? AND estado = 'Activo'
         UNION
-        SELECT 'transportador' AS role FROM transportador WHERE id_transportador = ?
+        SELECT 'transportador' AS role FROM transportador WHERE id_transportador = ? AND estado = 'Activo'
         UNION
-        SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ?;
+        SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ? AND estado = 'Activo';
     `;
         const result: any = await db.execute(sql, [userId, userId, userId, userId]);
 
