@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
+import cors from "cors"
 
 import UserRoutes from "./Routes/user";
 import SellerRoutes from "./Routes/seller";
@@ -15,8 +16,10 @@ import BuyRoutes from "./Routes/buy";
 dotenv.config();
 const PORT = process.env.PORT || 10101;
 
-const app = express().use(bodyParser.json())
-    .use(bodyParser.urlencoded({ extended: true }));
+const app = express()
+    .use(bodyParser.json())
+    .use(bodyParser.urlencoded({ extended: true }))
+    .use(cors());
 
 app.use("/usuario", UserRoutes);
 app.use("/vendedor", SellerRoutes);
