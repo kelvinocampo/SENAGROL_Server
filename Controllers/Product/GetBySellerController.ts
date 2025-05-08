@@ -9,7 +9,7 @@ const getBySeller = async (req: Request, res: Response) => {
         return res.status(200).json({
             status: "query ok",
             total: products.length,
-            products
+            products: products
         });
 
     } catch (error: any) {
