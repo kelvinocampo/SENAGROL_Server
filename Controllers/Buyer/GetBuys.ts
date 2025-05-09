@@ -4,9 +4,9 @@ import BuyerService from "../../Services/BuyerService";
 let getBuys = async (req: Request, res: Response) => {
     try {
         const { id_user } = req.body;
-        const transports = await BuyerService.getBuys(id_user);
+        const buys = await BuyerService.getBuys(id_user);
 
-        return res.status(200).json({ success: true, transports });
+        return res.status(200).json({ success: true, buys: buys });
     } catch (error: any) {
         console.error("🚨 Error en consultar compras:", error);
         if (error && error.code === "ER_DUP_ENTRY") {
