@@ -15,13 +15,34 @@ const UpdateProducts = async (req: Request, res: Response) => {
             quantity,
             MinimumQuantity,
             Discount,
-            id_user
-        } = req.body
+            id_user,
+            imagen // Agregamos este campo para recibir la URL actual
+        } = req.body;
         
-        const { url: imagenUrl } = await uploadToAzure(req.file, "producto")
+        let imagenUrl = imagen; // Mantenemos la imagen actual por defecto
 
-        // Crear DTO y registrar producto
-        const updatedProduct = new Products(id_user, Nombre, Precio, Description, latitud, longitud, quantity, MinimumQuantity, imagenUrl, Discount);
+        // Solo subir nueva imagen si se proporciona
+        if (req.file) {
+            const { url } = await uploadToAzure(req.file, "producto");
+            imagenUrl = url;
+        }
+
+        if (!imagenUrl) {
+            return res.status(400).json({ error: "La imagen es requerida" });
+        }
+
+        const updatedProduct = new Products(
+            id_user, 
+            Nombre, 
+            Precio, 
+            Description, 
+            latitud, 
+            longitud, 
+            quantity, 
+            MinimumQuantity, 
+            imagenUrl, 
+            Discount
+        );
 
         if (!id_producto) {
             return res.status(400).json({ error: "Falta el ID del producto" });

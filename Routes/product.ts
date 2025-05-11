@@ -34,7 +34,7 @@ router.post('/create',
     verifyRole(["vendedor"]),
     CreateValidator.validatorParams, CreateValidator.validator, RegisterProducts);
 router.put('/edit/:id_producto', upload.single("imagen"), verifyToken, verifyRole(["vendedor"]),
- UpdateValidator.validatorParams, UpdateValidator.validator, UpdateProducts);
+    UpdateValidator.validatorParams, UpdateValidator.validator, UpdateProducts);
 router.delete('/delete/:id', verifyToken, verifyRole(["vendedor"]), DeleteValidator.validatorParams, DeleteValidator.validator, DeleteProducts);
 
 
