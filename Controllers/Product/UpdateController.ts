@@ -6,22 +6,24 @@ import Products from "../../Dto/Product/ProductsCreate";
 const UpdateProducts = async (req: Request, res: Response) => {
     try {
         const { id_producto } = req.params;
+
+        // Los campos de texto vienen en req.body
         const {
-            Nombre,
-            Precio,
-            Description,
+            nombre,
+            descripcion,
+            cantidad,
+            cantidad_minima_compra,
+            precio_unidad,
+            descuento,
             latitud,
             longitud,
-            quantity,
-            MinimumQuantity,
-            Discount,
             id_user,
-            imagen // Agregamos este campo para recibir la URL actual
+            imagen_url // URL de la imagen existente
         } = req.body;
-        
-        let imagenUrl = imagen; // Mantenemos la imagen actual por defecto
 
-        // Solo subir nueva imagen si se proporciona
+        let imagenUrl = imagen_url;
+
+        // Procesar nueva imagen si fue enviada (viene en req.file)
         if (req.file) {
             const { url } = await uploadToAzure(req.file, "producto");
             imagenUrl = url;
@@ -31,22 +33,22 @@ const UpdateProducts = async (req: Request, res: Response) => {
             return res.status(400).json({ error: "La imagen es requerida" });
         }
 
+        // Crear DTO con los tipos correctos
         const updatedProduct = new Products(
-            id_user, 
-            Nombre, 
-            Precio, 
-            Description, 
-            latitud, 
-            longitud, 
-            quantity, 
-            MinimumQuantity, 
-            imagenUrl, 
-            Discount
+            Number(id_user),
+            nombre,
+            Number(precio_unidad),
+            descripcion,
+            Number(latitud),
+            Number(longitud),
+            Number(cantidad),
+            Number(cantidad_minima_compra),
+            imagenUrl,
+            Number(descuento)
         );
 
-        if (!id_producto) {
-            return res.status(400).json({ error: "Falta el ID del producto" });
-        }
+        console.log(updatedProduct);
+        
 
         await ProductService.updateProduct(Number(id_producto), updatedProduct);
 
@@ -54,7 +56,10 @@ const UpdateProducts = async (req: Request, res: Response) => {
 
     } catch (error: any) {
         console.error("Error al actualizar el producto:", error);
-        return res.status(500).json({ error: error.message || "Error interno del servidor" });
+        return res.status(500).json({
+            error: error.message,
+            details: error.stack // Solo para desarrollo
+        });
     }
 };
 

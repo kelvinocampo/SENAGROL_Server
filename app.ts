@@ -16,10 +16,17 @@ import BuyRoutes from "./Routes/buy";
 dotenv.config();
 const PORT = process.env.PORT || 10101;
 
+// Configuración CORS actualizada
+const corsOptions = {
+    origin: 'http://localhost:5173', // Reemplaza con tu URL de frontend
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
 const app = express()
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
-    .use(cors());
+    .use(cors(corsOptions));
 
 app.use("/usuario", UserRoutes);
 app.use("/vendedor", SellerRoutes);
