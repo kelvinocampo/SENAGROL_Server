@@ -51,35 +51,41 @@ class AdminRepository {
 
         return { success: true, message: "Usuario aprobado como transportador." };
     }
+static async CreateAdmin(userId: number) {
+  try {
+    const [solicitud]: any = await db.execute(
+      "SELECT * FROM administrador WHERE id_administrador = ? AND estado = 'Pendiente'",
+      [userId]
+    );
 
-    static async CreateAdmin(id_new_admin: number) {
-
-        const [solicitud]: any = await db.execute(
-            "SELECT * FROM administrador WHERE id_administrador = ? AND estado = 'Pendiente'",
-            [id_new_admin]
-        );
-
-        if (solicitud.length === 0) {
-            return { success: false, message: "No hay una solicitud pendiente para este usuario." };
-        }
-
-        // Desactivar otros roles si existen
-        const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
-        const deactivateTransporterSql = `UPDATE transportador SET estado = 'Pendiente' WHERE id_transportador = ?`;
-        const deactivateSellerSql = `UPDATE vendedor SET estado = 'Pendiente' WHERE id_vendedor = ?`;
-
-        await db.execute(deactivateBuyerSql, [id_new_admin]);
-        await db.execute(deactivateTransporterSql, [id_new_admin]);
-        await db.execute(deactivateSellerSql, [id_new_admin]);
-
-        const query = `
-            INSERT INTO administrador(id_administrador) VALUES (?)
-        `;
-        const values = [id_new_admin];
-
-        const [result] = await db.execute(query, values);
-        return result;
+    if (solicitud.length === 0) {
+      return { success: false, message: "No hay una solicitud pendiente para este usuario." };
     }
+
+    // Desactivar otros roles si existen
+    await db.execute(`UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`, [userId]);
+    await db.execute(`UPDATE transportador SET estado = 'Pendiente' WHERE id_transportador = ?`, [userId]);
+    await db.execute(`UPDATE vendedor SET estado = 'Pendiente' WHERE id_vendedor = ?`, [userId]);
+
+    // Cambiar a 'Activo'
+    const [result]: any = await db.execute(
+      "UPDATE administrador SET estado = 'Activo' WHERE id_administrador = ? AND estado = 'Pendiente'",
+      [userId]
+    );
+
+    // Verificar si se modificó una fila
+    if (result.affectedRows > 0) {
+      return { success: true, message: `El usuario ${userId} ahora es administrador.` };
+    } else {
+      return { success: false, message: `No se encontró solicitud pendiente para activar.` };
+    }
+  } catch (error) {
+    console.error("Error en AdminRepository.CreateAdmin:", error);
+    throw error;
+  }
+}
+
+
 
     static async deleteUser(id_delete_user: number) {
         const query = `

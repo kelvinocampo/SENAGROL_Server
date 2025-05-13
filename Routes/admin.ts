@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.post('/approveRequestSeller', verifyToken, verifyRole(["administrador"]), activeSellerController);
 router.post('/approveRequestTransporter', verifyToken, verifyRole(["administrador"]), activeTransporterController);
-router.post('/usuarios/:id_new_admin', verifyToken, verifyRole(["administrador"]), CreateAdmin);
+router.post('/usuarios/:userId', verifyToken, verifyRole(["administrador"]), CreateAdmin);
 router.delete('/usuarios/:id_delete_user', verifyToken, verifyRole(["administrador"]), DeleteUser);
 router.patch('/usuarios/:role/:id_deactivate_user',
     verifyToken, verifyRole(["administrador"]), DeactivateRoleValidator.validatorParams, DeactivateRoleValidator.validator,

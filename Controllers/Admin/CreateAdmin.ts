@@ -1,15 +1,27 @@
 import { Request, Response } from "express";
 import AdminService from "../../Services/AdminService";
 
+interface CreateAdminResult {
+  success: boolean;
+  message: string;
+}
 
 const createAdmin = async (req: Request, res: Response) => {
   try {
-    const { id_new_admin } = req.params;
+    const { userId } = req.params;
 
-    const result: any = await AdminService.CreateAdmin(parseInt(id_new_admin));
-    return res.status(result ? 200 : 400).json({
+    const result: CreateAdminResult = await AdminService.CreateAdmin(parseInt(userId));
+
+    if (!result.success) {
+      return res.status(400).json({
+        status: "error",
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
       status: "new admin",
-      message: result.message
+      message: result.message,
     });
   } catch (error) {
     console.error("Error en aprobarSolicitud:", error);

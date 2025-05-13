@@ -13,11 +13,21 @@ class AdminService {
         const result = await AdminRepository.ActiveTransporter(userId)
         return result
     }
-    static async CreateAdmin(id_new_admin: number) {
-        const result: any = await AdminRepository.CreateAdmin(id_new_admin)
-        if (result.affectedRows > 0) return { message: `Nuevo Admin creado con la ID ${id_new_admin}` }
-        if (result.affectedRows == 0) return { message: `Usuario con la ID ${id_new_admin} no encontrado` }
+   static async CreateAdmin(userId: number): Promise<{ success: boolean; message: string }> {
+    const result = await AdminRepository.CreateAdmin(userId);
+
+    // Si result es undefined o nulo
+    if (!result) {
+        return { success: false, message: "No se pudo procesar la solicitud para este usuario." };
     }
+
+    // Si result tiene affectedRows
+   
+
+    // Si result ya contiene message y success
+    return result;
+}
+
     static async deleteUser(id_delete_user: number) {
         const result: any = await AdminRepository.deleteUser(id_delete_user)
         if (result.affectedRows > 0) return { message: `Usuario eliminado` }
