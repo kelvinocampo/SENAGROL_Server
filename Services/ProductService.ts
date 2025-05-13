@@ -1,4 +1,5 @@
 import Product from "../Dto/Product/ProductsCreate";
+import { deleteFromAzure } from "../Helpers/DeleteFile";
 import ProductRepository from "../Repositories/ProductRepository";
 
 class ProductService {
@@ -36,13 +37,13 @@ class ProductService {
     static async updateProduct(id: number, productData: Product) {
         try {
             console.log(productData);
-            
+
             const existingProduct = await ProductRepository.findById(id);
             if (!existingProduct) {
                 return { success: false, message: "Producto no encontrado" };
             }
 
-            // await removeFile(existingProduct.imagen);
+            await deleteFromAzure(existingProduct.imagen, "producto");
 
             await ProductRepository.update(id, productData);
             return { success: true, message: "Producto actualizado correctamente." };
@@ -57,13 +58,16 @@ class ProductService {
     static async deleteProduct(userId: number, productId: number) {
         // Verificar si el producto existe y pertenece al vendedor
         const productOwner = await ProductRepository.findProductOwner(productId);
-        if (!productOwner) {
-            throw new Error("Producto no encontrado.");
+        const existingProduct = await ProductRepository.findById(productId);
+        if (!existingProduct || !productOwner) {
+            return { success: false, message: "Producto no encontrado" };
         }
 
         if (productOwner !== userId) {
-            throw new Error("No puedes eliminar un producto que no te pertenece.");
+            return { success: false, message: "No puedes eliminar un producto que no te pertenece." };
         }
+
+        await deleteFromAzure(existingProduct.imagen, "producto");
 
         // Eliminar el producto
         await ProductRepository.deleteProduct(productId);
