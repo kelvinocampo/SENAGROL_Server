@@ -2,59 +2,9 @@ import db from "../Config/configDB";
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 
 class AdminRepository {
-    static async ActiveSeller(userId: number) {
-        const [solicitud]: any = await db.execute(
-            "SELECT * FROM vendedor WHERE id_vendedor = ? AND estado = 'Pendiente'",
-            [userId]
-        );
-
-        if (solicitud.length === 0) {
-            return { success: false, message: "No hay una solicitud pendiente para este usuario." };
-        }
-
-        // Desactivar otros roles si existen
-        const deactivateAdminSql = `UPDATE administrador SET estado = 'Pendiente' WHERE id_administrador = ?`;
-        const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
-
-        await db.execute(deactivateAdminSql, [userId]);
-        await db.execute(deactivateBuyerSql, [userId]);
-
-        await db.execute(
-            "UPDATE vendedor SET estado = 'Activo' WHERE id_vendedor = ?",
-            [userId]
-        );
-
-        return { success: true, message: "Usuario aprobado como vendedor." };
-    }
-
-    static async ActiveTransporter(userId: number) {
-        const [solicitud]: any = await db.execute(
-            "SELECT * FROM transportador WHERE id_transportador = ? AND estado = 'Pendiente'",
-            [userId]
-        );
-
-        if (solicitud.length === 0) {
-            return { success: false, message: "No hay una solicitud pendiente para este usuario." };
-        }
-
-        // Desactivar otros roles si existen
-        const deactivateAdminSql = `UPDATE administrador SET estado = 'Pendiente' WHERE id_administrador = ?`;
-        const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
-
-        await db.execute(deactivateAdminSql, [userId]);
-        await db.execute(deactivateBuyerSql, [userId]);
-
-        await db.execute(
-            "UPDATE transportador SET estado = 'Activo' WHERE id_transportador = ?",
-            [userId]
-        );
-
-        return { success: true, message: "Usuario aprobado como transportador." };
-    }
-static async CreateAdmin(userId: number) {
-  try {
+  static async ActiveSeller(userId: number) {
     const [solicitud]: any = await db.execute(
-      "SELECT * FROM administrador WHERE id_administrador = ? AND estado = 'Pendiente'",
+      "SELECT * FROM vendedor WHERE id_vendedor = ? AND estado = 'Pendiente'",
       [userId]
     );
 
@@ -63,52 +13,91 @@ static async CreateAdmin(userId: number) {
     }
 
     // Desactivar otros roles si existen
-    await db.execute(`UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`, [userId]);
-    await db.execute(`UPDATE transportador SET estado = 'Pendiente' WHERE id_transportador = ?`, [userId]);
-    await db.execute(`UPDATE vendedor SET estado = 'Pendiente' WHERE id_vendedor = ?`, [userId]);
+    const deactivateAdminSql = `UPDATE administrador SET estado = 'Pendiente' WHERE id_administrador = ?`;
+    const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
 
-    // Cambiar a 'Activo'
-    const [result]: any = await db.execute(
-      "UPDATE administrador SET estado = 'Activo' WHERE id_administrador = ? AND estado = 'Pendiente'",
+    await db.execute(deactivateAdminSql, [userId]);
+    await db.execute(deactivateBuyerSql, [userId]);
+
+    await db.execute(
+      "UPDATE vendedor SET estado = 'Activo' WHERE id_vendedor = ?",
       [userId]
     );
 
-    // Verificar si se modificó una fila
-    if (result.affectedRows > 0) {
-      return { success: true, message: `El usuario ${userId} ahora es administrador.` };
-    } else {
-      return { success: false, message: `No se encontró solicitud pendiente para activar.` };
-    }
-  } catch (error) {
-    console.error("Error en AdminRepository.CreateAdmin:", error);
-    throw error;
+    return { success: true, message: "Usuario aprobado como vendedor." };
   }
-}
 
+  static async ActiveTransporter(userId: number) {
+    const [solicitud]: any = await db.execute(
+      "SELECT * FROM transportador WHERE id_transportador = ? AND estado = 'Pendiente'",
+      [userId]
+    );
 
+    if (solicitud.length === 0) {
+      return { success: false, message: "No hay una solicitud pendiente para este usuario." };
+    }
 
-    static async deleteUser(id_delete_user: number) {
-        const query = `
+    // Desactivar otros roles si existen
+    const deactivateAdminSql = `UPDATE administrador SET estado = 'Pendiente' WHERE id_administrador = ?`;
+    const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
+
+    await db.execute(deactivateAdminSql, [userId]);
+    await db.execute(deactivateBuyerSql, [userId]);
+
+    await db.execute(
+      "UPDATE transportador SET estado = 'Activo' WHERE id_transportador = ?",
+      [userId]
+    );
+
+    return { success: true, message: "Usuario aprobado como transportador." };
+  }
+  static async CreateAdmin(userId: number) {
+    try {
+      // Desactivar otros roles si existen
+      await db.execute(`UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`, [userId]);
+      await db.execute(`UPDATE transportador SET estado = 'Pendiente' WHERE id_transportador = ?`, [userId]);
+      await db.execute(`UPDATE vendedor SET estado = 'Pendiente' WHERE id_vendedor = ?`, [userId]);
+
+      // Verificar si ya existe una solicitud pendiente
+      const [solicitud]: any = await db.execute(
+        "INSERT INTO administrador (id_administrador, estado) VALUES (?, 'Activo') ON DUPLICATE KEY UPDATE estado = 'Activo'",
+        [userId]
+      );
+
+      // Verificar si se modificó una fila
+      if (solicitud.affectedRows > 0) {
+        return { success: true, message: `El usuario ${userId} ahora es administrador.` };
+      } else {
+        return { success: false, message: `No se encontró el usuario.` };
+      }
+    } catch (error) {
+      console.error("Error en AdminRepository.CreateAdmin:", error);
+      throw error;
+    }
+  }
+
+  static async deleteUser(id_delete_user: number) {
+    const query = `
             DELETE FROM usuario WHERE id_usuario = ?
         `;
-        const values = [id_delete_user];
+    const values = [id_delete_user];
 
-        const [result] = await db.execute(query, values);
-        return result;
-    }
+    const [result] = await db.execute(query, values);
+    return result;
+  }
 
-    static async deactivateRole(id_deactivate_user: number, role: Omit<RequiredRoles, "comprador">) {
-        const query = `
+  static async deactivateRole(id_deactivate_user: number, role: Omit<RequiredRoles, "comprador">) {
+    const query = `
             UPDATE ${role} 
             SET estado = "Pendiente" 
             WHERE id_${role} = ?
             AND estado = "Activo"
         `;
-        const values = [id_deactivate_user];
+    const values = [id_deactivate_user];
 
-        const [result] = await db.execute(query, values);
-        return result;
-    }
+    const [result] = await db.execute(query, values);
+    return result;
+  }
 }
 
 export default AdminRepository;
