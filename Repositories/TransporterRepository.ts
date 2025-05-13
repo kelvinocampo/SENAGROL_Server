@@ -4,7 +4,7 @@ import TransporterDto from '../Dto/User/TransporterDto';
 class TransporterRepository {
     static async register(transporter: TransporterDto, imagesName: string[]) {
         // 0. Verificar si ya es transportador
-        const checkSql = `SELECT * FROM transportador WHERE id_transportador = ? AND estado = `;
+        const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
         const [existingTransporter]: any = await db.execute(checkSql, [transporter.userId]);
 
         if (existingTransporter.length > 0) {

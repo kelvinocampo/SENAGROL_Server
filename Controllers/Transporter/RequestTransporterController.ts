@@ -21,7 +21,7 @@ let register = async (req: Request, res: Response) => {
       vehicleWeight
     );
 
-    if (!req.file) {
+    if (!req.files) {
       return res.status(400).json({ error: "Imagen del vehículo no proporcionada" });
     }
 
