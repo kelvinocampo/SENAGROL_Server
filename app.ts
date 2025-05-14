@@ -20,8 +20,8 @@ const app = express()
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
     .use(cors({
-        origin: 'https://senagrol.vercel.app', // Specify the allowed origin
-        methods: 'GET,POST,PUT,DELETE', // Allow specific methods if necessary
+        origin: 'http://localhost:5173', // Specify the allowed origin
+        methods: 'GET,POST,PUT,PATCH,DELETE', // Allow specific methods if necessary
         allowedHeaders: 'Content-Type,Authorization', // Adjust headers as needed
     }));
 
