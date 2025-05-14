@@ -19,6 +19,7 @@ import UpdateValidator from '../Middleware/User/UpdateValidator';
 import GetUsers from "../Controllers/User/GetAllController";
 
 import RefreshAccessToken from "../Controllers/User/RefreshTokenController";
+import GetRole from "../Controllers/User/GetRolesController";
 
 const router = express.Router();
 
@@ -29,6 +30,7 @@ router.patch('/password', verifyToken, UpdatePasswordValidator.validatorParams, 
 router.get("/", verifyToken, GetUserById);
 router.get("/all", verifyToken, GetUsers);
 router.put('/edit', verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateUserProfile);
+router.get('/role', verifyToken, GetRole);
 
 export default router;
 
