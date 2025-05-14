@@ -16,17 +16,14 @@ import BuyRoutes from "./Routes/buy";
 dotenv.config();
 const PORT = process.env.PORT || 10101;
 
-// Configuración CORS actualizada
-const corsOptions = {
-    origin: 'https://senagrol.vercel.app', // Reemplaza con tu URL de frontend
-    credentials: true,
-    optionsSuccessStatus: 200
-};
-
 const app = express()
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
-    .use(cors(corsOptions));
+    .use(cors({
+        origin: 'https://senagrol.vercel.app', // Specify the allowed origin
+        methods: 'GET,POST,PUT,DELETE', // Allow specific methods if necessary
+        allowedHeaders: 'Content-Type,Authorization', // Adjust headers as needed
+    }));
 
 app.use("/usuario", UserRoutes);
 app.use("/vendedor", SellerRoutes);
