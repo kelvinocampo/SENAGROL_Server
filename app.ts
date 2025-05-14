@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 10101;
 
 // Configuración CORS actualizada
 const corsOptions = {
-    origin: 'http://localhost:5173', // Reemplaza con tu URL de frontend
+    origin: 'https://senagrol.vercel.app', // Reemplaza con tu URL de frontend
     credentials: true,
     optionsSuccessStatus: 200
 };
