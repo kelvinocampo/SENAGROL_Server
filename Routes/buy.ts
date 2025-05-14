@@ -10,5 +10,8 @@ const router = express.Router();
 router.patch('/assign/:id_compra/:id_transportador',
     verifyToken, verifyRole(["comprador"]), AssignTransporterValidator.validatorParams, AssignTransporterValidator.validator,
     assignTransporter);
+router.get("/code/:id_compra",
+    verifyToken, verifyRole(["comprador"]),
+)
 
 export default router;
