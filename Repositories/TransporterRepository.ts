@@ -55,11 +55,9 @@ class TransporterRepository {
             u.cara,
             u.telefono,
             t.tipo_vehiculo,
-            t.peso_vehiculo,
-            GROUP_CONCAT(fv.foto SEPARATOR ',') AS fotos
+            t.peso_vehiculo
         FROM transportador t
         JOIN usuario u ON u.id_usuario = t.id_transportador
-        JOIN foto_vehiculo fv ON fv.id_transportador = t.id_transportador
         WHERE t.estado = 'Activo'
         GROUP BY u.id_usuario
         `;
