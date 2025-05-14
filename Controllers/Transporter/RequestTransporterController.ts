@@ -22,19 +22,17 @@ let register = async (req: Request, res: Response) => {
     );
 
     if (!req.files) {
-      return res.status(400).json({ error: "Imagen del vehículo no proporcionada" });
+      return res.status(400).json({ error: "Imagenes del vehículo no proporcionada" });
     }
 
-    const imagesNames : string[] = [];
+    const imagesNames: string[] = [];
     const files = req.files as {
       [fieldname: string]: Express.Multer.File[];
     };
 
-    if (files?.images) {
-      for (const image of files.images) {
-        const url = await uploadToAzure(image, "usuario");
-        imagesNames.push(url.url);
-      }
+    for (const image of files.imagen) {
+      const url = await uploadToAzure(image, "usuario");
+      imagesNames.push(url.url);
     }
 
     const transporterId = await TransporterService.register(newTransporter, imagesNames);
