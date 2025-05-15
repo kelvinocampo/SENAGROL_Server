@@ -26,7 +26,7 @@ class ProductService {
             }
 
             // Verificar si la cantidad solicitada es válida
-            if (cantidad <= 0 || cantidad > existingProduct.cantidad || cantidad < existingProduct.cantidad_minima) {
+            if (cantidad <= 0 || cantidad > existingProduct.cantidad || cantidad < existingProduct.cantidad_minima_compra) {
                 return { success: false, message: "Cantidad no válida" };
             }
 
