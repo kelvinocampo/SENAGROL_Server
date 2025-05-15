@@ -6,7 +6,7 @@ class ProductRepository {
     static async createProduct(product: Product) {
         const ProductSql = `
             INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, id_vendedor, fecha_publicacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const productValues = [
             product.Nombre,
