@@ -1,5 +1,6 @@
 import Product from "../Dto/Product/ProductsCreate";
 import { deleteFromAzure } from "../Helpers/DeleteFile";
+import BuyRepository from "../Repositories/BuyRepository";
 import ProductRepository from "../Repositories/ProductRepository";
 
 class ProductService {
@@ -90,6 +91,11 @@ class ProductService {
             return { success: false, message: "No puedes eliminar un producto que no te pertenece." };
         }
 
+        const result = await BuyRepository.findByProduct(productId);
+        if (result) {
+            return { success: false, message: "No puedes eliminar un producto que tiene compras asociadas." };
+        }
+
         await deleteFromAzure(existingProduct.imagen, "producto");
 
         // Eliminar el producto
@@ -102,6 +108,11 @@ class ProductService {
         const existingProduct = await ProductRepository.findById(productId);
         if (!existingProduct) {
             return { success: false, message: "Producto no encontrado" };
+        }
+
+        const result = await BuyRepository.findByProduct(productId);
+        if (result) {
+            return { success: false, message: "No puedes eliminar un producto que tiene compras asociadas." };
         }
 
         await deleteFromAzure(existingProduct.imagen, "producto");
