@@ -19,7 +19,16 @@ class UserService {
     }
 
     static async getByID(id: number) {
-        return await UserRepository.getByID(id);
+        const roles = await UserRepository.getUserRoles(id);
+        const user = await UserRepository.getByID(id);
+        if (!user) {
+            return null;
+        }
+        const userWithRoles = {
+            ...user,
+            roles: roles,
+        };
+        return userWithRoles;
     }
 
     static async getAll() {
