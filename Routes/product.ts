@@ -21,9 +21,11 @@ import DeleteValidator from "../Middleware/Product/DeleteValidator";
 import verifyToken from "../Middleware/VerifyToken";
 import upload from "../Middleware/multerConfig";
 import verifyRole from "../Middleware/VerifyTokenData";
+import Buy from "../Controllers/Product/BuyController";
 
 const router = express.Router();
 
+router.post("/buy/:id_producto", verifyToken, verifyRole(["comprador"]), Buy)
 router.get('/', GetAllProducts);
 router.get('/my_products', verifyToken, verifyRole(["vendedor"]), GetProductsBySeller);
 router.get('/discount', GetProductsWithDiscount);

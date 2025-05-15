@@ -16,6 +16,31 @@ class ProductService {
         }
     }
 
+    static async buy(id_producto: number, id_user: number, cantidad: number) {
+        try {
+            // Verificar si el producto existe
+            const existingProduct = await ProductRepository.findById(id_producto);
+            if (!existingProduct) {
+                return { success: false, message: "Producto no encontrado" };
+            }
+
+            // Verificar si la cantidad solicitada es válida
+            if (cantidad <= 0 || cantidad > existingProduct.cantidad || cantidad < existingProduct.cantidad_minima) {
+                return { success: false, message: "Cantidad no válida" };
+            }
+
+            const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad);
+            if (!result) {
+                return { success: false, message: "Error al realizar la compra" };
+            }
+
+            return { success: true, message: "Compra realizada exitosamente." };
+        } catch (error) {
+            console.error("Error en ProductService.buy:", error);
+            return { success: false, message: "Error interno del servidor." };
+        }
+    }
+
     // Obtener todos los productos
     static async getAll() {
         return await ProductRepository.getAll();

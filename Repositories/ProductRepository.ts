@@ -5,7 +5,7 @@ class ProductRepository {
 
     static async createProduct(product: Product) {
         const ProductSql = `
-            INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, id_vendedor)
+            INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, id_vendedor, fecha_publicacion)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const productValues = [
@@ -18,10 +18,21 @@ class ProductRepository {
             product.imagen,
             product.Precio,
             product.Discount,
-            product.userId
+            product.userId,
+            new Date()
         ];
 
         await db.execute(ProductSql, productValues);
+    }
+
+    static async buy(id_vendedor: number, id_producto: number, id_user: number, cantidad: number) {
+        const sql = `
+            INSERT INTO compra (id_producto, id_comprador, cantidad, fecha_compra, id_vendedor, estado)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `;
+        const values = [id_producto, id_user, cantidad, new Date(), id_vendedor, "Pendiente"];
+        const [result]: any = await db.execute(sql, values);
+        return result;
     }
 
     static async findById(id: number) {
@@ -37,8 +48,8 @@ class ProductRepository {
                 cantidad = ?, cantidad_minima_compra = ?, imagen = ?, descuento = ?
             WHERE id_producto = ?
         `;
-        const values = [productData.Nombre, productData.Precio, productData.Description, productData.latitud, productData.longitud, 
-            productData.quantity, productData.MinimumQuantity, productData.imagen, productData.Discount]
+        const values = [productData.Nombre, productData.Precio, productData.Description, productData.latitud, productData.longitud,
+        productData.quantity, productData.MinimumQuantity, productData.imagen, productData.Discount]
         await db.execute(updateSql, [...values, id]);
     }
 
