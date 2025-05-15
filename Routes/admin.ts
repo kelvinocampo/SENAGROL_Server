@@ -23,6 +23,6 @@ router.patch('/usuarios/:role/:id_deactivate_user',
 router.get('/products', verifyToken, verifyRole(["administrador"]), GetProducts);
 router.get('/sales', verifyToken, verifyRole(["administrador"]), GetSales);
 router.get('/usuarios', verifyToken, verifyRole(["administrador"]), GetUsersAdmin);
-router.get('/products/unpublish/:id_producto', verifyToken, verifyRole(["administrador"]), UnpublishProduct);
+router.patch('/products/unpublish/:id_producto', verifyToken, verifyRole(["administrador"]), UnpublishProduct);
 
 export default router;
