@@ -53,8 +53,6 @@ class ProductService {
         }
     }
 
-
-
     static async deleteProduct(userId: number, productId: number) {
         // Verificar si el producto existe y pertenece al vendedor
         const productOwner = await ProductRepository.findProductOwner(productId);
@@ -65,6 +63,20 @@ class ProductService {
 
         if (productOwner !== userId) {
             return { success: false, message: "No puedes eliminar un producto que no te pertenece." };
+        }
+
+        await deleteFromAzure(existingProduct.imagen, "producto");
+
+        // Eliminar el producto
+        await ProductRepository.deleteProduct(productId);
+        return { success: true, message: "Producto eliminado correctamente." };
+    }
+
+    static async deleteProductAdmin(productId: number) {
+        // Verificar si el producto existe y pertenece al vendedor
+        const existingProduct = await ProductRepository.findById(productId);
+        if (!existingProduct) {
+            return { success: false, message: "Producto no encontrado" };
         }
 
         await deleteFromAzure(existingProduct.imagen, "producto");
