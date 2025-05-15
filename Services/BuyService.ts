@@ -34,7 +34,7 @@ class BuyService {
             return { success: false, message: "Codigo invalido." };
         }
 
-        const result = await BuyRepository.receiveCodeBuy(parseInt(id_compra), estado, id_user);
+        const result = await BuyRepository.receiveCodeBuy(Number(id_compra), estado, id_user);
         if (result.affectedRows === 0) {
             return { success: false, message: "No se pudo actualizar el estado." };
         }
