@@ -78,7 +78,7 @@ class BuyRepository {
         SET estado = ?
         WHERE id_compra = ? AND (id_comprador = ? OR id_vendedor = ?)
         `
-        const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
+        const [result]: any = await db.execute(query, [estado, id_compra, id_user, id_user])
         return result;
     }
 

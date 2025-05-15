@@ -1,6 +1,5 @@
 import BuyRepository from '../Repositories/BuyRepository';
-const Hashids = require('hashids/cjs');
-
+import Hashids from 'hashids/cjs';
 // Configuración del hash
 const hashids = new Hashids(process.env.KEY_TOKEN, 5, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
@@ -34,11 +33,12 @@ class BuyService {
         if (!estado) {
             return { success: false, message: "Codigo invalido." };
         }
-        const result = await BuyRepository.receiveCodeBuy(id_compra, estado, id_user);
+
+        const result = await BuyRepository.receiveCodeBuy(parseInt(id_compra), estado, id_user);
         if (result.affectedRows === 0) {
             return { success: false, message: "No se pudo actualizar el estado." };
         }
-        return {success: true, message: "Estado actualizado."};
+        return { success: true, message: "Estado actualizado." };
     }
 }
 
