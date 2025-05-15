@@ -5,7 +5,7 @@ let getTransporters = async (req: Request, res: Response) => {
     try {
         const transporters = await TransporterService.getTransporters();
 
-        return res.status(200).json({ success: true, transporters });
+        return res.status(200).json({ success: true, transporters: transporters });
     } catch (error: any) {
         console.error("🚨 Error en consultar transportes:", error);
         if (error && error.code === "ER_DUP_ENTRY") {

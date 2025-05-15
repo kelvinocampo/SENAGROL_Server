@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
+import UserService from '../Services/UserServices';
 dotenv.config();
 
 interface Data {
@@ -30,6 +31,10 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
         let decoded = jwt.verify(token, process.env.KEY_TOKEN as string) as JwtPayload;
         req.body.id_user = decoded.data.id;
         req.body.roles = decoded.data.roles;
+        const exists = UserService.getByID(req.body.id_user)
+        if (!exists) {
+            return res.status(403).json({ status: "Usuario no encontrado con la data de este token" });
+        }
         console.log(req.body);
 
         next();
