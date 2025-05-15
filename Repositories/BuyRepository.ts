@@ -72,6 +72,16 @@ class BuyRepository {
         return result;
     }
 
+    static async receiveCodeBuy(id_compra:number, estado: string, id_user: number) {
+        const query = `
+        UPDATE compra
+        SET estado = ?
+        WHERE id_compra = ? AND (id_comprador = ? OR id_vendedor = ?)
+        `
+        const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
+        return result;
+    }
+
     static async getAllAdmin() {
         const query = `
         SELECT 

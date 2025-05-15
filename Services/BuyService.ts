@@ -28,10 +28,17 @@ class BuyService {
         };
     }
 
-    static async decodeCode(codigo: string) {
+    static async receiveCodeBuy(codigo: string, id_user: number) {
         const [id_compra, estadoNum] = hashids.decode(codigo);
-        const estado = estadoNum === 1 ? 'inicia' : estadoNum === 2 ? 'termina' : 'desconocido';
-        return { id_compra, estado };
+        const estado = estadoNum === 1 ? 'En Proceso' : estadoNum === 2 ? 'Completada' : '';
+        if (!estado) {
+            return { success: false, message: "Codigo invalido." };
+        }
+        const result = await BuyRepository.receiveCodeBuy(id_compra, estado, id_user);
+        if (result.affectedRows === 0) {
+            return { success: false, message: "No se pudo actualizar el estado." };
+        }
+        return {success: true, message: "Estado actualizado."};
     }
 }
 
