@@ -87,19 +87,6 @@ class AdminRepository {
   }
 
   static async deactivateRole(id_deactivate_user: number, role: Omit<RequiredRoles, "comprador">) {
-    const query = `
-            UPDATE ${role} 
-            SET estado = "Pendiente" 
-            WHERE id_${role} = ?
-            AND estado = "Activo"
-        `;
-    const values = [id_deactivate_user];
-
-    const [result] = await db.execute(query, values);
-    return result;
-  }
-
-  static async deactivateRole2(id_deactivate_user: number, role: Omit<RequiredRoles, "comprador">) {
     // Desactivar el rol especificado solo si está activo
     const query = `
       UPDATE ${role} 
@@ -109,8 +96,7 @@ class AdminRepository {
     await db.execute(query, [id_deactivate_user]);
 
     // Verificar si el usuario tiene algún otro rol activo
-    const [rolesActivos]: any = await db.execute(
-      `
+    const [rolesActivos]: any = await db.execute(`
     SELECT 
       (SELECT estado FROM administrador WHERE id_administrador = ? AND estado = 'Activo') AS admin_activo,
       (SELECT estado FROM vendedor WHERE id_vendedor = ? AND estado = 'Activo') AS vendedor_activo,

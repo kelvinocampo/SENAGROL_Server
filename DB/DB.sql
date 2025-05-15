@@ -91,7 +91,7 @@ DROP TABLE IF EXISTS compra;
 CREATE TABLE IF NOT EXISTS compra(
     id_compra INT PRIMARY KEY AUTO_INCREMENT,
     estado ENUM('Pendiente', 'Asignada', 'En Proceso', 'Completada'),
-    precio_transporte DECIMAL(10, 2),
+    precio_transporte DECIMAL(10, 2) NULL,
     precio_producto DECIMAL(10, 2),
     cantidad INT,
     fecha_compra DATETIME,

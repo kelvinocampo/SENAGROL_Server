@@ -5,9 +5,9 @@ type TypeOwner = "transportador" | "comprador" | "vendedor";
 class BuyRepository {
     static async getByOwner(id_user: number, typeOwner: TypeOwner) {
         let whereSentence = "WHERE "
-        if (typeOwner === "transportador") whereSentence+="c.id_transportador = ?"
-        else if (typeOwner === "comprador") whereSentence+="c.id_comprador = ?"
-        else if (typeOwner === "vendedor") whereSentence+="c.id_vendedor = ?"
+        if (typeOwner === "transportador") whereSentence += "c.id_transportador = ?"
+        else if (typeOwner === "comprador") whereSentence += "c.id_comprador = ?"
+        else if (typeOwner === "vendedor") whereSentence += "c.id_vendedor = ?"
 
         const query = `
         SELECT 
@@ -52,17 +52,27 @@ class BuyRepository {
         return result;
     }
 
-    static async assignTransporter(id_user:number, id_compra:number, id_transportador:number, precio_transporte:number){
+    static async assignTransporter(id_user: number, id_compra: number, id_transportador: number, precio_transporte: number) {
         const query = `
         UPDATE compra
         SET id_transportador = ?, estado = ?, precio_transporte = ?
         WHERE id_compra = ?
         `
-        const [result]: any = await db.execute(query, [id_transportador,"Asignada", id_compra])
+        const [result]: any = await db.execute(query, [id_transportador, "Asignada", id_compra])
         return result;
     }
 
-    static async getAllAdmin(){
+    static async generateCode(id_compra: number, id_user: number) {
+        const query = `
+        SELECT estado, id_compra
+        FROM compra
+        WHERE id_compra = ? AND (id_comprador = ? OR id_vendedor = ?)
+        `
+        const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
+        return result;
+    }
+
+    static async getAllAdmin() {
         const query = `
         SELECT 
             c.id_compra,
