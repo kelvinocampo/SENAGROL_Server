@@ -32,7 +32,14 @@ const validatorParams = [
 
     check('MinimumQuantity')
         .isInt({ min: 1 })
-        .withMessage('La cantidad mínima debe ser un número entero positivo mayor a 0.'),
+        .withMessage('La cantidad mínima debe ser un número entero positivo mayor a 0.')
+        .custom((value, { req }) => {
+            if (value > req.body.quantity) {
+                throw new Error('La cantidad mínima no puede ser mayor que la cantidad total.');
+            }
+            return true;
+        })
+        .withMessage('La cantidad mínima no puede ser mayor que la cantidad total.'),
 
     check('imagen')
         .optional()
