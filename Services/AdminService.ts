@@ -54,6 +54,10 @@ class AdminService {
         const result = await ProductRepository.unpublishProduct(id_producto)
         return result
     }
+    static async publishProduct(id_producto: number) {
+        const result = await ProductRepository.publishProduct(id_producto)
+        return result
+    }
 }
 
 export default AdminService;

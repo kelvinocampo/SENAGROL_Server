@@ -12,6 +12,7 @@ import GetSales from "../Controllers/Admin/GetSales";
 import UnpublishProduct from "../Controllers/Admin/UnpublishProduct";
 import GetUsersAdmin from "../Controllers/Admin/GetAllUsersController";
 import DeleteProductAdmin from "../Controllers/Admin/DeleteProductController";
+import PublishProduct from "../Controllers/Admin/PublishProduct";
 const router = express.Router();
 
 router.post('/approveRequestSeller', verifyToken, verifyRole(["administrador"]), activeSellerController);
@@ -25,6 +26,7 @@ router.get('/products', verifyToken, verifyRole(["administrador"]), GetProducts)
 router.get('/sales', verifyToken, verifyRole(["administrador"]), GetSales);
 router.get('/usuarios', verifyToken, verifyRole(["administrador"]), GetUsersAdmin);
 router.patch('/products/unpublish/:id_producto', verifyToken, verifyRole(["administrador"]), UnpublishProduct);
+router.patch('/products/publish/:id_producto', verifyToken, verifyRole(["administrador"]), PublishProduct);
 router.delete('/products/delete/:id_producto', verifyToken, verifyRole(["administrador"]), DeleteProductAdmin);
 
 export default router;

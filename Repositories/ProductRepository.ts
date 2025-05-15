@@ -135,6 +135,15 @@ class ProductRepository {
         const [result]: any = await db.execute(query, [id_producto]);
         return result;
     }
+    static async publishProduct(id_producto: number) {
+        const query = `
+        UPDATE producto
+        SET despublicado = 0
+        WHERE id_producto = ?
+        `;
+        const [result]: any = await db.execute(query, [id_producto]);
+        return result;
+    }
 }
 
 export default ProductRepository;
