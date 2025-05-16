@@ -25,6 +25,17 @@ class ProductRepository {
         await db.execute(ProductSql, productValues);
     }
 
+    static async restoreQuantity(id_producto: number, cantidad: number) {
+        const sql = `
+            UPDATE producto
+            SET cantidad = cantidad + ?
+            WHERE id_producto = ?
+        `;
+        const values = [cantidad, id_producto];
+        const [result]: any = await db.execute(sql, values);
+        return result;
+    }
+
     static async deleteProductsBySeller(id_user: number) {
         const sql = `
         UPDATE producto

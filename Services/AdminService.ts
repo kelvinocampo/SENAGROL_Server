@@ -48,6 +48,11 @@ class AdminService {
             const deletePendingBuys = await BuyRepository.deleteBuysPending(id_delete_user)
         }
         if (isPending && (roles.includes("vendedor") || roles.includes("comprador"))) {
+            buys.forEach(async (buy: any) => {
+                const id_producto = buy.id_producto
+                const cantidad = buy.cantidad
+                const restoreQuantity = await ProductRepository.restoreQuantity(id_producto, cantidad)
+            })
             const deleteBuysPending = await BuyRepository.deleteBuysPending(id_delete_user)
         }
         if (isDelivered) {
