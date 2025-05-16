@@ -8,7 +8,7 @@ const deleteUser = async (req: Request, res: Response) => {
     if (parseInt(id_delete_user) == parseInt(id_user)) { return res.status(403).json({ status: false, message: "No eliminar tu usuario." }); }
 
     const result: any = await AdminService.deleteUser(parseInt(id_delete_user));
-    return res.status(result ? 200 : 400).json({
+    return res.status(result.status).json({
       status: "user deleted",
       message: result.message
     });

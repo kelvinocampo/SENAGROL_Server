@@ -114,7 +114,7 @@ class ProductService {
         }
 
         const result = await BuyRepository.findByProduct(productId);
-        if (result) {
+        if (result.length > 0) {
             return { success: false, message: "No puedes eliminar un producto que tiene compras asociadas." };
         }
 
