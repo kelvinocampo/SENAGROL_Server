@@ -29,7 +29,10 @@ class ProductService {
             if (cantidad <= 0 || cantidad > existingProduct.cantidad || cantidad < existingProduct.cantidad_minima_compra) {
                 return { success: false, message: "Cantidad no válida" };
             }
-
+            const editQuantity = await ProductRepository.editQuantity(id_producto, cantidad);
+            if (!editQuantity) {
+                return { success: false, message: "Error al actualizar la cantidad del producto" };
+            }
             const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad);
             if (!result) {
                 return { success: false, message: "Error al realizar la compra" };

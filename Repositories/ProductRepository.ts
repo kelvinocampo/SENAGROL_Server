@@ -25,6 +25,17 @@ class ProductRepository {
         await db.execute(ProductSql, productValues);
     }
 
+    static async editQuantity(id_producto: number, cantidad: number) {
+        const sql = `
+            UPDATE producto
+            SET cantidad = cantidad - ?
+            WHERE id_producto = ?
+        `;
+        const values = [cantidad, id_producto];
+        const [result]: any = await db.execute(sql, values);
+        return result;
+    }
+
     static async buy(id_vendedor: number, id_producto: number, id_user: number, cantidad: number) {
         const sql = `
             INSERT INTO compra (id_producto, id_comprador, cantidad, fecha_compra, id_vendedor, estado)
