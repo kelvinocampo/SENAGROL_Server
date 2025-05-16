@@ -196,8 +196,8 @@ class BuyRepository {
         const query = `
         UPDATE compra
         SET estado = ?
-            WHERE id_compra = ? AND(id_comprador = ? OR id_vendedor = ?)
-                `
+        WHERE id_compra = ? AND (id_comprador = ? OR id_vendedor = ?)
+        `
         const [result]: any = await db.execute(query, [estado, id_compra, id_user, id_user])
         return result;
     }

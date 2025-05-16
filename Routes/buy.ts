@@ -17,6 +17,6 @@ router.patch('/assign/:id_compra/:id_transportador',
 router.get("/code/:id_compra",
     verifyToken, verifyRole(["comprador", "vendedor"]), GenerateCode)
 router.patch("/state/:code",
-    verifyToken, verifyRole(["comprador", "vendedor"]), ReceiveCodeBuy)
+    verifyToken, verifyRole(["transportador"]), ReceiveCodeBuy)
 
 export default router;
