@@ -55,11 +55,13 @@ class TransporterRepository {
             u.cara,
             u.telefono,
             t.tipo_vehiculo,
-            t.peso_vehiculo
+            t.peso_vehiculo,
+            GROUP_CONCAT(f.foto SEPARATOR ', ') AS fotos_vehiculo
         FROM transportador t
         JOIN usuario u ON u.id_usuario = t.id_transportador
+        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
         WHERE t.estado = 'Activo'
-        GROUP BY u.id_usuario
+        GROUP BY u.id_usuario;
         `;
         const result = await db.execute(query);
         return result[0];
