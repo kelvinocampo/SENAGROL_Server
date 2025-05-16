@@ -15,14 +15,22 @@ INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, cara, telefono
 
 -- === ROLES ===
 INSERT INTO administrador (id_administrador) VALUES (1);
-INSERT INTO comprador (id_comprador, estado) VALUES (2, 'Activo');
-INSERT INTO vendedor (id_vendedor, estado) VALUES (3, 'Activo');
-INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_propiedad_vehiculo, tipo_vehiculo, peso_vehiculo, estado)
-VALUES (4, 'ABC123456', 'SOAT123456', 'TPV123456', 'Camión', 3500.50, 'Activo');
-INSERT INTO comprador (id_comprador, estado) VALUES (6, 'Activo');
-INSERT INTO vendedor (id_vendedor, estado) VALUES (7, 'Activo');
-INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_propiedad_vehiculo, tipo_vehiculo, peso_vehiculo, estado)
-VALUES (8, 'DEF789012', 'SOAT789012', 'TPV789012', 'Camioneta', 1800.75, 'Activo');
+INSERT INTO comprador (id_comprador, estado) VALUES 
+(1, 'Pendiente'),
+(2, 'Activo'),
+(3, 'Pendiente'),
+(4, 'Pendiente'),
+(5, 'Pendiente'),
+(6, 'Activo'),
+(7, 'Pendiente'),
+(8, 'Pendiente'),
+(9, 'Pendiente');
+INSERT INTO vendedor (id_vendedor, estado) VALUES 
+(3, 'Activo'),
+(7, 'Activo');
+INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_propiedad_vehiculo, tipo_vehiculo, peso_vehiculo, estado) VALUES 
+(4, 'ABC123456', 'SOAT123456', 'TPV123456', 'Camión', 3500.50, 'Activo'),
+(8, 'DEF789012', 'SOAT789012', 'TPV789012', 'Camioneta', 1800.75, 'Activo');
 
 -- === FOTOS DEL VEHÍCULO ===
 INSERT INTO foto_vehiculo (foto, id_transportador) VALUES
