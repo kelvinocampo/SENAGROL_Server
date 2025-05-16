@@ -65,11 +65,11 @@ class ProductRepository {
     static async update(id: number, productData: Product) {
         const updateSql = `
             UPDATE producto 
-            SET nombre = ?, precio_unidad = ?, descripcion = ?, latitud = ?, longitud = ?, 
+            SET precio_unidad = ?, descripcion = ?, latitud = ?, longitud = ?, 
                 cantidad = ?, cantidad_minima_compra = ?, imagen = ?, descuento = ?
             WHERE id_producto = ?
         `;
-        const values = [productData.Nombre, productData.Precio, productData.Description, productData.latitud, productData.longitud,
+        const values = [productData.Precio, productData.Description, productData.latitud, productData.longitud,
         productData.quantity, productData.MinimumQuantity, productData.imagen, productData.Discount]
         await db.execute(updateSql, [...values, id]);
     }

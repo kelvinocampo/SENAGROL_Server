@@ -9,7 +9,6 @@ const UpdateProducts = async (req: Request, res: Response) => {
 
         // Los campos de texto vienen en req.body
         const {
-            nombre,
             descripcion,
             cantidad,
             cantidad_minima_compra,
@@ -36,7 +35,7 @@ const UpdateProducts = async (req: Request, res: Response) => {
         // Crear DTO con los tipos correctos
         const updatedProduct = new Products(
             Number(id_user),
-            nombre,
+            "",
             Number(precio_unidad),
             descripcion,
             Number(latitud),

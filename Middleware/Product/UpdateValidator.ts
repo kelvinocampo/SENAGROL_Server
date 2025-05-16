@@ -2,13 +2,6 @@ import { check, validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from "express";
 
 const validatorParams = [
-    check('Nombre')
-        .optional()
-        .trim()
-        .isLength({ min: 3, max: 100 })
-        .matches(/^[a-zA-Z\s]+$/)
-        .withMessage('El nombre debe tener entre 3 y 100 caracteres y solo puede contener letras y espacios.'),
-
     check('Precio')
         .optional()
         .isFloat({ min: 0.01 })
