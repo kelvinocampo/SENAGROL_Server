@@ -83,10 +83,11 @@ CREATE TABLE IF NOT EXISTS producto(
     fecha_publicacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     eliminado BOOLEAN DEFAULT 0,
 
-    id_vendedor INT,
+    id_vendedor INT NULL,
     FOREIGN KEY (id_vendedor)
     REFERENCES vendedor(id_vendedor)
-    ON DELETE CASCADE
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
 )engine=InnoDB;
 
 DROP TABLE IF EXISTS compra;
@@ -98,23 +99,30 @@ CREATE TABLE IF NOT EXISTS compra(
     cantidad INT,
     fecha_compra DATETIME,
     fecha_entrega DATETIME NULL,
+    nombre_comprador_eliminado VARCHAR(100) NULL,
+    nombre_vendedor_eliminado VARCHAR(100) NULL,
+    nombre_transportador_eliminado VARCHAR(100) NULL,
 
     id_producto INT,
     FOREIGN KEY (id_producto)
-    REFERENCES producto(id_producto),
+    REFERENCES producto(id_producto)
+    ON UPDATE CASCADE,
 
-    id_vendedor INT,
+    id_vendedor INT NULL,
     FOREIGN KEY (id_vendedor)
-    REFERENCES producto(id_vendedor),
+    REFERENCES producto(id_vendedor)
+    ON DELETE SET NULL,
 
-    id_comprador INT,
+    id_comprador INT NULL,
     FOREIGN KEY (id_comprador)
-    REFERENCES comprador(id_comprador),
+    REFERENCES comprador(id_comprador)
+    ON DELETE SET NULL,
 
     id_transportador INT NULL,
     FOREIGN KEY (id_transportador)
     REFERENCES transportador(id_transportador)
-);
+    ON DELETE SET NULL
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS chat;
 CREATE TABLE IF NOT EXISTS chat(
