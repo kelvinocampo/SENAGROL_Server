@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS producto(
     descuento DECIMAL(5, 2),
     despublicado BOOLEAN DEFAULT 0,
     fecha_publicacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    eliminado BOOLEAN DEFAULT 0,
 
     id_vendedor INT,
     FOREIGN KEY (id_vendedor)

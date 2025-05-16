@@ -47,7 +47,7 @@ class ProductRepository {
     }
 
     static async findById(id: number) {
-        const checkSql = `SELECT * FROM producto WHERE id_producto = ?`;
+        const checkSql = `SELECT * FROM producto WHERE id_producto = ? AND (p.despublicado = 0 OR p.eliminado = 0)`;
         const [result]: any = await db.execute(checkSql, [id]);
         return result.length ? result[0] : null;
     }
@@ -72,7 +72,7 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.despublicado = 0
+        WHERE (p.despublicado = 0 OR p.eliminado = 0)
         `;
         const [products]: any = await db.execute(sql);
         return products;
@@ -99,7 +99,7 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.id_producto = ? AND p.despublicado = 0
+        WHERE p.id_producto = ? AND (p.despublicado = 0 OR p.eliminado = 0)
         `;
         const [product]: any = await db.execute(sql, [id_product]);
         return product;
@@ -113,7 +113,7 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.descuento > 0 AND p.despublicado = 0
+        WHERE p.descuento > 0 AND (p.despublicado = 0 OR p.eliminado = 0)
         ORDER BY p.descuento DESC
         `;
         const [products]: any = await db.execute(sql);
@@ -128,7 +128,7 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario 
-        WHERE p.id_vendedor = ?
+        WHERE p.id_vendedor = ? AND p.eliminado = 0
         `;
         const [products]: any = await db.execute(sql, [id_user]);
         return products;
@@ -136,14 +136,17 @@ class ProductRepository {
 
     // Obtener el vendedor de un producto específico
     static async findProductOwner(productId: number) {
-        const query = `SELECT id_vendedor FROM producto WHERE id_producto = ?`;
+        const query = `SELECT id_vendedor FROM producto WHERE id_producto = ? AND eliminado = 0`;
         const [result]: any = await db.execute(query, [productId]);
         return result.length ? result[0].id_vendedor : null;
     }
 
     // Eliminar el producto si el vendedor es el dueño
     static async deleteProduct(productId: number) {
-        const query = `DELETE FROM producto WHERE id_producto = ?`;
+        const query = `
+        UPDATE producto
+        SET eliminado = 1
+        WHERE id_producto = ?`;
         const [result]: any = await db.execute(query, [productId]);
         return result;
     }
