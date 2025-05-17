@@ -16,11 +16,13 @@ import BuyRoutes from "./Routes/buy";
 dotenv.config();
 const PORT = process.env.PORT || 10101;
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "";
+
 const app = express()
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
     .use(cors({
-        origin: 'http://localhost:5173', // Specify the allowed origin
+        origin: FRONTEND_URL, // Specify the allowed origin
         methods: 'GET,POST,PUT,PATCH,DELETE', // Allow specific methods if necessary
         allowedHeaders: 'Content-Type,Authorization', // Adjust headers as needed
     }));

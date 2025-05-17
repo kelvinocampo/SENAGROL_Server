@@ -5,14 +5,14 @@ class UserRepository {
 
     static async getUserRoles(userId: number) {
         const sql = `
-        SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = ? AND estado = 'Activo'
-        UNION
-        SELECT 'administrador' AS role FROM administrador WHERE id_administrador = ? AND estado = 'Activo'
-        UNION
-        SELECT 'transportador' AS role FROM transportador WHERE id_transportador = ? AND estado = 'Activo'
-        UNION
-        SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ? AND estado = 'Activo';
-    `;
+            SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = ? AND estado = 'Activo'
+            UNION
+            SELECT 'administrador' AS role FROM administrador WHERE id_administrador = ? AND estado = 'Activo'
+            UNION
+            SELECT 'transportador' AS role FROM transportador WHERE id_transportador = ? AND estado = 'Activo'
+            UNION
+            SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ? AND estado = 'Activo';
+        `;
         const result: any = await db.execute(sql, [userId, userId, userId, userId]);
 
         const roles = (result[0].map((row: any) => row.role)).join(" ");
@@ -21,18 +21,25 @@ class UserRepository {
 
 
     static async add(user: User) {
-        const sql = `INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, telefono) 
-                     VALUES (?, ?, ?, ?, ?)`;
+        const sql = `
+            INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, telefono) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
         const values = [user.name, user.username, user.email, user.password, user.phoneNumber];
-
         const [result]: any = await db.execute(sql, values);
-
         return result.insertId;
     }
 
     static async getByID(id: number) {
         const sql = 'SELECT * FROM usuario WHERE id_usuario = ?';
         const values = [id];
+        const [result]: any = await db.execute(sql, values);
+        return result;
+    }
+
+    static async getByEmail(email: string) {
+        const sql = 'SELECT * FROM usuario WHERE correo = ?';
+        const values = [email];
         const [result]: any = await db.execute(sql, values);
         return result;
     }
@@ -69,17 +76,17 @@ class UserRepository {
             SELECT 
                 u.*,
                 IF(a.id_administrador IS NOT NULL, 
-                   IF(a.estado = 'Activo', 'Activo', 'Inactivo'), 
-                   'No disponible') AS rol_administrador,
+                    IF(a.estado = 'Activo', 'Activo', 'Inactivo'), 
+                    'No disponible') AS rol_administrador,
                 IF(c.id_comprador IS NOT NULL, 
-                   IF(c.estado = 'Activo', 'Activo', 'Inactivo'), 
-                   'No disponible') AS rol_comprador,
+                    IF(c.estado = 'Activo', 'Activo', 'Inactivo'), 
+                    'No disponible') AS rol_comprador,
                 IF(v.id_vendedor IS NOT NULL, 
-                   IF(v.estado = 'Activo', 'Activo', 'Inactivo'), 
-                   'No disponible') AS rol_vendedor,
+                    IF(v.estado = 'Activo', 'Activo', 'Inactivo'), 
+                    'No disponible') AS rol_vendedor,
                 IF(t.id_transportador IS NOT NULL, 
-                   IF(t.estado = 'Activo', 'Activo', 'Inactivo'), 
-                   'No disponible') AS rol_transportador
+                    IF(t.estado = 'Activo', 'Activo', 'Inactivo'), 
+                    'No disponible') AS rol_transportador
             FROM usuario u
             LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
             LEFT JOIN comprador c ON u.id_usuario = c.id_comprador

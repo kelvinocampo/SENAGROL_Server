@@ -8,9 +8,11 @@ import BuyerRepository from "../Repositories/BuyerRepository";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import TransporterDto from "../Dto/User/TransporterDto";
 import TransporterRepository from "../Repositories/TransporterRepository";
+import { DataEmail, sendResetEmail } from "../Helpers/SendResetEmail";
+
+const SECRET_KEY = process.env.KEY_TOKEN;
 
 class UserService {
-
     static async register(user: User) {
         user.password = await generateHash(user.password);
 
@@ -63,7 +65,6 @@ class UserService {
 
         const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
 
-        const SECRET_KEY = process.env.KEY_TOKEN;
         if (!SECRET_KEY) {
             throw new Error("La clave KEY_TOKEN no está definida.");
         }
@@ -103,6 +104,25 @@ class UserService {
         }
 
         return { success: true, status: "Perfil actualizado correctamente", user: updatedUser };
+    }
+
+    static async recoverUser(email: string) {
+        const result: any = await UserRepository.getByEmail(email)
+        if (result.length === 0) {
+            return { code: 400, success: false, message: "Usuario no encontrado" }
+        }
+        const [user] = result
+        const roles = await UserRepository.getUserRoles(user.id_usuario)
+        const token = generateToken({ id: user.id_usuario, roles: roles }, SECRET_KEY, 60)
+        const dataEmail: DataEmail = { email: user.correo, token: token }
+
+        const sendEmail = await sendResetEmail(dataEmail);
+
+        if(!sendEmail){
+        return { code: 500, success: false, message: "Correo no enviado." }
+        }
+
+        return { code: 200, success: true, message: "Correo enviado correctamente." }
     }
 }
 
