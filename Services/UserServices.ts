@@ -6,6 +6,8 @@ import generateToken from "../Helpers/generateToken";
 import bcrypt from "bcryptjs";
 import BuyerRepository from "../Repositories/BuyerRepository";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import TransporterDto from "../Dto/User/TransporterDto";
+import TransporterRepository from "../Repositories/TransporterRepository";
 
 class UserService {
 
@@ -80,7 +82,7 @@ class UserService {
         return { logged: true, status: "Login exitoso", accessToken: accessToken };
     }
 
-    static async updateUserProfile(id: number, updatedData: User) {
+    static async updateUserProfile(id: number, updatedData: User, dataTransporter: TransporterDto) {
         const user = await UserRepository.getByID(id);
 
         if (!user) {
@@ -88,6 +90,10 @@ class UserService {
         }
 
         const updatedUser = await UserRepository.update(id, updatedData);
+        const roles = await UserRepository.getUserRoles(id)
+        if (roles.includes("transportador")) {
+            const updatedTransporter = await TransporterRepository.update(dataTransporter);
+        }
 
         return { success: true, status: "Perfil actualizado correctamente", user: updatedUser };
     }

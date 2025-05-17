@@ -34,6 +34,47 @@ class TransporterRepository {
         return result
     }
 
+    static async update(dataTransporter: TransporterDto) {
+        const fields = [];
+        const values = [];
+
+        if (dataTransporter.license) {
+            fields.push("licencia_conduccion = ?");
+            values.push(dataTransporter.license);
+        }
+        if (dataTransporter.soat) {
+            fields.push("soat = ?");
+            values.push(dataTransporter.soat);
+        }
+        if (dataTransporter.vehicleCard) {
+            fields.push("tarjeta_propiedad_vehiculo = ?");
+            values.push(dataTransporter.vehicleCard);
+        }
+        if (dataTransporter.vehicleType) {
+            fields.push("tipo_vehiculo = ?");
+            values.push(dataTransporter.vehicleType);
+        }
+        if (dataTransporter.vehicleWeight) {
+            fields.push("peso_vehiculo = ?");
+            values.push(dataTransporter.vehicleWeight);
+        }
+
+        if (fields.length === 0) {
+            throw new Error("No se proporcionaron datos para actualizar");
+        }
+
+        const sql = `UPDATE transportador SET ${fields.join(", ")} WHERE id_transportador = ?`;
+        values.push(dataTransporter.userId);
+
+        const [result]: any = await db.execute(sql, values);
+
+        if (result.affectedRows > 0) {
+            return { success: true, status: "Perfil actualizado correctamente" };
+        } else {
+            return { success: false, status: "No se encontraron cambios o usuario no encontrado" };
+        }
+    }
+
     static async registerImage(imageName: string, id_user: number) {
         // 3. Insertar imagen del vehículo en la tabla foto_vehiculo
         const imageSql = `
