@@ -23,13 +23,13 @@ class BuyRepository {
             p.nombre AS producto_nombre,
             
             v.id_vendedor AS vendedor_id,
-            uv.nombre AS vendedor_nombre,
+            COALESCE(uv.nombre, c.nombre_vendedor_eliminado) AS vendedor_nombre,
             
             co.id_comprador AS comprador_id,
-            uc.nombre AS comprador_nombre,
+            COALESCE(uc.nombre, c.nombre_comprador_eliminado) AS comprador_nombre,
             
             t.id_transportador AS transportador_id,
-            ut.nombre AS transportador_nombre
+            COALESCE(ut.nombre, c.nombre_transportador_eliminado) AS transportador_nombre
         FROM 
             compra c
         LEFT JOIN 
@@ -97,13 +97,13 @@ class BuyRepository {
             p.nombre AS producto_nombre,
             
             v.id_vendedor AS vendedor_id,
-            uv.nombre AS vendedor_nombre,
+            COALESCE(uv.nombre, c.nombre_vendedor_eliminado) AS vendedor_nombre,
             
             co.id_comprador AS comprador_id,
-            uc.nombre AS comprador_nombre,
+            COALESCE(uc.nombre, c.nombre_comprador_eliminado) AS comprador_nombre,
             
             t.id_transportador AS transportador_id,
-            ut.nombre AS transportador_nombre
+            COALESCE(ut.nombre, c.nombre_transportador_eliminado) AS transportador_nombre
         FROM
             compra c
         LEFT JOIN
@@ -142,13 +142,13 @@ class BuyRepository {
             p.nombre AS producto_nombre,
             
             v.id_vendedor AS vendedor_id,
-            uv.nombre AS vendedor_nombre,
+            COALESCE(uv.nombre, c.nombre_vendedor_eliminado) AS vendedor_nombre,
             
             co.id_comprador AS comprador_id,
-            uc.nombre AS comprador_nombre,
+            COALESCE(uc.nombre, c.nombre_comprador_eliminado) AS comprador_nombre,
             
             t.id_transportador AS transportador_id,
-            ut.nombre AS transportador_nombre
+            COALESCE(ut.nombre, c.nombre_transportador_eliminado) AS transportador_nombre
         FROM
             compra c
         LEFT JOIN
@@ -205,7 +205,7 @@ class BuyRepository {
     static async getAllAdmin() {
         const query = `
         SELECT
-        c.id_compra,
+            c.id_compra,
             c.estado,
             c.precio_transporte,
             c.precio_producto,
@@ -214,16 +214,16 @@ class BuyRepository {
             c.fecha_entrega,
 
             p.id_producto AS producto_id,
-                p.nombre AS producto_nombre,
+            p.nombre AS producto_nombre,
 
-                    v.id_vendedor AS vendedor_id,
-                        uv.nombre AS vendedor_nombre,
-
-                            co.id_comprador AS comprador_id,
-                                uc.nombre AS comprador_nombre,
-
-                                    t.id_transportador AS transportador_id,
-                                        ut.nombre AS transportador_nombre
+            v.id_vendedor AS vendedor_id,
+            COALESCE(uv.nombre, c.nombre_vendedor_eliminado) AS vendedor_nombre,
+            
+            co.id_comprador AS comprador_id,
+            COALESCE(uc.nombre, c.nombre_comprador_eliminado) AS comprador_nombre,
+            
+            t.id_transportador AS transportador_id,
+            COALESCE(ut.nombre, c.nombre_transportador_eliminado) AS transportador_nombre
         FROM 
             compra c
         LEFT JOIN 
@@ -240,7 +240,7 @@ class BuyRepository {
             transportador t ON c.id_transportador = t.id_transportador
         LEFT JOIN 
             usuario ut ON t.id_transportador = ut.id_usuario
-            `;
+        `;
         const [result]: any = await db.execute(query)
         return result;
     }
