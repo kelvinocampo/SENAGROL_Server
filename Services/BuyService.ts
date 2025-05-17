@@ -40,6 +40,22 @@ class BuyService {
         }
         return { success: true, message: "Estado actualizado." };
     }
+
+    static async cancelTransport(id_user: number, id_compra: number) {
+        const getBuy: any = await BuyRepository.getById(id_compra)
+        if (getBuy.length === 0) {
+            return { code: 400, success: false, message: "compra no encontrada" }
+        }
+        if (getBuy[0].estado != "Asignada") {
+            return { code: 409, success: false, message: "Solo se puede cancelar el transporte a una compra asignada." }
+        }
+
+        const result: any = await BuyRepository.cancelTransport(id_user, id_compra)
+        if (result.affectedRows === 0) {
+            return { code: 400, success: false, message: "transporte no cancelado" }
+        }
+        return { code: 200, success: true, message: "Transporte Cancelado" }
+    }
 }
 
 export default BuyService;

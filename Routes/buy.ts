@@ -9,6 +9,8 @@ import AssignTransporterValidator from "../Middleware/Buy/AssignTransporterValid
 import GenerateCode from "../Controllers/Buy/GenerateCode";
 
 import ReceiveCodeBuy from "../Controllers/Buy/ReceiveCode";
+
+import CancelTransport from "../Controllers/Buy/CancelTransport";
 const router = express.Router();
 
 router.patch('/assign/:id_compra/:id_transportador',
@@ -18,5 +20,7 @@ router.get("/code/:id_compra",
     verifyToken, verifyRole(["comprador", "vendedor"]), GenerateCode)
 router.patch("/state/:code",
     verifyToken, verifyRole(["transportador"]), ReceiveCodeBuy)
+router.patch("/cancelTransport/:id_compra",
+    verifyToken, verifyRole(["transportador", "comprador"]), CancelTransport)
 
 export default router;
