@@ -19,7 +19,7 @@ export async function sendResetEmail(dataEmail: DataEmail) {
             subject: "Recuperación de contraseña",
             sender: {
                 name: "SENAGROL",
-                email: "no-reply@tudominio.com"
+                email: "kevinocampooso@gmail.com"
             },
             to: [{ email: dataEmail.email }],
             htmlContent: `
@@ -56,7 +56,6 @@ export async function sendResetEmail(dataEmail: DataEmail) {
 
         // Enviar email
         const response = await brevoApi.sendTransacEmail(sendSmtpEmail);
-        console.log('Email enviado:', response);
         return true;
 
     } catch (error) {
