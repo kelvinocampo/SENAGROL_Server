@@ -97,7 +97,7 @@ class TransporterRepository {
             u.telefono,
             t.tipo_vehiculo,
             t.peso_vehiculo,
-            GROUP_CONCAT(f.foto SEPARATOR ', ) AS fotos_vehiculo
+            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
         FROM transportador t
         JOIN usuario u ON u.id_usuario = t.id_transportador
         LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
@@ -105,6 +105,24 @@ class TransporterRepository {
         GROUP BY u.id_usuario;
         `;
         const result = await db.execute(query);
+        return result[0];
+    }
+
+    static async getById(id_transporter: number) {
+        const query = `
+        SELECT
+            t.licencia_conduccion,
+            t.soat,
+            t.tarjeta_propiedad_vehiculo,
+            t.tipo_vehiculo,
+            t.peso_vehiculo,
+            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
+        FROM transportador t
+        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
+        WHERE t.estado = 'Activo' AND t.id_transportador = ?
+        GROUP BY t.id_transportador;
+        `;
+        const result = await db.execute(query, [id_transporter]);
         return result[0];
     }
 }

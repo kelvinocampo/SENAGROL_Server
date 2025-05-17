@@ -26,10 +26,17 @@ class UserService {
         if (!user) {
             return null;
         }
-        const userWithRoles = {
+        let userWithRoles = {
             ...user,
             roles: roles,
         };
+        if (roles.include("transportador")) {
+            const getDataTransporter: any = await TransporterRepository.getById(id)
+            if (getDataTransporter.length > 0) {
+                const dataTransporter = getDataTransporter[0];
+                userWithRoles = { ...userWithRoles, ...dataTransporter }
+            }
+        }
         return userWithRoles;
     }
 
