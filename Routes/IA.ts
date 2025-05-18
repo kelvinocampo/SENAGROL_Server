@@ -2,10 +2,10 @@ import express from "express";
 import IARegisteredController from "../Controllers/IA/IARegisteredController";
 import verifyToken from "../Middleware/VerifyToken";
 import IAController from "../Controllers/IA/IAController";
-import IARegisteredMiddleware from "../Middleware/IA/IARegistered"
+import IAMiddleware from "../Middleware/IA/IARegistered"
 const router = express.Router();
 
-router.post('/registered_user', verifyToken, IARegisteredMiddleware.validatorParams, IARegisteredMiddleware.validator, IARegisteredController);
-router.post('/', IAController);
+router.post('/registered_user', verifyToken, IAMiddleware.validatorParams, IAMiddleware.validator, IARegisteredController);
+router.post('/', IAMiddleware.validatorParams, IAMiddleware.validator, IAController);
 
 export default router;
