@@ -367,7 +367,7 @@ class IAService {
             const sqlResponse: any = await IARepository.querySQL(cleanedSQL);
 
             // Formatear resultados
-            const formattedResults = this.formatSQLResponse(sqlResponse);
+            const formattedResults = this.formatSQLResponse(sqlResponse, operationType);
 
             // Generar respuesta final
             const finalPrompt = `
@@ -426,21 +426,71 @@ class IAService {
             .trim();
     }
 
-    // Formatear respuesta de la base de datos
-    static formatSQLResponse(results: any[]): string {
-        if (!results || results.length === 0) {
-            return "No se encontraron resultados.";
+    // Formatear respuesta de la base de datos mejorado
+    static formatSQLResponse(results: any, operationType?: string): string {
+        if (!results) {
+            return "No se recibió respuesta de la base de datos.";
         }
 
-        // Formatear cada fila de manera legible
-        const formattedResults = results.map((row, index) => {
-            const rowData = Object.entries(row)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join(', ');
-            return `Registro ${index + 1}: { ${rowData} }`;
-        }).join('\n');
+        // Verificar si es un array (resultados de SELECT)
+        if (Array.isArray(results)) {
+            if (results.length === 0) {
+                return "No se encontraron resultados.";
+            }
 
-        return formattedResults;
+            // Formatear cada fila de manera legible
+            const formattedResults = results.map((row, index) => {
+                const rowData = Object.entries(row)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(', ');
+                return `Registro ${index + 1}: { ${rowData} }`;
+            }).join('\n');
+
+            return formattedResults;
+        }
+
+        // Si no es un array, es un objeto (resultado de INSERT, UPDATE, DELETE)
+        if (typeof results === 'object') {
+            const resultInfo = [];
+            
+            // Información común de operaciones de modificación
+            if (results.affectedRows !== undefined) {
+                resultInfo.push(`Filas afectadas: ${results.affectedRows}`);
+            }
+            
+            if (results.insertId !== undefined && results.insertId > 0) {
+                resultInfo.push(`ID insertado: ${results.insertId}`);
+            }
+            
+            if (results.changedRows !== undefined) {
+                resultInfo.push(`Filas modificadas: ${results.changedRows}`);
+            }
+            
+            if (results.warningCount !== undefined && results.warningCount > 0) {
+                resultInfo.push(`Advertencias: ${results.warningCount}`);
+            }
+
+            // Mensaje específico según el tipo de operación
+            let operationMessage = "";
+            if (operationType === 'ELIMINACION' && results.affectedRows > 0) {
+                operationMessage = "El producto ha sido marcado como eliminado correctamente.";
+            } else if (operationType === 'PUBLICACION' && results.affectedRows > 0) {
+                operationMessage = "El estado de publicación del producto ha sido cambiado.";
+            } else if (results.affectedRows > 0) {
+                operationMessage = "La operación se ejecutó correctamente.";
+            } else {
+                operationMessage = "No se realizaron cambios. Verifica que los datos sean correctos.";
+            }
+
+            const formattedInfo = resultInfo.length > 0 ? 
+                `${operationMessage} Detalles: ${resultInfo.join(', ')}` : 
+                operationMessage;
+
+            return formattedInfo;
+        }
+
+        // Si no es ni array ni objeto, convertir a string
+        return String(results);
     }
 }
 
