@@ -133,14 +133,18 @@ CREATE TABLE IF NOT EXISTS chat(
     eliminado_user2 BOOLEAN NULL,
     fecha_reciente DATETIME,
 
-    id_user1 INT,
+    id_user1 INT NULL,
     FOREIGN KEY (id_user1) 
-    REFERENCES usuario(id_usuario),
+    REFERENCES usuario(id_usuario)
+    ON UPDATE CASCADE
+    ON DELETE SET NULL,
 
-    id_user2 INT,
+    id_user2 INT NULL,
     FOREIGN KEY (id_user2) 
     REFERENCES usuario(id_usuario)
-);
+    ON UPDATE CASCADE
+    ON DELETE SET NULL
+)engine=InnoDB;
 
 DROP TABLE IF EXISTS mensaje;
 CREATE TABLE IF NOT EXISTS mensaje(
@@ -152,7 +156,9 @@ CREATE TABLE IF NOT EXISTS mensaje(
 
     id_chat INT,
     FOREIGN KEY (id_chat) 
-    REFERENCES chat(id_chat),
+    REFERENCES chat(id_chat)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
 
     id_user INT
-);
+)engine=InnoDB;
