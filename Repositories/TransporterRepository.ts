@@ -34,6 +34,47 @@ class TransporterRepository {
         return result
     }
 
+    static async update(dataTransporter: TransporterDto) {
+        const fields = [];
+        const values = [];
+
+        if (dataTransporter.license) {
+            fields.push("licencia_conduccion = ?");
+            values.push(dataTransporter.license);
+        }
+        if (dataTransporter.soat) {
+            fields.push("soat = ?");
+            values.push(dataTransporter.soat);
+        }
+        if (dataTransporter.vehicleCard) {
+            fields.push("tarjeta_propiedad_vehiculo = ?");
+            values.push(dataTransporter.vehicleCard);
+        }
+        if (dataTransporter.vehicleType) {
+            fields.push("tipo_vehiculo = ?");
+            values.push(dataTransporter.vehicleType);
+        }
+        if (dataTransporter.vehicleWeight) {
+            fields.push("peso_vehiculo = ?");
+            values.push(dataTransporter.vehicleWeight);
+        }
+
+        if (fields.length === 0) {
+            throw new Error("No se proporcionaron datos para actualizar");
+        }
+
+        const sql = `UPDATE transportador SET ${fields.join(", ")} WHERE id_transportador = ?`;
+        values.push(dataTransporter.userId);
+
+        const [result]: any = await db.execute(sql, values);
+
+        if (result.affectedRows > 0) {
+            return { success: true, status: "Perfil actualizado correctamente" };
+        } else {
+            return { success: false, status: "No se encontraron cambios o usuario no encontrado" };
+        }
+    }
+
     static async registerImage(imageName: string, id_user: number) {
         // 3. Insertar imagen del vehículo en la tabla foto_vehiculo
         const imageSql = `
@@ -56,7 +97,7 @@ class TransporterRepository {
             u.telefono,
             t.tipo_vehiculo,
             t.peso_vehiculo,
-            GROUP_CONCAT(f.foto SEPARATOR ', ) AS fotos_vehiculo
+            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
         FROM transportador t
         JOIN usuario u ON u.id_usuario = t.id_transportador
         LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
@@ -64,6 +105,24 @@ class TransporterRepository {
         GROUP BY u.id_usuario;
         `;
         const result = await db.execute(query);
+        return result[0];
+    }
+
+    static async getById(id_transporter: number) {
+        const query = `
+        SELECT
+            t.licencia_conduccion,
+            t.soat,
+            t.tarjeta_propiedad_vehiculo,
+            t.tipo_vehiculo,
+            t.peso_vehiculo,
+            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
+        FROM transportador t
+        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
+        WHERE t.estado = 'Activo' AND t.id_transportador = ?
+        GROUP BY t.id_transportador;
+        `;
+        const result = await db.execute(query, [id_transporter]);
         return result[0];
     }
 }

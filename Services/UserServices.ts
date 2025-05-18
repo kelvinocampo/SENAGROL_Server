@@ -6,9 +6,13 @@ import generateToken from "../Helpers/generateToken";
 import bcrypt from "bcryptjs";
 import BuyerRepository from "../Repositories/BuyerRepository";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import TransporterDto from "../Dto/User/TransporterDto";
+import TransporterRepository from "../Repositories/TransporterRepository";
+import { DataEmail, sendResetEmail } from "../Helpers/SendResetEmail";
+
+const SECRET_KEY = process.env.KEY_TOKEN;
 
 class UserService {
-
     static async register(user: User) {
         user.password = await generateHash(user.password);
 
@@ -24,10 +28,17 @@ class UserService {
         if (!user) {
             return null;
         }
-        const userWithRoles = {
+        let userWithRoles = {
             ...user,
             roles: roles,
         };
+        if (roles.include("transportador")) {
+            const getDataTransporter: any = await TransporterRepository.getById(id)
+            if (getDataTransporter.length > 0) {
+                const dataTransporter = getDataTransporter[0];
+                userWithRoles = { ...userWithRoles, ...dataTransporter }
+            }
+        }
         return userWithRoles;
     }
 
@@ -54,7 +65,6 @@ class UserService {
 
         const userRoles = await UserRepository.getUserRoles(foundUser.id_usuario);
 
-        const SECRET_KEY = process.env.KEY_TOKEN;
         if (!SECRET_KEY) {
             throw new Error("La clave KEY_TOKEN no está definida.");
         }
@@ -80,7 +90,7 @@ class UserService {
         return { logged: true, status: "Login exitoso", accessToken: accessToken };
     }
 
-    static async updateUserProfile(id: number, updatedData: User) {
+    static async updateUserProfile(id: number, updatedData: User, dataTransporter: TransporterDto) {
         const user = await UserRepository.getByID(id);
 
         if (!user) {
@@ -88,8 +98,31 @@ class UserService {
         }
 
         const updatedUser = await UserRepository.update(id, updatedData);
+        const roles = await UserRepository.getUserRoles(id)
+        if (roles.includes("transportador")) {
+            const updatedTransporter = await TransporterRepository.update(dataTransporter);
+        }
 
         return { success: true, status: "Perfil actualizado correctamente", user: updatedUser };
+    }
+
+    static async recoverUser(email: string) {
+        const result: any = await UserRepository.getByEmail(email)
+        if (result.length === 0) {
+            return { code: 400, success: false, message: "Usuario no encontrado" }
+        }
+        const [user] = result
+        const roles = await UserRepository.getUserRoles(user.id_usuario)
+        const token = generateToken({ id: user.id_usuario, roles: roles }, SECRET_KEY, 60)
+        const dataEmail: DataEmail = { email: user.correo, token: token }
+
+        const sendEmail = await sendResetEmail(dataEmail);
+
+        if(!sendEmail){
+        return { code: 500, success: false, message: "Correo no enviado." }
+        }
+
+        return { code: 200, success: true, message: "Correo enviado correctamente." }
     }
 }
 

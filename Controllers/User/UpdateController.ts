@@ -1,14 +1,23 @@
 import { Request, Response } from "express";
 import UserService from "../../Services/UserServices";
 import User from "../../Dto/User/UserDto";
+import TransporterDto from "../../Dto/User/TransporterDto";
 
 async function updateUserProfile(req: Request, res: Response) {
     try {
-        const { name, username, email, phone, password } = req.body;
+        const { name, username, email, phone, password, id_user,
+            license, soat, vehicleCard, vehicleType, vehicleWeight // data transporter
+        } = req.body;
 
-        const userId = req.body.id_user;
-
-        const updatedUser = await UserService.updateUserProfile(userId, new User(name, username, email, password, phone));
+        const newTransporter = new TransporterDto(
+            id_user,
+            license || "",
+            soat || "",
+            vehicleCard || "",
+            vehicleType || "",
+            vehicleWeight || 0
+        );
+        const updatedUser = await UserService.updateUserProfile(id_user, new User(name, username, email, password, phone), newTransporter);
 
         if (!updatedUser.success) {
             return res.status(404).json({ error: updatedUser.status });

@@ -43,8 +43,49 @@ let validatorParams = [
         .withMessage('El número de teléfono solo puede contener dígitos.'),
 
     check('confirmPassword')
+        .optional()
         .custom((value, { req }) => value === req.body.password)
-        .withMessage('Las contraseñas no coinciden.')
+        .withMessage('Las contraseñas no coinciden.'),
+
+    check('license')
+        .trim()
+        .optional()
+        .isLength({ min: 5, max: 30 })
+        .withMessage('La licencia de conducción debe tener entre 5 y 30 caracteres.')
+        .matches(/^[a-zA-Z0-9-]+$/)
+        .withMessage('La licencia solo puede contener letras, números y guiones.'),
+
+    check('soat')
+        .trim()
+        .optional()
+        .isLength({ min: 5, max: 30 })
+        .withMessage('El SOAT debe tener entre 5 y 30 caracteres.')
+        .matches(/^[a-zA-Z0-9-]+$/)
+        .withMessage('El SOAT solo puede contener letras, números y guiones.'),
+
+    check('vehicleCard')
+        .trim()
+        .optional()
+        .isLength({ min: 5, max: 30 })
+        .withMessage('La tarjeta de propiedad debe tener entre 5 y 30 caracteres.')
+        .matches(/^[a-zA-Z0-9-]+$/)
+        .withMessage('La tarjeta de propiedad solo puede contener letras, números y guiones.'),
+
+    check('vehicleType')
+        .trim()
+        .optional()
+        .isLength({ min: 3, max: 50 })
+        .withMessage('El tipo de vehículo debe tener entre 3 y 50 caracteres.')
+        .matches(/^[a-zA-Z\s]+$/)
+        .withMessage('El tipo de vehículo solo puede contener letras y espacios.'),
+
+    check('vehicleWeight')
+        .trim()
+        .optional()
+        .isNumeric()
+        .withMessage('El peso del vehículo debe ser un número.')
+        .isFloat({ min: 500, max: 50000 })
+        .withMessage('El peso del vehículo debe estar entre 500 y 50,000 kg.')
 ];
 
 function validator(req: Request, res: Response, next: NextFunction) {
