@@ -5,17 +5,33 @@ const deactivateRole = async (req: Request, res: Response) => {
   try {
     const { role, id_deactivate_user } = req.params;
     const { id_user } = req.body;
-    if (parseInt(id_deactivate_user) == parseInt(id_user)) { return res.status(403).json({ status: false, message: "No puedes editar los roles de tu usuario." }); }
+
+    if (parseInt(id_deactivate_user) == parseInt(id_user)) {
+      return res.status(403).json({
+        status: false,
+        message: "No puedes editar los roles de tu usuario."
+      });
+    }
 
     const result: any = await AdminService.deactivateRole(parseInt(id_deactivate_user), role);
-    return res.status(result ? 200 : 400).json({
-      status: "Role desactivado",
-      message: result.message
+
+    if (!result) {
+      return res.status(400).json({
+        status: false,
+        message: "No se pudo desactivar el rol."
+      });
+    }
+
+    return res.status(200).json({
+      status: true,
+      message: result.message || "Rol desactivado correctamente."
     });
+
   } catch (error) {
-    console.error("Error en aprobarSolicitud:", error);
+    console.error("Error en aprobarSolicitud:", error instanceof Error ? error.message : error);
     return res.status(500).json({ error: "Error interno del servidor." });
   }
 };
+
 
 export default deactivateRole;
