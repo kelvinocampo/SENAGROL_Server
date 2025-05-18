@@ -76,7 +76,7 @@ class BuyRepository {
     static async deleteBuysPending(id_user: number) {
         const query = `
         DELETE FROM compra
-        WHERE c.id_vendedor = ? AND estado = 'Pendiente'
+        WHERE id_vendedor = ? AND estado = 'Pendiente'
         `;
         const [result]: any = await db.execute(query, [id_user, id_user])
         return result;
