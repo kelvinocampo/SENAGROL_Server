@@ -49,7 +49,7 @@ class AdminService {
         }
         if (isPending && (roles.includes("vendedor") || roles.includes("comprador"))) {
             buys.forEach(async (buy: any) => {
-                const id_producto = buy.id_producto
+                const id_producto = buy.producto_id
                 const cantidad = buy.cantidad
                 const restoreQuantity = await ProductRepository.restoreQuantity(id_producto, cantidad)
             })

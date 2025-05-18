@@ -32,7 +32,7 @@ class UserService {
             ...user,
             roles: roles,
         };
-        if (roles.include("transportador")) {
+        if (roles.includes("transportador")) {
             const getDataTransporter: any = await TransporterRepository.getById(id)
             if (getDataTransporter.length > 0) {
                 const dataTransporter = getDataTransporter[0];
@@ -99,7 +99,7 @@ class UserService {
 
         const updatedUser = await UserRepository.update(id, updatedData);
         const roles = await UserRepository.getUserRoles(id)
-        if (roles.includes("transportador")) {
+        if (roles.include("transportador")) {
             const updatedTransporter = await TransporterRepository.update(dataTransporter);
         }
 
