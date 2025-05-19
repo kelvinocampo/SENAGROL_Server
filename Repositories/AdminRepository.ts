@@ -93,7 +93,7 @@ class AdminRepository {
       SET estado = "Pendiente" 
       WHERE id_${role} = ? AND estado = "Activo"
     `;
-    await db.execute(query, [id_deactivate_user]);
+    const [result] = await db.execute(query, [id_deactivate_user]);
 
     // Verificar si el usuario tiene algún otro rol activo
     const [rolesActivos]: any = await db.execute(`
@@ -117,7 +117,7 @@ class AdminRepository {
       );
     }
 
-    return { success: true, message: `Rol ${role} desactivado correctamente.` };
+    return result;
   }
 
 }
