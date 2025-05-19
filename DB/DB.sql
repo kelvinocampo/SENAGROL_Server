@@ -109,9 +109,9 @@ CREATE TABLE IF NOT EXISTS compra(
     ON UPDATE CASCADE,
 
     id_vendedor INT NULL,
-    FOREIGN KEY (id_vendedor)
-    REFERENCES producto(id_vendedor)
-    ON DELETE SET NULL,
+    -- FOREIGN KEY (id_vendedor)
+    -- REFERENCES producto(id_vendedor)
+    -- ON DELETE SET NULL,
 
     id_comprador INT NULL,
     FOREIGN KEY (id_comprador)

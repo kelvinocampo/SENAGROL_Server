@@ -74,8 +74,8 @@ class AdminService {
         }
 
         const result: any = await AdminRepository.deleteUser(id_delete_user)
-        if (result.affectedRows > 0) return { message: `Usuario eliminado` }
-        if (result.affectedRows == 0) return { message: `Usuario con la ID ${id_delete_user} no encontrado` }
+        if (result.affectedRows > 0) return { status: 200, message: `Usuario eliminado` }
+        if (result.affectedRows == 0) return { status: 404, message: `Usuario con la ID ${id_delete_user} no encontrado` }
     }
 
     static async deactivateRole(id_deactivate_user: number, role: string) {
