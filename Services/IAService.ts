@@ -12,16 +12,16 @@ const AVAILABLE_ROUTES = {
     // Rutas generales
     login: "/login",
     register: "/register",
-    
+
     // Rutas de vendedor
     productos_crear: "MisProductos/Crear",
     productos_editar: "MisProductos/Editar/:id_producto",
     productos_lista: "MisProductos",
-    
+
     // Rutas de administrador
     admin: "/admin",
     admin_productos: "/admin/productos",
-    
+
     // Rutas adicionales (agregar aquí manualmente)
     perfil: "/perfil",
     configuracion: "/configuracion",
@@ -43,8 +43,8 @@ const globalHistory = {
                 text: `No contestes con formato markdown. 
                 Solo puedes ayudar con tres funcionalidades específicas si el usuario se encuentra identificado:
                 1. GESTIÓN DE PRODUCTOS (crear, actualizar, eliminar productos) para el rol de vendedor
-                   - Creación/edición: redirigir a rutas del frontend
-                   - Eliminación: manejar por estado lógico del campo "eliminado"
+                    - Creación/edición: redirigir a rutas del frontend
+                    - Eliminación: manejar por estado lógico del campo "eliminado"
                 2. CONSULTA DE COMPRAS Y PRODUCTOS (ver información de productos y compras) para los participantes de una compra
                 3. DESPUBLICACIÓN Y PUBLICACIÓN DE PRODUCTOS (cambiar estado de visibilidad) para administradores
                 4. NAVEGACIÓN - Sugerir rutas como /login, /register, /admin cuando sea apropiado
@@ -83,18 +83,18 @@ class IAService {
 
             // 1. Analizar el tipo de solicitud
             const requestType = await this.analyzeRequestType(prompt, role, chat);
-            
+
             // 2. Manejar según el tipo de solicitud
             switch (requestType.action) {
                 case 'ROUTE_REDIRECT':
                     return this.handleRouteRedirect(requestType, prompt, role, id, chat);
-                
+
                 case 'DATABASE_OPERATION':
                     return this.handleDatabaseOperation(prompt, role, id, chat);
-                
+
                 case 'PERMISSION_DENIED':
                     return this.buildPermissionDeniedResponse(role, prompt);
-                
+
                 case 'SIMPLE_RESPONSE':
                 default:
                     return this.responseIA(prompt, history);
@@ -196,7 +196,7 @@ class IAService {
         try {
             // Verificar permisos antes de acceder a la DB
             const hasPermission = await this.checkPermissions(prompt, role, chat);
-            
+
             if (!hasPermission) {
                 return this.buildPermissionDeniedResponse(role, prompt);
             }
@@ -236,24 +236,24 @@ class IAService {
     // Construir respuesta cuando se deniegan permisos
     static buildPermissionDeniedResponse(role: string, prompt: string): string {
         const lowerPrompt = prompt.toLowerCase();
-        
+
         // Analizar el tipo de operación solicitada y sugerir la acción apropiada
         if (lowerPrompt.includes('producto') && (lowerPrompt.includes('crear') || lowerPrompt.includes('nuevo'))) {
             return `Solo los vendedores pueden crear productos. ${this.getSuggestedAction(role, 'vendedor')}`;
         }
-        
+
         if (lowerPrompt.includes('producto') && lowerPrompt.includes('editar')) {
             return `Solo los vendedores pueden editar sus productos. ${this.getSuggestedAction(role, 'vendedor')}`;
         }
-        
+
         if (lowerPrompt.includes('admin') || lowerPrompt.includes('despublicar') || lowerPrompt.includes('publicar')) {
             return `Solo los administradores pueden realizar esta acción. ${this.getSuggestedAction(role, 'administrador')}`;
         }
-        
+
         if (!role || role === 'guest' || role === 'anonimo') {
             return `Necesitas iniciar sesión para acceder a esta funcionalidad. Dirígete a ${AVAILABLE_ROUTES.login} para iniciar sesión o ${AVAILABLE_ROUTES.register} para registrarte.`;
         }
-        
+
         return "No tienes permisos para realizar esta operación.";
     }
 
@@ -314,9 +314,9 @@ class IAService {
         try {
             // Determinar el tipo de operación SQL
             const operationType = await this.determineSQLOperationType(prompt, chat);
-            
+
             let sqlPrompt: string;
-            
+
             if (operationType === 'ELIMINACION') {
                 sqlPrompt = `
                     Genera una consulta SQL UPDATE para marcar un producto como eliminado (eliminado = 1).
@@ -418,7 +418,7 @@ class IAService {
         if (match && match[1]) {
             return match[1].trim();
         }
-        
+
         // Remover otras marcas de formato
         return response
             .replace(/``/g, '')
@@ -452,20 +452,20 @@ class IAService {
         // Si no es un array, es un objeto (resultado de INSERT, UPDATE, DELETE)
         if (typeof results === 'object') {
             const resultInfo = [];
-            
+
             // Información común de operaciones de modificación
             if (results.affectedRows !== undefined) {
                 resultInfo.push(`Filas afectadas: ${results.affectedRows}`);
             }
-            
+
             if (results.insertId !== undefined && results.insertId > 0) {
                 resultInfo.push(`ID insertado: ${results.insertId}`);
             }
-            
+
             if (results.changedRows !== undefined) {
                 resultInfo.push(`Filas modificadas: ${results.changedRows}`);
             }
-            
+
             if (results.warningCount !== undefined && results.warningCount > 0) {
                 resultInfo.push(`Advertencias: ${results.warningCount}`);
             }
@@ -482,8 +482,8 @@ class IAService {
                 operationMessage = "No se realizaron cambios. Verifica que los datos sean correctos.";
             }
 
-            const formattedInfo = resultInfo.length > 0 ? 
-                `${operationMessage} Detalles: ${resultInfo.join(', ')}` : 
+            const formattedInfo = resultInfo.length > 0 ?
+                `${operationMessage} Detalles: ${resultInfo.join(', ')}` :
                 operationMessage;
 
             return formattedInfo;

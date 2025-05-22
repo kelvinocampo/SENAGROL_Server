@@ -5,7 +5,14 @@ const IAController = async (req: Request, res: Response) => {
     try {
         const { prompt, history = [] } = req.body;
 
-        const responseIA = await IAService.responseIA(prompt, history);
+        const parsedHistory: any[] = history.map((item:any)=>{
+            return {
+                role: item.role == "ia"?"model":"user" ,
+                parts:[{text: item.message}]
+            }
+        })
+
+        const responseIA = await IAService.responseIA(prompt, parsedHistory);
 
         return res.status(200).json({
             status: 'response ok',

@@ -6,7 +6,14 @@ const IARegisteredController = async (req: Request, res: Response) => {
         const { id_user, roles } = req.body;
         const { prompt, history = [] } = req.body;
 
-        const responseIA = await IAService.requestRegister(prompt, roles, id_user, history);
+        const parsedHistory: any[] = history.map((item: any) => {
+            return {
+                role: item.role == "ia" ? "model" : "user",
+                parts: [{ text: item.message }]
+            }
+        })
+
+        const responseIA = await IAService.requestRegister(prompt, roles, id_user, parsedHistory);
 
         return res.status(200).json({
             status: 'response ok',
