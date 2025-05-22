@@ -5,9 +5,7 @@ const getChats = async (req: Request, res: Response) => {
     try {
         const { id_user } = req.body;
 
-        const result = await ChatService.getChats(
-            parseInt(id_user)
-        );
+        const result = await ChatService.getChats(parseInt(id_user));
 
         return res.status(200).json({
             status: 'success',

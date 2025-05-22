@@ -47,14 +47,14 @@ INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad
 ("Mangos Tommy", "Mangos dulces y jugosos de la región", 4.450000, -75.720000, 80, 4, "https://upload.wikimedia.org/wikipedia/commons/8/88/Bright_red_tomato_and_cross_section02.jpg", 2.00, 0.20, 1, 3); -- Despublicado
 
 -- === COMPRAS ===
-INSERT INTO compra (estado, precio_transporte, precio_producto, cantidad, fecha_compra, fecha_entrega, id_producto, id_vendedor, id_comprador, id_transportador)
+INSERT INTO compra (estado, precio_transporte, precio_producto, cantidad, fecha_compra, fecha_entrega, id_producto, id_vendedor, id_comprador, id_transportador, latitud, longitud)
 VALUES
-('Pendiente', 20.00, 50.00, 20, NOW(), NULL, 1, 3, 2, 4),
-('Asignada', 15.00, 36.00, 20, NOW(), NOW(), 2, 3, 2, 4),
-('En Proceso', 18.00, 45.00, 15, NOW(), DATE_ADD(NOW(), INTERVAL 2 DAY), 1, 7, 6, 8),
-('Completada', 12.00, 64.00, 20, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), 2, 7, 2, 4),
-('Pendiente', NULL, 25.00, 10, NOW(), NULL, 3, 3, 6, NULL), -- Sin transportador asignado
-('Asignada', 25.00, 80.00, 40, NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), 1, 7, 2, 8);
+('Pendiente', 20.00, 50.00, 20, NOW(), NULL, 1, 3, 2, 4, 4.609710, -74.081750),
+('Asignada', 15.00, 36.00, 20, NOW(), NOW(), 2, 3, 2, 4,, 4.609710, -74.081750),
+('En Proceso', 18.00, 45.00, 15, NOW(), DATE_ADD(NOW(), INTERVAL 2 DAY), 1, 7, 6, 8,, 4.609710, -74.081750),
+('Completada', 12.00, 64.00, 20, DATE_SUB(NOW(), INTERVAL 5 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), 2, 7, 2, 4,, 4.609710, -74.081750),
+('Pendiente', NULL, 25.00, 10, NOW(), NULL, 3, 3, 6, NULL, 4.609710, -74.081750), -- Sin transportador asignado
+('Asignada', 25.00, 80.00, 40, NOW(), DATE_ADD(NOW(), INTERVAL 3 DAY), 1, 7, 2, 8,, 4.609710, -74.081750);
 
 -- === CHATS ===
 INSERT INTO chat (bloqueado_user1, bloqueado_user2, eliminado_user1, eliminado_user2, fecha_reciente, id_user1, id_user2)

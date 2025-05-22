@@ -102,6 +102,8 @@ CREATE TABLE IF NOT EXISTS compra(
     nombre_comprador_eliminado VARCHAR(100) NULL,
     nombre_vendedor_eliminado VARCHAR(100) NULL,
     nombre_transportador_eliminado VARCHAR(100) NULL,
+    latitud_comprador DECIMAL(9, 6) NOT NULL,
+    longitud_comprador DECIMAL(9, 6) NOT NULL,
 
     id_producto INT,
     FOREIGN KEY (id_producto)
