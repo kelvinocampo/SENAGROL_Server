@@ -13,6 +13,8 @@ import ReceiveCodeBuy from "../Controllers/Buy/ReceiveCode";
 import CancelTransport from "../Controllers/Buy/CancelTransport";
 
 import GetLocation from "../Controllers/Buy/GetLocation";
+
+import GetAddress from "../Controllers/Buy/GetAddress";
 const router = express.Router();
 
 router.patch('/assign/:id_compra/:id_transportador',
@@ -26,5 +28,6 @@ router.patch("/cancelTransport/:id_compra",
     verifyToken, verifyRole(["transportador", "comprador"]), CancelTransport)
 router.get("/getLocation/:id_compra",
     verifyToken, verifyRole(["transportador", "comprador"]), GetLocation)
+router.get("/getAddress", GetAddress)
 
 export default router;

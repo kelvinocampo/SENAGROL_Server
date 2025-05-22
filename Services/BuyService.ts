@@ -1,3 +1,4 @@
+import { getAddressByCoords } from '../Helpers/GetAddressByCoords';
 import BuyRepository from '../Repositories/BuyRepository';
 import Hashids from 'hashids/cjs';
 // Configuración del hash
@@ -69,6 +70,14 @@ class BuyService {
         const result: any = await BuyRepository.getLocation(id_user, id_compra)
         if (result.length === 0) {
             return { code: 400, success: false, message: "No se pudo obtener la ubicación." }
+        }
+        return { code: 200, success: true, message: result[0] }
+    }
+
+    static async getAddress(lat: number, lon: number) {
+        const result: any = await getAddressByCoords(lat, lon)
+        if (result.length === 0) {
+            return { code: 400, success: false, message: "No se pudo obtener la dirección." }
         }
         return { code: 200, success: true, message: result[0] }
     }
