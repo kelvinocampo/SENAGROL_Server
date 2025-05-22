@@ -13,7 +13,7 @@ brevoApi.setApiKey(0, BREVO_KEY);
 
 export async function sendResetEmail(dataEmail: DataEmail) {
     try {
-        const resetLink = `${FRONTEND_URL}/reset-password?token=${dataEmail.token}`;
+        const resetLink = `${FRONTEND_URL}/RecuperarContraseña?token=${dataEmail.token}`;
 
         const sendSmtpEmail: SendSmtpEmail = {
             subject: "Recuperación de contraseña",
