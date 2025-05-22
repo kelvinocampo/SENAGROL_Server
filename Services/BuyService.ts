@@ -79,7 +79,7 @@ class BuyService {
         if (result.length === 0) {
             return { code: 400, success: false, message: "No se pudo obtener la dirección." }
         }
-        return { code: 200, success: true, message: result[0] }
+        return { code: 200, success: true, message: result }
     }
 }
 
