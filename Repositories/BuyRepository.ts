@@ -174,31 +174,31 @@ class BuyRepository {
 
     static async assignTransporter(id_user: number, id_compra: number, id_transportador: number, precio_transporte: number) {
         const query = `
-        UPDATE compra
-        SET id_transportador = ?, estado = ?, precio_transporte = ?
+            UPDATE compra
+            SET id_transportador = ?, estado = ?, precio_transporte = ?
             WHERE id_compra = ?
-                `
+        `
         const [result]: any = await db.execute(query, [id_transportador, "Asignada", id_compra])
         return result;
     }
 
     static async generateCode(id_compra: number, id_user: number) {
         const query = `
-        SELECT estado, id_compra
-        FROM compra
-        WHERE id_compra = ? AND(id_comprador = ? OR id_vendedor = ?)
-            `
+            SELECT estado, id_compra
+            FROM compra
+            WHERE id_compra = ? AND(id_comprador = ? OR id_vendedor = ?)
+        `
         const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
         return result;
     }
 
     static async receiveCodeBuy(id_compra: number, estado: string, id_user: number) {
         const query = `
-        UPDATE compra
-        SET estado = ?
-        WHERE id_compra = ? AND (id_comprador = ? OR id_vendedor = ?)
+            UPDATE compra
+            SET estado = ?
+            WHERE id_compra = ? AND id_transportador = ?
         `
-        const [result]: any = await db.execute(query, [estado, id_compra, id_user, id_user])
+        const [result]: any = await db.execute(query, [estado, id_compra, id_user])
         return result;
     }
 
