@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import BuyService from "../../Services/BuyService";
 
-let cancelTransport = async (req: Request, res: Response) => {
+let getLocation = async (req: Request, res: Response) => {
     try {
         const { id_user } = req.body;
         const { id_compra } = req.params;
-        const result: any = await BuyService.cancelTransport(id_user, parseInt(id_compra));
+        const result: any = await BuyService.getLocation(id_user, parseInt(id_compra));
 
         return res.status(result.code).json({ success: result.success, message: result.message });
     } catch (error: any) {
@@ -17,4 +17,4 @@ let cancelTransport = async (req: Request, res: Response) => {
     }
 };
 
-export default cancelTransport;
+export default getLocation;

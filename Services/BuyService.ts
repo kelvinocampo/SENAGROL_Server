@@ -56,6 +56,22 @@ class BuyService {
         }
         return { code: 200, success: true, message: "Transporte Cancelado" }
     }
+
+    static async getLocation(id_user: number, id_compra: number) {
+        const getBuy: any = await BuyRepository.getById(id_compra)
+        if (getBuy.length === 0) {
+            return { code: 400, success: false, message: "compra no encontrada" }
+        }
+        if (getBuy[0].estado != "Asignada") {
+            return { code: 409, success: false, message: "Solo se puede cancelar el transporte a una compra asignada." }
+        }
+
+        const result: any = await BuyRepository.getLocation(id_user, id_compra)
+        if (result.length === 0) {
+            return { code: 400, success: false, message: "No se pudo obtener la ubicación." }
+        }
+        return { code: 200, success: true, message: result[0] }
+    }
 }
 
 export default BuyService;

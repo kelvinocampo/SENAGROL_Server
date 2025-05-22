@@ -300,7 +300,16 @@ class BuyRepository {
         return result
     }
 
-
+    static async getLocation(id_user: number, id_compra: number) {
+        const query = `
+            SELECT c.latitud_comprador, c.longitud_comprador, p.latitud, p.longitud
+            FROM compra c
+            LEFT JOIN producto p ON c.id_producto = p.id_producto
+            WHERE c.id_compra = ? AND (c.id_comprador = ? OR c.id_transportador = ?)
+        `
+        const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
+        return result;
+    }
 }
 
 export default BuyRepository;
