@@ -20,11 +20,27 @@ const validatorParams = [
 
     check('latitud')
         .isFloat({ min: -90, max: 90 })
-        .withMessage('La latitud debe estar entre -90 y 90.'),
+        .withMessage('La latitud debe ser un valor decimal entre -90 y 90 grados.')
+        .custom(value => {
+            // Validar que tenga máximo 6 decimales (precisión típica para coordenadas)
+            const decimalPlaces = (value.toString().split('.')[1] || '').length;
+            if (decimalPlaces > 6) {
+                throw new Error('La latitud no puede tener más de 6 decimales.');
+            }
+            return true;
+        }),
 
     check('longitud')
         .isFloat({ min: -180, max: 180 })
-        .withMessage('La longitud debe estar entre -180 y 180.'),
+        .withMessage('La longitud debe ser un valor decimal entre -180 y 180 grados.')
+        .custom(value => {
+            // Validar que tenga máximo 6 decimales
+            const decimalPlaces = (value.toString().split('.')[1] || '').length;
+            if (decimalPlaces > 6) {
+                throw new Error('La longitud no puede tener más de 6 decimales.');
+            }
+            return true;
+        }),
 
     check('quantity')
         .isInt({ min: 1 })

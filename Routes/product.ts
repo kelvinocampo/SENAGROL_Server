@@ -25,6 +25,7 @@ import Buy from "../Controllers/Product/BuyController";
 
 const router = express.Router();
 
+// Needed buy validator
 router.post("/buy/:id_producto", verifyToken, verifyRole(["comprador"]), Buy)
 router.get('/', GetAllProducts);
 router.get('/my_products', verifyToken, verifyRole(["vendedor"]), GetProductsBySeller);

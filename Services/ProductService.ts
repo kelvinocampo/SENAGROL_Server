@@ -17,7 +17,7 @@ class ProductService {
         }
     }
 
-    static async buy(id_producto: number, id_user: number, cantidad: number) {
+    static async buy(id_producto: number, id_user: number, cantidad: number, latitud: number, longitud: number) {
         try {
             // Verificar si el producto existe
             const existingProduct = await ProductRepository.findById(id_producto);
@@ -33,7 +33,7 @@ class ProductService {
             if (!editQuantity) {
                 return { success: false, message: "Error al actualizar la cantidad del producto" };
             }
-            const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad);
+            const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad, latitud, longitud);
             if (!result) {
                 return { success: false, message: "Error al realizar la compra" };
             }

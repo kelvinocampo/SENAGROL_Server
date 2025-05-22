@@ -57,12 +57,12 @@ class ProductRepository {
         return result;
     }
 
-    static async buy(id_vendedor: number, id_producto: number, id_user: number, cantidad: number) {
+    static async buy(id_vendedor: number, id_producto: number, id_user: number, cantidad: number, latitud: number, longitud: number) {
         const sql = `
-            INSERT INTO compra (id_producto, id_comprador, cantidad, fecha_compra, id_vendedor, estado)
+            INSERT INTO compra (id_producto, id_comprador, cantidad, fecha_compra, id_vendedor, estado, latitud_comprador, longitud_comprador)
             VALUES (?, ?, ?, ?, ?, ?)
         `;
-        const values = [id_producto, id_user, cantidad, new Date(), id_vendedor, "Pendiente"];
+        const values = [id_producto, id_user, cantidad, new Date(), id_vendedor, "Pendiente", latitud, longitud];
         const [result]: any = await db.execute(sql, values);
         return result;
     }

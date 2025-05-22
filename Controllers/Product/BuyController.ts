@@ -3,13 +3,14 @@ import ProductService from "../../Services/ProductService";
 
 let buy = async (req: Request, res: Response) => {
     try {
-        const { id_user, cantidad } = req.body;
+        const { id_user, cantidad, latitud, longitud } = req.body;
         const { id_producto } = req.params;
 
         const result = await ProductService.buy(
             parseInt(id_producto),
             parseInt(id_user),
-            parseInt(cantidad)
+            parseInt(cantidad),
+            latitud, longitud
         );
 
         if (!result.success) {
