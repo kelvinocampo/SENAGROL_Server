@@ -21,10 +21,12 @@ import upload from "../Middleware/multerConfig";
 import AudioMessageController from "../Controllers/Chat/AudioMessage";
 import BlockChatController from "../Controllers/Chat/BlockChat";
 import UnblockChatController from "../Controllers/Chat/UnblockChat";
+import InitChat from "../Controllers/Chat/InitChat";
 
 const router = express.Router();
 
 router.get('/', verifyToken, GetChats);
+router.post('/:id_user2', verifyToken, InitChat);
 router.get('/:id_chat', verifyToken, GetChat);
 router.delete('/:id_chat', verifyToken, DeleteChatController);
 router.post('/:id_chat/message/text', verifyToken, TextMessageMiddleware.validatorParams, TextMessageMiddleware.validator, TextMessageController);

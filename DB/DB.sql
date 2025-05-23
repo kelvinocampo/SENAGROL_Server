@@ -129,10 +129,10 @@ CREATE TABLE IF NOT EXISTS compra(
 DROP TABLE IF EXISTS chat;
 CREATE TABLE IF NOT EXISTS chat(
     id_chat INT PRIMARY KEY AUTO_INCREMENT,
-    bloqueado_user1 BOOLEAN NULL,
-    bloqueado_user2 BOOLEAN NULL,
-    eliminado_user1 BOOLEAN NULL,
-    eliminado_user2 BOOLEAN NULL,
+    bloqueado_user1 BOOLEAN NULL DEFAULT FALSE,
+    bloqueado_user2 BOOLEAN NULL DEFAULT FALSE,
+    eliminado_user1 BOOLEAN NULL DEFAULT FALSE,
+    eliminado_user2 BOOLEAN NULL DEFAULT FALSE,
     fecha_reciente DATETIME,
 
     id_user1 INT NULL,

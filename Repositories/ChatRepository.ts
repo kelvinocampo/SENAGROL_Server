@@ -152,6 +152,36 @@ class ChatRepository {
             throw error;
         }
     }
+
+    /**
+     * Inicializa un nuevo chat entre dos usuarios
+     * @param id_user1 - ID del primer usuario
+     * @param id_user2 - ID del segundo usuario
+     * @returns Resultado de la operación
+     */
+    static async initChat(id_user1: number, id_user2: number) {
+        try {
+            const query = `
+                INSERT INTO chat (id_user1, id_user2, fecha_reciente)
+                VALUES (?, ?, ?);
+            `;
+            const values = [id_user1, id_user2, new Date()];
+            const [result] = await db.execute(query, values);
+            return result;
+        } catch (error) {
+            console.error("Error en ChatRepository.initChat:", error);
+            throw error;
+        }
+    }
+
+    static async getChatByUsers(id_user1: number, id_user2: number) {
+        const query = `
+            SELECT * FROM chat 
+            WHERE (id_user1 = ? AND id_user2 = ?) OR (id_user1 = ? AND id_user2 = ?)
+        `;
+        const [result] = await db.execute(query, [id_user1, id_user2, id_user2, id_user1]);
+        return result;
+    }
 }
 
 export default ChatRepository;
