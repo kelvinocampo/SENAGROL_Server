@@ -27,8 +27,10 @@ INSERT INTO comprador (id_comprador, estado) VALUES
 (9, 'Pendiente');
 INSERT INTO vendedor (id_vendedor, estado) VALUES 
 (3, 'Activo'),
+(5, 'Activo'),
 (7, 'Activo');
 INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_propiedad_vehiculo, tipo_vehiculo, peso_vehiculo, estado) VALUES 
+(5, 'ABC123456', 'SOAT123456', 'TPV123456', 'Camión', 3500.50, 'Activo'),
 (4, 'ABC123456', 'SOAT123456', 'TPV123456', 'Camión', 3500.50, 'Activo'),
 (8, 'DEF789012', 'SOAT789012', 'TPV789012', 'Camioneta', 1800.75, 'Activo');
 
@@ -36,7 +38,8 @@ INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_
 INSERT INTO foto_vehiculo (foto, id_transportador) VALUES
 ("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 4),
 ("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 4),
-("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 8);
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 8),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 5);
 
 -- === PRODUCTOS ===
 INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, despublicado, id_vendedor) VALUES
