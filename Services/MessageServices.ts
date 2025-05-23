@@ -17,6 +17,8 @@ class MessageService {
             throw new Error("No tienes permiso para enviar mensajes en este chat");
         }
 
+        await ChatRepository.UpdateDate(chat.id_chat);
+
         return await MessageRepository.createMessage(message);
     }
 

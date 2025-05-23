@@ -174,12 +174,34 @@ class ChatRepository {
         }
     }
 
+    /**
+     * Retrieves a chat between two users
+     * @param id_user1 - ID of the first user
+     * @param id_user2 - ID of the second user
+     * @returns The chat object if found, otherwise null
+     */
     static async getChatByUsers(id_user1: number, id_user2: number) {
         const query = `
             SELECT * FROM chat 
             WHERE (id_user1 = ? AND id_user2 = ?) OR (id_user1 = ? AND id_user2 = ?)
         `;
         const [result] = await db.execute(query, [id_user1, id_user2, id_user2, id_user1]);
+        return result;
+    }
+
+    /**
+     * Updates the recent date of a chat
+     * @param id_chat - ID of the chat to update
+     * @returns Result of the update operation
+     */
+    static async UpdateDate(id_chat: number) {
+        const query = `
+            UPDATE chat
+            SET fecha_reciente = ?
+            WHERE id_chat = ?;
+        `;
+        const values = [new Date(), id_chat];
+        const [result] = await db.execute(query, values);
         return result;
     }
 }
