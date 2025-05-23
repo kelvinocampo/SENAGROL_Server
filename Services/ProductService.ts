@@ -33,7 +33,7 @@ class ProductService {
             if (!editQuantity) {
                 return { success: false, message: "Error al actualizar la cantidad del producto" };
             }
-            const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad, latitud, longitud);
+            const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad, latitud, longitud, (existingProduct.precio_unidad * cantidad));
             if (!result) {
                 return { success: false, message: "Error al realizar la compra" };
             }
