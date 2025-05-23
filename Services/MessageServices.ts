@@ -12,12 +12,16 @@ class MessageService {
     static async sendMessage(message: Message) {
         const chat = await ChatRepository.getChatById(message.id_chat);
         if (!chat) throw new Error("Chat no encontrado");
-        
+
         if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
             throw new Error("No tienes permiso para enviar mensajes en este chat");
         }
 
-        await ChatRepository.UpdateDate(chat.id_chat);
+        if ((chat.id_user1 && chat.eliminado_user1) || (chat.id_user2 && chat.eliminado_user2)) {
+            await ChatRepository.unDeleteChat(message.id_user, message.id_chat);
+        }
+
+        await ChatRepository.updateDate(chat.id_chat);
 
         return await MessageRepository.createMessage(message);
     }
@@ -32,7 +36,7 @@ class MessageService {
     static async updateTextMessage(message: Message, id_message: number) {
         const chat = await ChatRepository.getChatById(message.id_chat);
         if (!chat) throw new Error("Chat no encontrado");
-        
+
         if (chat.id_user1 !== message.id_user && chat.id_user2 !== message.id_user) {
             throw new Error("No tienes permiso para modificar mensajes en este chat");
         }
@@ -51,7 +55,7 @@ class MessageService {
     static async deleteMessage(id_user: number, id_message: number, id_chat: number) {
         const chat = await ChatRepository.getChatById(id_chat);
         if (!chat) throw new Error("Chat no encontrado");
-        
+
         if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
             throw new Error("No tienes permiso para eliminar mensajes en este chat");
         }

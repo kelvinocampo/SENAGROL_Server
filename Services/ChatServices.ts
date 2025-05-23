@@ -91,6 +91,7 @@ class ChatService {
 
         const existingChat: any = await ChatRepository.getChatByUsers(id_user1, id_user2);
         if (existingChat) {
+            await ChatRepository.unDeleteChat(id_user1, existingChat[0].id_chat);
             return { code: 200, status: true, message: "Chat ya existe", chat: existingChat[0].id_chat };
         }
 

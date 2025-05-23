@@ -194,7 +194,7 @@ class ChatRepository {
      * @param id_chat - ID of the chat to update
      * @returns Result of the update operation
      */
-    static async UpdateDate(id_chat: number) {
+    static async updateDate(id_chat: number) {
         const query = `
             UPDATE chat
             SET fecha_reciente = ?
@@ -203,6 +203,36 @@ class ChatRepository {
         const values = [new Date(), id_chat];
         const [result] = await db.execute(query, values);
         return result;
+    }
+
+    /**
+     * Restores a deleted chat for a user
+     * @param id_user - ID of the user restoring the chat
+     * @param id_chat - ID of the chat to restore
+     * @returns Result of the restore operation
+     */
+    static async unDeleteChat(id_user: number, id_chat: number) {
+        try {
+            const query = `
+                UPDATE chat
+                SET 
+                    eliminado_user1 = CASE 
+                        WHEN id_user1 = ? THEN false
+                        ELSE eliminado_user1
+                    END,
+                    eliminado_user2 = CASE 
+                        WHEN id_user2 = ? THEN false
+                        ELSE eliminado_user2
+                    END
+                WHERE id_chat = ?;
+            `;
+            const values = [id_user, id_user, id_chat];
+            const [result] = await db.execute(query, values);
+            return result;
+        } catch (error) {
+            console.error("Error en ChatRepository.unDeleteChat:", error);
+            throw error;
+        }
     }
 }
 
