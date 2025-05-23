@@ -68,7 +68,7 @@ class ProductRepository {
     }
 
     static async findById(id: number) {
-        const checkSql = `SELECT * FROM producto WHERE id_producto = ? AND (p.despublicado = 0 OR p.eliminado = 0)`;
+        const checkSql = `SELECT * FROM producto WHERE id_producto = ? AND (despublicado = 0 OR eliminado = 0)`;
         const [result]: any = await db.execute(checkSql, [id]);
         return result.length ? result[0] : null;
     }
