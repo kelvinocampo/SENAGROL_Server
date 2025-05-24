@@ -14,11 +14,11 @@ export const initSocket = (server: http.Server): Server => {
     });
 
     io.on("connection", (socket) => {
-        console.log(`🟢 Nueva conexión: ${socket.id}`);
+        console.log(`Nueva conexión: ${socket.id}`);
 
         // Solo manejar conexión básica aquí
         socket.on("disconnect", () => {
-            console.log(`🔴 Desconectado: ${socket.id}`);
+            console.log(`Desconectado: ${socket.id}`);
         });
     });
 

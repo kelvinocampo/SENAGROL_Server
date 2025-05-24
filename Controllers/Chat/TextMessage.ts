@@ -8,13 +8,14 @@ const textMessageController = async (req: Request, res: Response) => {
         const { text } = req.body;
         const { id_chat } = req.params;
 
-        const result = await MessageService.sendMessage(
+        const result:any = await MessageService.sendMessage(
             new Message(false, "texto", text, (new Date()), parseInt(id_chat), parseInt(id_user))
         );
 
-        return res.status(200).json({
-            status: 'success',
-            data: result
+        return res.status(result.code).json({
+            status: result.success,
+            message: result.message || null,
+            data: result.data || null
         });
     } catch (error: any) {
         return res.status(500).json({

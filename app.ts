@@ -58,7 +58,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 // Iniciar servidor
 server.listen(PORT, () => {
     console.log(`Servidor ejecutándose en el puerto: ${PORT}`);
-    console.log(`🔗 URL Frontend permitida: ${FRONTEND_URL}`);
+    console.log(`URL Frontend permitida: ${FRONTEND_URL}`);
 }).on("error", (error: { message: string }) => {
     console.error("Error en el servidor:", error.message);
     process.exit(1);
