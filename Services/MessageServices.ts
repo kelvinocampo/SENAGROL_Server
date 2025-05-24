@@ -34,7 +34,23 @@ class MessageService {
                 await ChatRepository.unDeleteChat(message.id_user, message.id_chat);
             }
 
+            if ((message.id_user == chat.bloqueado_user1 && chat.bloqueado_user1) ||
+                (message.id_user == chat.bloqueado_user2 && chat.bloqueado_user2)) {
+                return {
+                    code: 403,
+                    success: false,
+                    message: "No puedes enviar mensajes porque has sido bloqueado en este chat"
+                }
+            }
+
             const updatedDateChat = await ChatRepository.updateDate(chat.id_chat);
+            if (!updatedDateChat) {
+                return {
+                    code: 500,
+                    success: false,
+                    message: "Error al actualizar la fecha reciente del chat"
+                };
+            }
 
             const new_message: any = await MessageRepository.createMessage(message);
 
