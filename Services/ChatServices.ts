@@ -1,5 +1,6 @@
 import ChatRepository from "../Repositories/ChatRepository";
 import MessageRepository from "../Repositories/MessageRepository";
+import UserRepository from "../Repositories/UserRepository";
 
 class ChatService {
     /**
@@ -87,6 +88,11 @@ class ChatService {
     static async initChat(id_user1: number, id_user2: number) {
         if (id_user1 === id_user2) {
             return { code: 400, status: false, message: "No puedes iniciar un chat contigo mismo" };
+        }
+
+        const existUser2 = await UserRepository.getByID(id_user2)
+        if (!existUser2) {
+            return { code: 404, status: false, message: "El usuario para iniciar conversacion no existe" };
         }
 
         const existingChat: any = await ChatRepository.getChatByUsers(id_user1, id_user2);
