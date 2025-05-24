@@ -1,8 +1,10 @@
 import Message from "../Dto/Chat/MessageDTO";
 import MessageRepository from "../Repositories/MessageRepository";
 import ChatRepository from "../Repositories/ChatRepository";
+import { getIO } from "../Config/socket";
 
 class MessageService {
+    static io = getIO();
     /**
      * Sends a new message in a chat
      * @param message Message object containing chat and user information
@@ -23,7 +25,16 @@ class MessageService {
 
         await ChatRepository.updateDate(chat.id_chat);
 
-        return await MessageRepository.createMessage(message);
+        const new_message: any = await MessageRepository.createMessage(message);
+
+        this.io.to(`chat_${message.id_chat}`).emit("new_message", {
+            tipo: message.tipo,
+            contenido: message.contenido,
+            fecha_envio: message.fecha_envio,
+            usuario: message.id_user
+        });
+
+        return new_message
     }
 
     /**
@@ -41,7 +52,17 @@ class MessageService {
             throw new Error("No tienes permiso para modificar mensajes en este chat");
         }
 
-        return await MessageRepository.updateTextMessage(message, id_message);
+        const updatedMessage = await MessageRepository.updateTextMessage(message, id_message);
+
+        this.io.to(`chat_${message.id_chat}`).emit("updated_message", {
+            id_mensaje: id_message,
+            tipo: message.tipo,
+            contenido: message.contenido,
+            fecha_envio: message.fecha_envio,
+            usuario: message.id_user
+        });
+
+        return updatedMessage
     }
 
     /**
@@ -60,7 +81,13 @@ class MessageService {
             throw new Error("No tienes permiso para eliminar mensajes en este chat");
         }
 
-        return await MessageRepository.deleteMessage(id_user, id_message, id_chat);
+        const deletedMessage = await MessageRepository.deleteMessage(id_user, id_message, id_chat);
+
+        this.io.to(`chat_${id_chat}`).emit("deleted_message", {
+            id_mensaje: id_message
+        });
+
+        return deletedMessage;
     }
 }
 
