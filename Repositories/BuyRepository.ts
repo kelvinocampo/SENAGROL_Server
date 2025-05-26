@@ -178,7 +178,7 @@ class BuyRepository {
             SET id_transportador = ?, estado = ?, precio_transporte = ?
             WHERE id_compra = ?
         `
-        const [result]: any = await db.execute(query, [id_transportador, "Asignada", id_compra])
+        const [result]: any = await db.execute(query, [id_transportador, "Asignada", precio_transporte, id_compra])
         return result;
     }
 
