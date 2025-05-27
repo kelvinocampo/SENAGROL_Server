@@ -30,19 +30,18 @@ class ChatRepository {
         try {
             const query = `
                 SELECT chat.*,
-                CASE 
-                    WHEN id_user1 = ? AND bloqueado_user1 = 1 THEN "Bloqueado"
-                    WHEN id_user2 = ? AND bloqueado_user2 = 1 THEN "Bloqueado"
-                    ELSE "Activo"
-                END AS estado
+                    CASE 
+                        WHEN (id_user1 = 2 AND COALESCE(bloqueado_user1, FALSE) = TRUE) THEN "Bloqueado"
+                        WHEN (id_user2 = 2 AND COALESCE(bloqueado_user2, FALSE) = TRUE) THEN "Bloqueado"
+                        ELSE "Activo"
+                    END AS estado
                 FROM chat 
-                WHERE
-                    (id_user1 = ? OR id_user2 = ?) AND
-                    (
-                        (id_user1 = ? AND eliminado_user1 = 0) OR
-                        (id_user2 = ? AND eliminado_user2 = 0)
-                    )
-                ORDER BY fecha_reciente DESC
+                WHERE (id_user1 = 2 OR id_user2 = 2)
+                AND (
+                    (id_user1 = 2 AND COALESCE(eliminado_user1, FALSE) = FALSE) OR 
+                    (id_user2 = 2 AND COALESCE(eliminado_user2, FALSE) = FALSE)
+                )
+                ORDER BY fecha_reciente DESC;
             `;
             const values = Array(6).fill(id_user);
             const [rows]: any = await db.execute(query, values);
