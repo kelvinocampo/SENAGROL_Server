@@ -35,6 +35,6 @@ router.post('/:id_chat/message/image', upload.single("audio"), verifyToken, Audi
 router.put('/:id_chat/message/:id_message', verifyToken, UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);
 router.delete('/:id_chat/message/:id_message', verifyToken, DeleteMessageController);
 router.patch("/block/:id_chat", verifyToken, BlockChatController)
-router.patch("/block/:id_chat", verifyToken, UnblockChatController)
+router.patch("/unblock/:id_chat", verifyToken, UnblockChatController)
 
 export default router;
