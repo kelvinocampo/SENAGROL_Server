@@ -29,26 +29,42 @@ class ChatRepository {
     static async getChats(id_user: number) {
         try {
             const query = `
-                SELECT chat.*,
-                    CASE 
-                        WHEN (id_user1 = 2 AND COALESCE(bloqueado_user1, FALSE) = TRUE) THEN "Bloqueado"
-                        WHEN (id_user2 = 2 AND COALESCE(bloqueado_user2, FALSE) = TRUE) THEN "Bloqueado"
-                        ELSE "Activo"
-                    END AS estado
-                FROM chat 
-                WHERE (id_user1 = 2 OR id_user2 = 2)
+            SELECT 
+                c.id_chat,
+                c.bloqueado_user1,
+                c.bloqueado_user2,
+                c.eliminado_user1,
+                c.eliminado_user2,
+                c.fecha_reciente,
+                u1.nombre AS nombre_user1,
+                u2.nombre AS nombre_user2,
+                CASE 
+                    WHEN (c.id_user1 = ? AND COALESCE(c.bloqueado_user1, FALSE) = TRUE) THEN 'Bloqueado'
+                    WHEN (c.id_user2 = ? AND COALESCE(c.bloqueado_user2, FALSE) = TRUE) THEN 'Bloqueado'
+                    ELSE 'Activo'
+                END AS estado
+            FROM 
+                chat c
+            JOIN 
+                usuario u1 ON c.id_user1 = u1.id_usuario
+            JOIN 
+                usuario u2 ON c.id_user2 = u2.id_usuario
+            WHERE 
+                (c.id_user1 = ? OR c.id_user2 = ?)
                 AND (
-                    (id_user1 = 2 AND COALESCE(eliminado_user1, FALSE) = FALSE) OR 
-                    (id_user2 = 2 AND COALESCE(eliminado_user2, FALSE) = FALSE)
+                    (c.id_user1 = ? AND COALESCE(c.eliminado_user1, FALSE) = FALSE) OR 
+                    (c.id_user2 = ? AND COALESCE(c.eliminado_user2, FALSE) = FALSE)
                 )
-                ORDER BY fecha_reciente DESC;
-            `;
-            const values = Array(6).fill(id_user);
-            const [rows]: any = await db.execute(query, values);
+            ORDER BY 
+                c.fecha_reciente DESC;
+        `;
+
+            const values = [id_user, id_user, id_user, id_user, id_user, id_user];
+            const [rows] = await db.execute(query, values);
             return rows;
         } catch (error) {
             console.error("Error en ChatRepository.getChats:", error);
-            throw error;
+            throw new Error("No se pudieron obtener los chats");
         }
     }
 
