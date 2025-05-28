@@ -29,34 +29,58 @@ class ChatRepository {
     static async getChats(id_user: number) {
         try {
             const query = `
-            SELECT 
-                c.id_chat,
-                c.bloqueado_user1,
-                c.bloqueado_user2,
-                c.eliminado_user1,
-                c.eliminado_user2,
-                c.fecha_reciente,
-                u1.nombre AS nombre_user1,
-                u2.nombre AS nombre_user2,
-                CASE 
-                    WHEN (c.id_user1 = ? AND COALESCE(c.bloqueado_user1, FALSE) = TRUE) THEN 'Bloqueado'
-                    WHEN (c.id_user2 = ? AND COALESCE(c.bloqueado_user2, FALSE) = TRUE) THEN 'Bloqueado'
-                    ELSE 'Activo'
-                END AS estado
-            FROM 
-                chat c
-            JOIN 
-                usuario u1 ON c.id_user1 = u1.id_usuario
-            JOIN 
-                usuario u2 ON c.id_user2 = u2.id_usuario
-            WHERE 
-                (c.id_user1 = ? OR c.id_user2 = ?)
-                AND (
-                    (c.id_user1 = ? AND COALESCE(c.eliminado_user1, FALSE) = FALSE) OR 
-                    (c.id_user2 = ? AND COALESCE(c.eliminado_user2, FALSE) = FALSE)
-                )
-            ORDER BY 
-                c.fecha_reciente DESC;
+                SELECT 
+                    c.id_chat,
+                    c.bloqueado_user1,
+                    c.bloqueado_user2,
+                    c.eliminado_user1,
+                    c.eliminado_user2,
+                    c.fecha_reciente,
+                    u1.nombre AS nombre_user1,
+                    (
+                        SELECT GROUP_CONCAT(role, ' ')
+                        FROM (
+                            SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = c.id_user1 AND estado = 'Activo'
+                            UNION ALL
+                            SELECT 'administrador' AS role FROM administrador WHERE id_administrador = c.id_user1 AND estado = 'Activo'
+                            UNION ALL
+                            SELECT 'transportador' AS role FROM transportador WHERE id_transportador = c.id_user1 AND estado = 'Activo'
+                            UNION ALL
+                            SELECT 'comprador' AS role FROM comprador WHERE id_comprador = c.id_user1 AND estado = 'Activo'
+                        ) AS roles_user1
+                    ) AS rol_user1,
+                    u2.nombre AS nombre_user2,
+                    (
+                        SELECT GROUP_CONCAT(role, ' ')
+                        FROM (
+                            SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = c.id_user2 AND estado = 'Activo'
+                            UNION ALL
+                            SELECT 'administrador' AS role FROM administrador WHERE id_administrador = c.id_user2 AND estado = 'Activo'
+                            UNION ALL
+                            SELECT 'transportador' AS role FROM transportador WHERE id_transportador = c.id_user2 AND estado = 'Activo'
+                            UNION ALL
+                            SELECT 'comprador' AS role FROM comprador WHERE id_comprador = c.id_user2 AND estado = 'Activo'
+                        ) AS roles_user2
+                    ) AS rol_user2,
+                    CASE 
+                        WHEN (c.id_user1 = ? AND COALESCE(c.bloqueado_user1, FALSE) = TRUE) THEN 'Bloqueado'
+                        WHEN (c.id_user2 = ? AND COALESCE(c.bloqueado_user2, FALSE) = TRUE) THEN 'Bloqueado'
+                        ELSE 'Activo'
+                    END AS estado
+                FROM 
+                    chat c
+                JOIN 
+                    usuario u1 ON c.id_user1 = u1.id_usuario
+                JOIN 
+                    usuario u2 ON c.id_user2 = u2.id_usuario
+                WHERE 
+                    (c.id_user1 = ? OR c.id_user2 = ?)
+                    AND (
+                        (c.id_user1 = ? AND COALESCE(c.eliminado_user1, FALSE) = FALSE) OR 
+                        (c.id_user2 = ? AND COALESCE(c.eliminado_user2, FALSE) = FALSE)
+                    )
+                ORDER BY 
+                    c.fecha_reciente DESC;
         `;
 
             const values = [id_user, id_user, id_user, id_user, id_user, id_user];
