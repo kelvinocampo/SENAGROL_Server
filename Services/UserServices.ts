@@ -99,7 +99,7 @@ class UserService {
 
         const updatedUser = await UserRepository.update(id, updatedData);
         const roles = await UserRepository.getUserRoles(id)
-        if (roles.include("transportador")) {
+        if (roles.includes("transportador")) {
             const updatedTransporter = await TransporterRepository.update(dataTransporter);
         }
 
