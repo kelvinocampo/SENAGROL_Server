@@ -63,9 +63,6 @@ class BuyService {
         if (getBuy.length === 0) {
             return { code: 400, success: false, message: "compra no encontrada" }
         }
-        if (getBuy[0].estado != "Asignada") {
-            return { code: 409, success: false, message: "Solo se puede cancelar el transporte a una compra asignada." }
-        }
 
         const result: any = await BuyRepository.getLocation(id_user, id_compra)
         if (result.length === 0) {
