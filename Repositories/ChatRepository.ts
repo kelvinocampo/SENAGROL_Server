@@ -50,6 +50,8 @@ class ChatRepository {
                         ) AS roles_user1
                     ) AS rol_user1,
                     u2.nombre AS nombre_user2,
+                    c.id_user2,
+                    c.id_user1,
                     (
                         SELECT GROUP_CONCAT(role, ' ')
                         FROM (
