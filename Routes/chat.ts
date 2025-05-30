@@ -31,7 +31,7 @@ router.get('/:id_chat', verifyToken, GetChat);
 router.delete('/:id_chat', verifyToken, DeleteChatController);
 router.post('/:id_chat/message/text', verifyToken, TextMessageMiddleware.validatorParams, TextMessageMiddleware.validator, TextMessageController);
 router.post('/:id_chat/message/image', upload.single("imagen"), verifyToken, ImageMessageController);
-router.post('/:id_chat/message/image', upload.single("audio"), verifyToken, AudioMessageController);
+router.post('/:id_chat/message/audio', upload.single("audio"), verifyToken, AudioMessageController);
 router.put('/:id_chat/message/:id_message', verifyToken, UpdateTextMessageMiddleware.validatorParams, UpdateTextMessageMiddleware.validator, UpdateTextMessageController);
 router.delete('/:id_chat/message/:id_message', verifyToken, DeleteMessageController);
 router.patch("/block/:id_chat", verifyToken, BlockChatController)
