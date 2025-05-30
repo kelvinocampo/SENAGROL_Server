@@ -2,16 +2,16 @@ USE senagrol;
 
 -- === USUARIOS GENERALES ===
 -- PASSWORD: Password123!
-INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, cara, telefono) VALUES
-("admin", "admin", "admin@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara.png", "1234567890"), -- id = 1
-("Carlos Pérez", "carlosp", "carlos@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara1.png", "3110000001"), -- id = 2
-("Luisa Gómez", "luisag", "luisa@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara2.png", "3110000002"), -- id = 3
-("Pedro Ríos", "pedror", "pedro@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara3.png", "3110000003"), -- id = 4
-("Sofía Díaz", "sofiad", "sofia@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara4.png", "3110000004"), -- id = 5
-("Ana Vargas", "anav", "ana@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara5.png", "3110000005"), -- id = 6
-("Ricardo Soto", "ricardos", "ricardo@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara6.png", "3110000006"), -- id = 7
-("Mónica León", "monical", "monica@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara7.png", "3110000007"), -- id = 8
-("Javier Torres", "javiert", "javier@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "cara8.png", "3110000008"); -- id = 9
+INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, telefono) VALUES
+("admin", "admin", "admin@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "1234567890"), -- id = 1
+("Carlos Pérez", "carlosp", "carlos@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000001"), -- id = 2
+("Luisa Gómez", "luisag", "luisa@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000002"), -- id = 3
+("Pedro Ríos", "pedror", "pedro@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000003"), -- id = 4
+("Sofía Díaz", "sofiad", "sofia@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000004"), -- id = 5
+("Ana Vargas", "anav", "ana@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000005"), -- id = 6
+("Ricardo Soto", "ricardos", "ricardo@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000006"), -- id = 7
+("Mónica León", "monical", "monica@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000007"), -- id = 8
+("Javier Torres", "javiert", "javier@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000008"); -- id = 9
 
 -- === ROLES ===
 INSERT INTO administrador (id_administrador) VALUES (1);

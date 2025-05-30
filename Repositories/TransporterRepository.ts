@@ -93,7 +93,6 @@ class TransporterRepository {
             u.nombre,
             u.nombre_usuario,
             u.correo,
-            u.cara,
             u.telefono,
             t.tipo_vehiculo,
             t.peso_vehiculo,

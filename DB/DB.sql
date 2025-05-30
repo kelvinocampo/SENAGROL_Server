@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS usuario(
     nombre_usuario VARCHAR(20) UNIQUE,
     correo VARCHAR(100) UNIQUE,
     contraseña VARCHAR(60),
-    cara VARCHAR(255),
     telefono VARCHAR(15)
 );
 
