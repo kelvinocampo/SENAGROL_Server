@@ -16,7 +16,18 @@ export const initSocket = (server: http.Server): Server => {
     io.on("connection", (socket) => {
         console.log(`Nueva conexión: ${socket.id}`);
 
-        // Solo manejar conexión básica aquí
+        // Manejar unirse a una room de chat
+        socket.on("join_chat", ({ chatId }) => {
+            socket.join(`chat_${chatId}`);
+            console.log(`Usuario ${socket.id} se unió al chat ${chatId}`);
+        });
+
+        // Manejar salir de una room de chat
+        socket.on("leave_chat", ({ chatId }) => {
+            socket.leave(`chat_${chatId}`);
+            console.log(`Usuario ${socket.id} salió del chat ${chatId}`);
+        });
+
         socket.on("disconnect", () => {
             console.log(`Desconectado: ${socket.id}`);
         });
