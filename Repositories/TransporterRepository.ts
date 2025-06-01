@@ -124,6 +124,8 @@ class TransporterRepository {
         const result = await db.execute(query, [id_transporter]);
         return result[0];
     }
+    
+    
 }
 
 export default TransporterRepository;

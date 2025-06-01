@@ -8,7 +8,7 @@ class TransporterService {
         return result;
     }
 
-    static async getTransports(id_user:number) {
+    static async getTransports(id_user: number) {
         const result = await BuyRepository.getByOwner(id_user, "transportador");
         return result;
     }
@@ -17,6 +17,12 @@ class TransporterService {
         const result = await TransporterRepository.getTransporters();
         return result;
     }
+
+  static async getTransporterById(id: number) {
+    const result = await TransporterRepository.getById(id);
+    return result;
+}
+
 }
 
 export default TransporterService;
