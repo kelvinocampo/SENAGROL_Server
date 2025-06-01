@@ -13,6 +13,7 @@ import UnpublishProduct from "../Controllers/Admin/UnpublishProduct";
 import GetUsersAdmin from "../Controllers/Admin/GetAllUsersController";
 import DeleteProductAdmin from "../Controllers/Admin/DeleteProductController";
 import PublishProduct from "../Controllers/Admin/PublishProduct";
+import GetTransporterById from "../Controllers/Admin/GetTransporterById";
 const router = express.Router();
 
 router.post('/approveRequestSeller', verifyToken, verifyRole(["administrador"]), activeSellerController);
@@ -25,6 +26,7 @@ router.patch('/usuarios/:role/:id_deactivate_user',
 router.get('/products', verifyToken, verifyRole(["administrador"]), GetProducts);
 router.get('/sales', verifyToken, verifyRole(["administrador"]), GetSales);
 router.get('/usuarios', verifyToken, verifyRole(["administrador"]), GetUsersAdmin);
+router.get("/transporters/:id", verifyToken, verifyRole(["administrador"]), GetTransporterById);
 router.patch('/products/unpublish/:id_producto', verifyToken, verifyRole(["administrador"]), UnpublishProduct);
 router.patch('/products/publish/:id_producto', verifyToken, verifyRole(["administrador"]), PublishProduct);
 router.delete('/products/delete/:id_producto', verifyToken, verifyRole(["administrador"]), DeleteProductAdmin);
