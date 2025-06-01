@@ -24,7 +24,7 @@ INSERT INTO comprador (id_comprador, estado) VALUES
 (6, 'Activo'),
 (7, 'Pendiente'),
 (8, 'Pendiente'),
-(9, 'Pendiente');
+(9, 'Activo');
 INSERT INTO vendedor (id_vendedor, estado) VALUES 
 (3, 'Activo'),
 (5, 'Activo'),
