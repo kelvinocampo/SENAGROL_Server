@@ -19,7 +19,7 @@ class TransporterService {
     }
 
   static async getTransporterById(id: number) {
-    const result = await TransporterRepository.getById(id);
+    const result = await TransporterRepository.getByIdSAdmin(id);
     return result;
 }
 

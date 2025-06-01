@@ -125,6 +125,25 @@ class TransporterRepository {
         return result[0];
     }
     
+    static async getByIdSAdmin(id_transporter: number) {
+       const query = `
+        SELECT
+            t.licencia_conduccion,
+            t.soat,
+            t.tarjeta_propiedad_vehiculo,
+            t.tipo_vehiculo,
+            t.peso_vehiculo,
+            t.estado,  -- Incluye el estado en los resultados
+            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
+        FROM transportador t
+        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
+        WHERE t.id_transportador = ?
+        GROUP BY t.id_transportador;
+    `;
+    const result = await db.execute(query, [id_transporter]);
+    return result[0]; // Asegúrate de que esto no es un array vacío
+    }
+    
     
 }
 

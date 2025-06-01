@@ -7,7 +7,7 @@ const GetTransporterById = async (req: Request, res: Response) => {
     const id = Number(req.params.id);
 
     const transporter = await TransporterService.getTransporterById(id);
-
+    console.log("🚚 Transportador encontrado:", transporter);
     if (!transporter) {
       return res
         .status(404)
