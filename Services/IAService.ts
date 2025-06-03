@@ -1,6 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
-import IARepository from "../Repositories/IARepository";
 import { FRONT_ROUTES } from "../Data/FrontRoutes";
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import ProductRepository from "../Repositories/ProductRepository";
@@ -32,15 +31,16 @@ class IAService {
                 Eres un clasificador de consultas para un sistema de comercio electrónico. 
                 Clasifica la siguiente consulta del usuario según su tipo y teniendo en cuenta el rol del usuario: ${role}.
 
-                Tipos de respuesta:
-                - GENERAL: Para consultas sobre el negocio en general (ej. políticas, información de la empresa)
-                - BUY: Para consultas relacionadas con compras (ej. estado de pedido, carrito de compras)
-                - PRODUCT: Para consultas sobre productos específicos (ej. características, disponibilidad)
-                - NAV: Para solicitudes de navegación a secciones específicas de la aplicación
-
                 Instrucciones:
                 1. Clasifica la consulta en uno de los tipos mencionados
                 2. Genera una respuesta breve y útil según el tipo y el rol del usuario
+                3. Responde solo con el tipo de respuesta, sin explicaciones adicionales
+
+                Tipos de respuesta:
+                - GENERAL: Para consultas sobre el negocio en general (ej. políticas, información de la empresa)
+                - PRODUCT: Para consultas sobre productos (ej. características, disponibilidad)
+                - BUY: Para consultas relacionadas con compras (ej. estado de pedido)
+                - NAV: Para solicitudes de navegación a secciones específicas de la aplicación
 
                 Consulta del usuario: "${prompt}"
                 Responde solo con el tipo de respuesta
@@ -53,6 +53,9 @@ class IAService {
             const response: any = await chat.sendMessage({
                 message: classificationPrompt,
             });
+
+            console.log("Response from classification:", response.text);
+            
 
             return this.CleanResponse(response.text);
         } catch (error) {
@@ -110,6 +113,9 @@ class IAService {
                 2. Si el usuario no tiene compras, informa que no se encontraron compras
                 3. Responde solo con la información de la compra
                 4. Omite las compras que no pertenecen al usuario
+                5. Responde en formato markdown para los links ejemplo: [Texto del enlace](URL)
+                6. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
+                7. Responde de manera corta y concisa
 
                 Compras del usuario:
                 ${formattedBuys}
@@ -139,6 +145,12 @@ class IAService {
                 2. Si el producto no existe, informa que no se encontró el producto
                 3. Responde solo con la información del producto
                 4. Omite los productos despublicados o eliminados
+                5. Responde en formato markdown para los links ejemplo: [Nombre del producto](/Producto/:id_producto)
+                6. Proporciona el link del productos siendo la siguiente ruta: /Producto/:id_producto
+                7. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
+                8. Responde de manera corta y concisa
+                9. Si es necesario listar, hazlo con el nombre, descripcion , precio y link del producto
+                10. Responde en formato markdown para el estilo de la respuesta, ejemplo: **Nombre del producto** - _Descripción del producto_ - $Precio - [Ver producto](/Producto/:id_producto) /n
 
                 Productos disponibles:
                 ${formattedProducts}
@@ -171,6 +183,7 @@ class IAService {
                 5. Responde solo con el enlace y la respuesta
                 6. Si no se puede identificar la sección, informa que no se pudo encontrar la ruta
                 7. Si no posee acceso no le muestres la ruta, muesrake donde conseguir el rol necesario
+                8. Response en formato markdown para los links ejemplo: [Texto del enlace](URL)
 
                 Rutas de navegacion de la aplicacion: 
                 ${routes}
