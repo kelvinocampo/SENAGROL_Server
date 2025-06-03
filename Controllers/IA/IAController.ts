@@ -5,10 +5,10 @@ const IAController = async (req: Request, res: Response) => {
     try {
         const { prompt, history = [] } = req.body;
 
-        const parsedHistory: any[] = history.map((item:any)=>{
+        const parsedHistory: any[] = history.map((item: any) => {
             return {
-                role: item.role == "ia"?"model":"user" ,
-                parts:[{text: item.message}]
+                role: item.role == "ia" ? "model" : "user",
+                parts: [{ text: item.message }]
             }
         })
 
