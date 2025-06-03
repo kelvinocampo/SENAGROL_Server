@@ -12,7 +12,7 @@ const IAController = async (req: Request, res: Response) => {
             }
         })
 
-        const responseIA = await IAService.responseIA(prompt, parsedHistory);
+        const responseIA = await IAService.getResponse(prompt, parsedHistory);
 
         return res.status(200).json({
             status: 'response ok',

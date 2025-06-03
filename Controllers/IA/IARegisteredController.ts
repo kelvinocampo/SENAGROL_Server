@@ -13,7 +13,7 @@ const IARegisteredController = async (req: Request, res: Response) => {
             }
         })
 
-        const responseIA = await IAService.requestRegister(prompt, roles, id_user, parsedHistory);
+        const responseIA = await IAService.getResponse(prompt, parsedHistory, roles, id_user);
 
         return res.status(200).json({
             status: 'response ok',
