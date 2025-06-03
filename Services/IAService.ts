@@ -4,6 +4,7 @@ import IARepository from "../Repositories/IARepository";
 import { FRONT_ROUTES } from "../Data/FrontRoutes";
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import ProductRepository from "../Repositories/ProductRepository";
+import BuyRepository from "../Repositories/BuyRepository";
 dotenv.config();
 
 const { APIKEY = "" } = process.env;
@@ -66,7 +67,7 @@ class IAService {
             case 'GENERAL':
                 return await this.getGeneralResponse(prompt, history);
             case 'BUY':
-            // return await IARepository.getBuyResponse(prompt, history);
+                return await this.getBuyResponse(prompt, history, id_user);
             case 'PRODUCT':
                 return await this.getProductResponse(prompt, history);
             case 'NAV':
@@ -89,6 +90,35 @@ class IAService {
         return this.CleanResponse(response.text);
     }
 
+    static async getBuyResponse(prompt: string, history: any[], id_user: number) {
+        const chat = ai.chats.create({
+            model: "gemini-2.0-flash",
+            history: history
+        });
+        const buys = await BuyRepository.getAllByUserId(id_user);
+        const formattedBuys = await this.formatObject(buys);
+        const response: any = await chat.sendMessage({
+            message: `
+                Eres un asistente de IA especializado en comercio electrónico.
+                El usuario ha solicitado información sobre su compra.
+
+                Consulta del usuario: "${prompt}"
+                ID del usuario: ${id_user}
+
+                Instrucciones:
+                1. Proporciona información detallada sobre el estado de la compra
+                2. Si el usuario no tiene compras, informa que no se encontraron compras
+                3. Responde solo con la información de la compra
+                4. Omite las compras que no pertenecen al usuario
+
+                Compras del usuario:
+                ${formattedBuys}
+            `
+        });
+
+        return this.CleanResponse(response.text)
+    }
+
     static async getProductResponse(prompt: string, history: any[]) {
         const chat = ai.chats.create({
             model: "gemini-2.0-flash",
@@ -96,7 +126,7 @@ class IAService {
         });
         const products = await ProductRepository.getAll();
         const formattedProducts = await this.formatObject(products);
-        
+
         const response: any = await chat.sendMessage({
             message: `
                 Eres un asistente de IA especializado en productos de comercio electrónico.
