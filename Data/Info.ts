@@ -1,3 +1,9 @@
 export const Info = {
-
+    "Introduccion" : `
+        SENAGROL es un aplicativo web diseñado para conectar de manera directa, eficiente y accesible a los agricultores con los consumidores, abordando uno de los principales retos del sector agroalimentario: la comercialización rentable de los cultivos. A pesar de la disponibilidad de herramientas tecnológicas en el mercado, muchos productores aún enfrentan barreras significativas para llegar al consumidor, lo que provoca una excesiva intermediación, pérdidas económicas y una menor disponibilidad de productos frescos y locales para la población.
+        Este proyecto busca cerrar esa brecha, facilitando la venta directa de productos agrícolas. Así, SENAGROL incrementa la rentabilidad de los agricultores y mejora la oferta para los consumidores, promoviendo un comercio más justo y eficiente.
+        Además, la plataforma integrará a transportadores locales, quienes podrán ofrecer sus servicios para optimizar la distribución en zonas rurales, donde el acceso al transporte es limitado. De esta forma, SENAGROL no solo impulsa la economía local, sino que también mejora la logística y el acceso a alimentos en comunidades apartadas.
+        Con un enfoque en la sostenibilidad y la innovación social, SENAGROL pretende transformar las dinámicas del sector agroalimentario, generando impacto positivo para todos los actores involucrados.
+        Inicialmente, el proyecto se enfocará principalmente en el municipio de Circasia, en el departamento del Quindío, aprovechando sus características agrícolas, su potencial productivo y el compromiso de su comunidad con el desarrollo rural. Esta localidad servirá como punto de partida para validar el modelo y escalarlo posteriormente a otras regiones del país.
+    `,
 }

@@ -1,9 +1,11 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import { FRONT_ROUTES } from "../Data/FrontRoutes";
+import { Info } from "../Data/Info";
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import ProductRepository from "../Repositories/ProductRepository";
 import BuyRepository from "../Repositories/BuyRepository";
+import { info } from "console";
 dotenv.config();
 
 const { APIKEY = "" } = process.env;
@@ -55,7 +57,7 @@ class IAService {
             });
 
             console.log("Response from classification:", response.text);
-            
+
 
             return this.CleanResponse(response.text);
         } catch (error) {
@@ -85,9 +87,26 @@ class IAService {
             model: "gemini-2.0-flash",
             history: history
         })
+        const info = await this.formatObject(Info)
+
+        const generalPrompt = `
+            Eres un asistente de IA especializado en comercio electrónico.
+            El usuario ha solicitado información general sobre el negocio.
+
+            Información del negocio:
+            ${info}
+
+            Consulta del usuario: "${prompt}"
+
+            Instrucciones:
+            1. Proporciona información general sobre el negocio
+            2. Responde solo con la información relevante
+            3. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
+            4. Responde de manera corta y concisa
+        `
 
         const response: any = await chat.sendMessage({
-            message: prompt,
+            message: generalPrompt,
         })
 
         return this.CleanResponse(response.text);
