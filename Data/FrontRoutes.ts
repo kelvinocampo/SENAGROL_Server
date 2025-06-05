@@ -7,4 +7,6 @@ export const FRONT_ROUTES = {
     "/Chats/Usuarios": "Lista de usuarios, Donde los usuarios pueden ver y seleccionar otros usuarios para chatear, Acceso exclusivo para usuarios registrados",
     "/Chats": "Lista de chats, Donde los usuarios pueden ver sus conversaciones, Acceso exclusivo para usuarios registrados",
     "/Perfil": "Pagina de perfil, Donde los usuarios pueden ver y editar su información personal, lugar de peticiones de rol, Acceso exclusivo para usuarios registrados",
+    "/MisCompras": "Pagina que contiene la lista de compras del comprador, Acceso exclusivo para compradores",
+    "/RecuperarContraseña": "Página de recuperación de contraseña, Donde los usuarios pueden enviar correo para recuperar su contraseña",
 }
