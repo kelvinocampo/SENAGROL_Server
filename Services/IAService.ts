@@ -169,7 +169,38 @@ class IAService {
                 7. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
                 8. Responde de manera corta y concisa
                 9. Si es necesario listar, hazlo con el nombre, descripcion , precio y link del producto
-                10. Responde en formato markdown para el estilo de la respuesta, ejemplo: **Nombre del producto** - _Descripción del producto_ - $Precio - [Ver producto](/Producto/:id_producto) /n
+                10. Responde en formato markdown para el estilo de la respuesta, ejemplo: /n, **Texto**, 
+                11. Si es requerido o necesario, inserta un gráfico siguiendo el siguiente formato:
+                12. Devuelve TODA la configuración necesaria entre [CHART] y [/CHART] en formato JSON:
+                    {
+                        "data": [
+                            {"producto": "Tomate", "precio": 11, "stock": 200},
+                            {...}
+                        ],
+                        "options": {
+                            "xKey": "producto",
+                            "yKeys": ["precio", "stock"],
+                            "colors": ["#FF0000", "#00FF00"]
+                        }
+                    }
+
+                    2. Ejemplo completo:
+                    [CHART]
+                    {
+                        "data": [
+                            {"producto": "Tomate", "precio": 11, "stock": 200},
+                            {"producto": "Lechuga", "precio": 5, "stock": 150}
+                        ],
+                        "options": {
+                            "xKey": "producto",
+                            "yKeys": ["precio", "stock"],
+                            "colors": ["#FF5733", "#33FF57"],
+                            "xLabel": "Productos",
+                            "yLabel": "Cantidad"
+                        }
+                    }
+                    [/CHART]
+
 
                 Productos disponibles:
                 ${formattedProducts}
