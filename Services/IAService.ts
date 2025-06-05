@@ -154,57 +154,75 @@ class IAService {
 
         const response: any = await chat.sendMessage({
             message: `
-                Eres un asistente de IA especializado en productos de comercio electrónico.
-                El usuario ha solicitado información sobre un producto específico.
+            Eres un asistente de IA especializado en productos de comercio electrónico.
+            El usuario ha solicitado información sobre un producto específico.
 
-                Consulta del usuario: "${prompt}"
+            Consulta del usuario: "${prompt}"
 
-                Instrucciones:
-                1. Proporciona información detallada sobre el producto solicitado
-                2. Si el producto no existe, informa que no se encontró el producto
-                3. Responde solo con la información del producto
-                4. Omite los productos despublicados o eliminados
-                5. Responde en formato markdown para los links ejemplo: [Nombre del producto](/Producto/:id_producto)
-                6. Proporciona el link del productos siendo la siguiente ruta: /Producto/:id_producto
-                7. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
-                8. Responde de manera corta y concisa
-                9. Si es necesario listar, hazlo con el nombre, descripcion , precio y link del producto
-                10. Responde en formato markdown para el estilo de la respuesta, ejemplo: /n, **Texto**, 
-                11. Si es requerido o necesario, inserta un gráfico siguiendo el siguiente formato:
-                12. Devuelve TODA la configuración necesaria entre [CHART] y [/CHART] en formato JSON:
-                    {
-                        "data": [
-                            {"producto": "Tomate", "precio": 11, "stock": 200},
-                            {...}
-                        ],
-                        "options": {
-                            "xKey": "producto",
-                            "yKeys": ["precio", "stock"],
-                            "colors": ["#FF0000", "#00FF00"]
-                        }
+            Instrucciones:
+            1. Proporciona información detallada sobre el producto solicitado
+            2. Si el producto no existe, informa que no se encontró el producto
+            3. Responde solo con la información del producto
+            4. Omite los productos despublicados o eliminados
+            5. Responde en formato markdown para los links ejemplo: [Nombre del producto](/Producto/:id_producto)
+            6. Proporciona el link del productos siendo la siguiente ruta: /Producto/:id_producto
+            7. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
+            8. Responde de manera corta y concisa
+            9. Si es necesario listar, hazlo con el nombre, descripcion , precio y link del producto
+            10. Responde en formato markdown para el estilo de la respuesta, ejemplo: /n, **Texto**, __Texto__, - Texto, etc.
+            11. Evalua el tipo de grafica a utilizar según la información proporcionada y el contexto de la consulta del usuario, ejemplo: 
+                - Para grandes cantidades utiliza un gráfico de barras.
+                - Para mostrar tendencias a lo largo del tiempo, utiliza un gráfico de líneas.
+                - Para mostrar proporciones o porcentajes, utiliza un gráfico de pie.
+                - No usar pie para más de 5 elementos.
+            12. Si es requerido o necesario, inserta un gráfico siguiendo el siguiente formato:
+            13. Devuelve TODA la configuración necesaria entre [CHART] y [/CHART] en formato JSON:
+                {
+                    "data": [
+                        {"producto": "Tomate", "precio": 11, "stock": 200},
+                        {...}
+                    ],
+                    "options": {
+                        "chartType": "bar" | "line" | "pie" | "area" | "scatter",
+                        "xKey": "producto",
+                        "yKeys": ["precio", "stock"],
+                        "colors": ["#FF0000", "#00FF00"],
+                        "xLabel": "Productos",
+                        "yLabel": "Cantidad",
+                        "stacked": true/false (opcional para barras),
+                        "radius": number (opcional para gráficos de pie)
                     }
+                }
 
-                    2. Ejemplo completo:
-                    [CHART]
-                    {
-                        "data": [
-                            {"producto": "Tomate", "precio": 11, "stock": 200},
-                            {"producto": "Lechuga", "precio": 5, "stock": 150}
-                        ],
-                        "options": {
-                            "xKey": "producto",
-                            "yKeys": ["precio", "stock"],
-                            "colors": ["#FF5733", "#33FF57"],
-                            "xLabel": "Productos",
-                            "yLabel": "Cantidad"
-                        }
-                    }
-                    [/CHART]
+            Reglas para seleccionar el tipo de gráfico:
+            - Usa 'bar' para comparar valores entre categorías
+            - Usa 'line' para mostrar tendencias en el tiempo
+            - Usa 'pie' para mostrar proporciones o porcentajes
+            - Usa 'area' para mostrar acumulación de valores
+            - Usa 'scatter' para correlaciones entre dos variables
 
+            Ejemplo completo:
+            [CHART]
+            {
+                "data": [
+                    {"producto": "Tomate", "precio": 11, "stock": 200},
+                    {"producto": "Lechuga", "precio": 5, "stock": 150}
+                ],
+                "options": {
+                    "chartType": "bar",
+                    "xKey": "producto",
+                    "yKeys": ["precio", "stock"],
+                    "colors": ["#FF5733", "#33FF57"],
+                    "xLabel": "Productos",
+                    "yLabel": "Cantidad",
+                    "stacked": true
+                }
+            }
+            [/CHART]
 
-                Productos disponibles:
-                ${formattedProducts}
-            `
+            Productos disponibles:
+            ${formattedProducts}
+        `
         });
 
         return this.CleanResponse(response.text);
