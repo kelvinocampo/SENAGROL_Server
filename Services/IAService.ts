@@ -5,7 +5,6 @@ import { Info } from "../Data/Info";
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import ProductRepository from "../Repositories/ProductRepository";
 import BuyRepository from "../Repositories/BuyRepository";
-import { info } from "console";
 dotenv.config();
 
 const { APIKEY = "" } = process.env;
@@ -28,6 +27,8 @@ class IAService {
 
     static async classifyResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno") {
         try {
+            console.log(role);
+            
             // Construimos el prompt de clasificación
             const classificationPrompt = `
                 Eres un clasificador de consultas para un sistema de comercio electrónico. 
@@ -40,9 +41,9 @@ class IAService {
 
                 Tipos de respuesta:
                 - GENERAL: Para consultas sobre el negocio en general (ej. políticas, información de la empresa)
-                - PRODUCT: Para consultas sobre productos (ej. características, disponibilidad)
-                - BUY: Para consultas relacionadas con compras (ej. estado de pedido)
-                - NAV: Para solicitudes de navegación a secciones específicas de la aplicación
+                - PRODUCT: Para consultas sobre productos
+                - BUY: Para consultas sobre compras (Acceso exclusivo para compradores)
+                - NAV: Para solicitudes de navegación a secciones específicas de la aplicación (Consideralo como ultimo recurso)
 
                 Consulta del usuario: "${prompt}"
                 Responde solo con el tipo de respuesta
@@ -117,31 +118,71 @@ class IAService {
             model: "gemini-2.0-flash",
             history: history
         });
+
         const buys = await BuyRepository.getAllByUserId(id_user);
         const formattedBuys = await this.formatObject(buys);
+
         const response: any = await chat.sendMessage({
             message: `
                 Eres un asistente de IA especializado en comercio electrónico.
-                El usuario ha solicitado información sobre su compra.
+                El usuario ha solicitado información sobre sus compras.
 
                 Consulta del usuario: "${prompt}"
                 ID del usuario: ${id_user}
 
                 Instrucciones:
-                1. Proporciona información detallada sobre el estado de la compra
+                1. Proporciona información detallada sobre las compras del usuario
                 2. Si el usuario no tiene compras, informa que no se encontraron compras
-                3. Responde solo con la información de la compra
-                4. Omite las compras que no pertenecen al usuario
-                5. Responde en formato markdown para los links ejemplo: [Texto del enlace](URL)
-                6. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
-                7. Responde de manera corta y concisa
+                3. Responde en formato markdown para los links ejemplo: [Texto del enlace](URL)
+                4. No incluyas información sensible como IDs
+                5. Organiza la información por: estado, fecha, producto, vendedor, transportador y monto total (precio_producto + precio_transporte)
+                6. Evalua si la consulta del usuario requiere solo una gráfica y si es así, inclúyelo siguiendo estas reglas:
+                    - Para tendencias de compras en el tiempo: gráfico de líneas (usar fecha_compra)
+                    - Para comparar montos entre compras: gráfico de barras
+                    - Para distribución por estado: gráfico de pie (solo si hay menos de 5 estados)
+                    - Para relación entre cantidad y precio: gráfico de dispersión
+                7. Para gráficos, sigue el formato entre [CHART] y [/CHART] en JSON con esta estructura de ejemplo:
+                {
+                    "data": [
+                        {
+                            "fecha": "2023-01-15",
+                            "monto_total": 150.50,
+                            "estado": "completado",
+                            "producto": "Producto A",
+                            "cantidad": 2
+                        },
+                        {...}
+                    ],
+                    "options": {
+                        "chartType": "bar" | "line" | "pie" | "area",
+                        "xKey": "fecha",
+                        "yKeys": ["monto_total"],
+                        "colors": ["#FF0000"],
+                        "xLabel": "Fecha",
+                        "yLabel": "Monto ($)",
+                        "stacked": false
+                    }
+                }
 
-                Compras del usuario:
+                Posibles gráficos según los datos disponibles:
+                - Evolución de compras: línea temporal con fechas y montos
+                - Distribución por estado: gráfico de pie (completado, pendiente, cancelado)
+                - Relación cantidad-precio: gráfico de dispersión
+                - Comparación de montos por vendedor: gráfico de barras
+
+                Datos de compras del usuario:
                 ${formattedBuys}
+
+                Notas importantes:
+                - El monto total se calcula como: precio_producto + precio_transporte
+                - Para gráficos de tiempo, usa fecha_compra como eje X
+                - Para estado, usa los valores: completado, pendiente, cancelado
+                - Los nombres de productos están en producto_nombre
+                - Los nombres de vendedores están en vendedor_nombre
             `
         });
 
-        return this.CleanResponse(response.text)
+        return this.CleanResponse(response.text);
     }
 
     static async getProductResponse(prompt: string, history: any[]) {
@@ -175,7 +216,7 @@ class IAService {
                 - Para mostrar tendencias a lo largo del tiempo, utiliza un gráfico de líneas.
                 - Para mostrar proporciones o porcentajes, utiliza un gráfico de pie.
                 - No usar pie para más de 5 elementos.
-            12. Si es requerido o necesario, inserta un gráfico siguiendo el siguiente formato:
+            12. Si es requerido o necesario, inserta solo una gráfica siguiendo el siguiente formato:
             13. Devuelve TODA la configuración necesaria entre [CHART] y [/CHART] en formato JSON:
                 {
                     "data": [
@@ -183,7 +224,7 @@ class IAService {
                         {...}
                     ],
                     "options": {
-                        "chartType": "bar" | "line" | "pie" | "area" | "scatter",
+                        "chartType": "bar" | "line" | "pie" | "area",
                         "xKey": "producto",
                         "yKeys": ["precio", "stock"],
                         "colors": ["#FF0000", "#00FF00"],
