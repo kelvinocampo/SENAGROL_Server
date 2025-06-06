@@ -135,38 +135,37 @@ class IAService {
                 2. Si el usuario no tiene compras, informa que no se encontraron compras
                 3. Responde en formato markdown para los links ejemplo: [Texto del enlace](URL)
                 4. No incluyas información sensible como IDs
-                5. Organiza la información por: estado, fecha, producto, vendedor, transportador y monto total (precio_producto + precio_transporte)
-                6. Evalua si la consulta del usuario requiere solo una gráfica y si es así, inclúyelo siguiendo estas reglas:
-                    - Para tendencias de compras en el tiempo: gráfico de líneas (usar fecha_compra)
+                5. Evalua si la consulta del usuario requiere solo una gráfica y si es así, inclúyelo siguiendo estas reglas:
+                    - Para tendencias de compras en el tiempo: gráfico de líneas
                     - Para comparar montos entre compras: gráfico de barras
                     - Para distribución por estado: gráfico de pie (solo si hay menos de 5 estados)
                     - Para relación entre cantidad y precio: gráfico de dispersión
-                7. Para gráficos, sigue el formato entre [CHART] y [/CHART] en JSON con esta estructura de ejemplo:
-                {
-                    "data": [
-                        {
-                            "fecha": "2023-01-15",
-                            "monto_total": 150.50,
-                            "estado": "completado",
-                            "producto": "Producto A",
-                            "cantidad": 2
-                        },
-                        {...}
-                    ],
-                    "options": {
-                        "chartType": "bar" | "line" | "pie" | "area",
-                        "xKey": "fecha",
-                        "yKeys": ["monto_total"],
-                        "colors": ["#FF0000"],
-                        "xLabel": "Fecha",
-                        "yLabel": "Monto ($)",
-                        "stacked": false
+                6. Para gráficos, sigue el formato entre [CHART] y [/CHART] en JSON con esta estructura de ejemplo:
+                    {
+                        "data": [
+                            {
+                                "fecha": "2023-01-15",
+                                "monto_total": 150.50,
+                                "estado": "completado",
+                                "producto": "Producto",
+                                "cantidad": 2
+                            },
+                            {...}
+                        ],
+                        "options": {
+                            "chartType": "bar" | "line" | "pie" | "area",
+                            "xKey": "fecha",
+                            "yKeys": ["monto_total"],
+                            "colors": ["#FF0000"],
+                            "xLabel": "Fecha",
+                            "yLabel": "Monto ($)",
+                            "stacked": false
+                        }
                     }
-                }
 
                 Posibles gráficos según los datos disponibles:
                 - Evolución de compras: línea temporal con fechas y montos
-                - Distribución por estado: gráfico de pie (completado, pendiente, cancelado)
+                - Distribución por estado: gráfico de pie 
                 - Relación cantidad-precio: gráfico de dispersión
                 - Comparación de montos por vendedor: gráfico de barras
 
