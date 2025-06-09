@@ -4,7 +4,7 @@ import { FRONT_ROUTES } from "../Data/FrontRoutes";
 import { Info } from "../Data/Info";
 import { RequiredRoles } from "../Middleware/VerifyTokenData";
 import ProductRepository from "../Repositories/ProductRepository";
-import BuyRepository from "../Repositories/BuyRepository";
+import BuyRepository, { TypeOwner } from "../Repositories/BuyRepository";
 dotenv.config();
 
 const { APIKEY = "" } = process.env;
@@ -28,7 +28,7 @@ class IAService {
     static async classifyResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno") {
         try {
             console.log(role);
-            
+
             // Construimos el prompt de clasificación
             const classificationPrompt = `
                 Eres un clasificador de consultas para un sistema de comercio electrónico. 
@@ -42,7 +42,7 @@ class IAService {
                 Tipos de respuesta:
                 - GENERAL: Para consultas sobre el negocio en general (ej. políticas, información de la empresa)
                 - PRODUCT: Para consultas sobre productos
-                - BUY: Para consultas sobre compras (Acceso exclusivo para compradores)
+                - BUY: Para consultas sobre compras, transportes, o ventas (Acceso exclusivo para usuarios registrados)
                 - NAV: Para solicitudes de navegación a secciones específicas de la aplicación (Consideralo como ultimo recurso)
 
                 Consulta del usuario: "${prompt}"
@@ -71,9 +71,9 @@ class IAService {
 
         switch (responseType) {
             case 'GENERAL':
-                return await this.getGeneralResponse(prompt, history);
+                return await this.getGeneralResponse(prompt, history, role);
             case 'BUY':
-                return await this.getBuyResponse(prompt, history, id_user);
+                return await this.getBuyResponse(prompt, history, id_user, role as RequiredRoles);
             case 'PRODUCT':
                 return await this.getProductResponse(prompt, history);
             case 'NAV':
@@ -83,7 +83,7 @@ class IAService {
         }
     }
 
-    static async getGeneralResponse(prompt: string, history: any[]) {
+    static async getGeneralResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno" = "Ninguno") {
         const chat = ai.chats.create({
             model: "gemini-2.0-flash",
             history: history
@@ -94,7 +94,8 @@ class IAService {
             Eres un asistente de IA especializado en comercio electrónico.
             El usuario ha solicitado información general sobre el negocio.
 
-            Información del negocio:
+            rol del usuario: ${role}
+            Información del negocio si la necesitas:
             ${info}
 
             Consulta del usuario: "${prompt}"
@@ -113,31 +114,32 @@ class IAService {
         return this.CleanResponse(response.text);
     }
 
-    static async getBuyResponse(prompt: string, history: any[], id_user: number) {
+    static async getBuyResponse(prompt: string, history: any[], id_user: number, role: RequiredRoles) {
         const chat = ai.chats.create({
             model: "gemini-2.0-flash",
             history: history
         });
 
-        const buys = await BuyRepository.getAllByUserId(id_user);
+        const buys = await BuyRepository.getByOwner(id_user, role as TypeOwner);
+        const label = role == "vendedor" ? "Ventas" : role == "transportador" ? "Transportes" : "Compras";
         const formattedBuys = await this.formatObject(buys);
 
         const response: any = await chat.sendMessage({
             message: `
                 Eres un asistente de IA especializado en comercio electrónico.
-                El usuario ha solicitado información sobre sus compras.
+                El usuario ha solicitado información sobre sus ${label}.
 
                 Consulta del usuario: "${prompt}"
                 ID del usuario: ${id_user}
 
                 Instrucciones:
-                1. Proporciona información detallada sobre las compras del usuario
-                2. Si el usuario no tiene compras, informa que no se encontraron compras
+                1. Proporciona información detallada sobre las ${label} del usuario
+                2. Si el usuario no tiene ${label}, informa que no se encontraron ${label}
                 3. Responde en formato markdown para los links ejemplo: [Texto del enlace](URL)
                 4. No incluyas información sensible como IDs
                 5. Evalua si la consulta del usuario requiere solo una gráfica y si es así, inclúyelo siguiendo estas reglas:
-                    - Para tendencias de compras en el tiempo: gráfico de líneas
-                    - Para comparar montos entre compras: gráfico de barras
+                    - Para tendencias de ${label.toLowerCase()} en el tiempo: gráfico de líneas
+                    - Para comparar montos entre ${label.toLowerCase()}: gráfico de barras
                     - Para distribución por estado: gráfico de pie (solo si hay menos de 5 estados)
                     - Para relación entre cantidad y precio: gráfico de dispersión
                 6. Para gráficos, sigue el formato entre [CHART] y [/CHART] en JSON con esta estructura de ejemplo:
@@ -164,12 +166,12 @@ class IAService {
                     }
 
                 Posibles gráficos según los datos disponibles:
-                - Evolución de compras: línea temporal con fechas y montos
-                - Distribución por estado: gráfico de pie 
+                - Evolución de ${label.toLowerCase()}: línea temporal con fechas y montos
+                - Distribución por estado: gráfico de pie
                 - Relación cantidad-precio: gráfico de dispersión
                 - Comparación de montos por vendedor: gráfico de barras
 
-                Datos de compras del usuario:
+                Datos de ${label.toLowerCase()} relacionadas al usuario:
                 ${formattedBuys}
 
                 Notas importantes:
@@ -178,6 +180,7 @@ class IAService {
                 - Para estado, usa los valores: completado, pendiente, cancelado
                 - Los nombres de productos están en producto_nombre
                 - Los nombres de vendedores están en vendedor_nombre
+                - No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
             `
         });
 

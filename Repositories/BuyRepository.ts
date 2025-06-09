@@ -1,6 +1,6 @@
 import db from "../Config/configDB";
 
-type TypeOwner = "transportador" | "comprador" | "vendedor";
+export type TypeOwner = "transportador" | "comprador" | "vendedor";
 
 class BuyRepository {
     static async getByOwner(id_user: number, typeOwner: TypeOwner) {
