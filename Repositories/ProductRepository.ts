@@ -94,7 +94,7 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE (p.despublicado = 0 OR p.eliminado = 0)
+        WHERE p.despublicado = 0 AND p.eliminado = 0
         `;
         const [products]: any = await db.execute(sql);
         return products;
