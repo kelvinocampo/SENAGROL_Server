@@ -200,7 +200,7 @@ class BuyRepository {
         }
         const query = `
             UPDATE compra
-            SET estado = ?
+            SET estado = ? ${setDateSend}
             WHERE id_compra = ? AND id_transportador = ?
         `
         const values: any = [estado, id_compra, id_user]
