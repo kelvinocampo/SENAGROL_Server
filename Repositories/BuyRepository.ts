@@ -193,12 +193,19 @@ class BuyRepository {
     }
 
     static async receiveCodeBuy(id_compra: number, estado: string, id_user: number) {
+        const dateSend = new Date();
+        let setDateSend = "";
+        if (estado === "Entregada") {
+            setDateSend = ", fecha_entrega = ?";
+        }
         const query = `
             UPDATE compra
             SET estado = ?
             WHERE id_compra = ? AND id_transportador = ?
         `
-        const [result]: any = await db.execute(query, [estado, id_compra, id_user])
+        const values: any = [estado, id_compra, id_user]
+        if (estado === "Entregada") values.push(dateSend)
+        const [result]: any = await db.execute(query, values)
         return result;
     }
 
