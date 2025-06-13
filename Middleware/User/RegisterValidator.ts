@@ -6,14 +6,14 @@ let validatorParams = [
         .trim()
         .isLength({ min: 3, max: 100 })
         .withMessage('El nombre debe tener entre 3 y 100 caracteres.')
-        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]+$/)
+        .isString()
         .withMessage('El nombre solo puede contener letras y espacios.'),
 
     check('username')
         .trim()
         .isLength({ min: 3, max: 20 })
         .withMessage('El nombre de usuario debe tener entre 3 y 20 caracteres.')
-        .matches(/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ0-9_]+$/)
+        .isString()
         .withMessage('El nombre de usuario solo puede contener letras, números y guiones bajos (_).'),
 
     check('email')
