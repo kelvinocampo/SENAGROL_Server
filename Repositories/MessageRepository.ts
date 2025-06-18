@@ -1,44 +1,43 @@
+// Repositories/MessageRepository.ts
 import db from "../Config/configDB";
 import Message from "../Dto/Chat/MessageDTO";
 
 class MessageRepository {
-    /**
-     * Crea un nuevo mensaje en la base de datos
-     * @param message - Objeto MessageDTO con los datos del mensaje
-     * @returns El mensaje creado
-     * @throws Error si falla la creación del mensaje
-     */
     static async createMessage(message: Message) {
         try {
             const query = `
                 INSERT INTO mensaje 
-                (editado, tipo, contenido, fecha_envio, id_chat, id_user)
+                (contenido, tipo, fecha_envio, id_chat, id_user, editado) 
                 VALUES (?, ?, ?, ?, ?, ?)
             `;
-
-            const result = await db.execute(query, [
-                message.editado,
-                message.tipo,
+            const values = [
                 message.contenido,
+                message.tipo,
                 message.fecha_envio,
                 message.id_chat,
-                message.id_user
-            ]);
+                message.id_user,
+                message.editado ? 1 : 0
+            ];
 
-            return { ...message };
+            const [result]: any = await db.execute(query, values);
+            const id_mensaje = result.insertId;
+
+            return {
+                id_mensaje,
+                contenido: message.contenido,
+                tipo: message.tipo,
+                fecha_envio: message.fecha_envio,
+                id_chat: message.id_chat,
+                id_user: message.id_user,
+                editado: message.editado
+            };
+
         } catch (error) {
             console.error("Error en MessageRepository.createMessage:", error);
             throw error;
         }
     }
 
-    /**
-     * Actualiza el texto de un mensaje existente
-     * @param message - Objeto MessageDTO con los nuevos datos
-     * @param id_message - ID del mensaje a actualizar
-     * @returns El mensaje actualizado
-     * @throws Error si el mensaje no existe o no es de tipo texto
-     */
     static async updateTextMessage(message: Message, id_message: number) {
         try {
             const query = `
@@ -49,7 +48,7 @@ class MessageRepository {
             `;
 
             const [result]: any = await db.execute(query, [
-                message.editado,
+                message.editado ? 1 : 0,
                 message.contenido,
                 id_message
             ]);
@@ -58,21 +57,13 @@ class MessageRepository {
                 throw new Error('No se encontró el mensaje de texto para actualizar');
             }
 
-            return { ...message };
+            return { ...message, id_mensaje: id_message };
         } catch (error) {
             console.error("Error en MessageRepository.updateTextMessage:", error);
             throw error;
         }
     }
 
-    /**
-     * Elimina un mensaje de la base de datos
-     * @param id_user - ID del usuario que solicita la eliminación
-     * @param id_message - ID del mensaje a eliminar
-     * @param id_chat - ID del chat donde está el mensaje
-     * @returns Objeto con el número de filas afectadas
-     * @throws Error si el mensaje no existe o no pertenece al usuario/chat
-     */
     static async deleteMessage(id_user: number, id_message: number, id_chat: number) {
         try {
             const query = `
@@ -99,12 +90,6 @@ class MessageRepository {
         }
     }
 
-    /**
-     * Obtiene todos los mensajes de un chat específico
-     * @param id_chat - ID del chat del que se quieren obtener los mensajes
-     * @returns Array con todos los mensajes del chat
-     * @throws Error si hay problemas al recuperar los mensajes
-     */
     static async getMessages(id_chat: number) {
         try {
             const query = `SELECT * FROM mensaje WHERE id_chat = ?`;

@@ -1,15 +1,10 @@
+// Services/MessageService.ts
 import Message from "../Dto/Chat/MessageDTO";
 import MessageRepository from "../Repositories/MessageRepository";
 import ChatRepository from "../Repositories/ChatRepository";
 import { getIO } from "../Config/socket";
 
 class MessageService {
-    /**
-     * Sends a new message in a chat
-     * @param message Message object containing chat and user information
-     * @throws Error if chat not found or user lacks permission
-     * @returns The created message
-     */
     static async sendMessage(message: Message) {
         try {
             const chat = await ChatRepository.getChatById(message.id_chat);
@@ -29,45 +24,23 @@ class MessageService {
                 };
             }
 
-            if ((message.id_user == chat.id_user1 && chat.eliminado_user1) ||
-                (message.id_user == chat.id_user2 && chat.eliminado_user2)) {
-                await ChatRepository.unDeleteChat(message.id_user, message.id_chat);
-            }
+            const new_message = await MessageRepository.createMessage(message);
 
-            if ((message.id_user == chat.bloqueado_user1 && chat.bloqueado_user1) ||
-                (message.id_user == chat.bloqueado_user2 && chat.bloqueado_user2)) {
-                return {
-                    code: 403,
-                    success: false,
-                    message: "No puedes enviar mensajes porque has sido bloqueado en este chat"
-                }
-            }
-
-            const updatedDateChat = await ChatRepository.updateDate(chat.id_chat);
-            if (!updatedDateChat) {
+            if (!new_message || !new_message.id_mensaje) {
                 return {
                     code: 500,
                     success: false,
-                    message: "Error al actualizar la fecha reciente del chat"
-                };
-            }
-
-            const new_message: any = await MessageRepository.createMessage(message);
-
-            if (!new_message) {
-                return {
-                    code: 500,
-                    success: false,
-                    message: "Error al crear el mensaje"
+                    message: "Error al crear el mensaje: ID no generado"
                 };
             }
 
             const io = getIO();
             io.to(`chat_${message.id_chat}`).emit("new_message", {
-                tipo: message.tipo,
-                contenido: message.contenido,
-                fecha_envio: message.fecha_envio,
-                usuario: message.id_user
+                id_mensaje: new_message.id_mensaje,
+                tipo: new_message.tipo,
+                contenido: new_message.contenido,
+                fecha_envio: new_message.fecha_envio,
+                usuario: new_message.id_user
             });
 
             return {
@@ -85,13 +58,6 @@ class MessageService {
         }
     }
 
-    /**
-     * Updates the text of an existing message
-     * @param message Updated message content
-     * @param id_message ID of the message to update
-     * @throws Error if chat not found, user lacks permission, or message doesn't exist
-     * @returns The updated message
-     */
     static async updateTextMessage(message: Message, id_message: number) {
         const chat = await ChatRepository.getChatById(message.id_chat);
         if (!chat) throw new Error("Chat no encontrado");
@@ -111,17 +77,9 @@ class MessageService {
             usuario: message.id_user
         });
 
-        return updatedMessage
+        return updatedMessage;
     }
 
-    /**
-     * Deletes a message from a chat
-     * @param id_user ID of user requesting deletion
-     * @param id_message ID of message to delete
-     * @param id_chat ID of chat containing the message
-     * @throws Error if chat not found, user lacks permission, or message doesn't exist
-     * @returns Result of deletion operation
-     */
     static async deleteMessage(id_user: number, id_message: number, id_chat: number) {
         const chat = await ChatRepository.getChatById(id_chat);
         if (!chat) throw new Error("Chat no encontrado");
