@@ -40,7 +40,7 @@ class MessageService {
                 tipo: new_message.tipo,
                 contenido: new_message.contenido,
                 fecha_envio: new_message.fecha_envio,
-                usuario: new_message.id_user
+                id_user: new_message.id_user
             });
 
             return {
