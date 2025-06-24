@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 10101;
 const FRONTEND_URL = process.env.FRONTEND_URL || "";
 
 // Inicialización de Express
-export const app = express()
+const app = express()
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
     .use(cors({
