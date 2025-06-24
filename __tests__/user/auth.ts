@@ -15,36 +15,60 @@ export const registerUser = async (overrideData = {}) => {
 
     return request(app)
         .post('/usuario/register')
-        .send(userData); // <-- corregido
+        .send(userData);
 };
 
 // usuario/login
 export const loginUser = async (overrideData = {}) => {
     const userData = {
-        identifier: 'juanperez',
+        identifier: 'admin',
         password: 'Password123!',
         ...overrideData
     };
 
     return request(app)
         .post('/usuario/login')
-        .send(userData); // <-- corregido
+        .send(userData);
 };
 
-describe("Autenticación de usuario", () => {
-    test("✅ Registrar usuario exitosamente", async () => {
+describe("Registro de usuario", () => {
+    test("Registrar usuario exitosamente", async () => {
         const response = await registerUser();
         expect(response.status).toBe(201);
         expect(response.body.status).toBe('register ok');
     });
-
-    test("❌ Fallo al registrar con email inválido", async () => {
+    test("Fallo al registrar con email inválido", async () => {
         const response = await registerUser({ email: "no-es-un-correo" });
         expect(response.status).toBe(422);
         expect(response.body.errores).toEqual(
             expect.arrayContaining([
-                expect.objectContaining({ param: 'email' })
+                expect.objectContaining({ path: 'email' })
             ])
         );
+    });
+});
+
+describe("Iniciar Sesion", () => {
+    test("Iniciar sesión exitosamente", async () => {
+        await registerUser({
+            username: 'usuarioLogin',
+            email: 'login@example.com',
+        });
+        const response = await loginUser({
+            identifier: 'usuarioLogin',
+            password: 'Password123!'
+        });
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe("Login exitoso");
+        expect(response.body.token).toBeDefined();
+        expect(typeof response.body.token).toBe('string');
+    });
+    test("Falló el Iniciar sesión por credenciales incorrectas", async () => {
+        const response = await loginUser({
+            identifier: 'usuarioInexistente',
+            password: 'contraseñaIncorrecta'
+        });
+        expect(response.status).toBe(401);
+        expect(response.body.status).toBe("Usuario o contraseña incorrectos");
     });
 });
