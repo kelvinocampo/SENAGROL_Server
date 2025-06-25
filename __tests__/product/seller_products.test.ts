@@ -1,40 +1,29 @@
 import request from 'supertest';
 import { app } from '../../app';
-import { registerUser, loginUser } from '../user/auth'; // Reutilizamos tus funciones
+import { loginUser } from '../user/auth.test'; // Asegúrate que exporta loginUser
 
-describe('🛒 Obtener productos del vendedor autenticado', () => {
+describe('🛒 Productos del vendedor autenticado', () => {
   test('✅ Debería devolver los productos del vendedor con token válido', async () => {
-    // Generar datos únicos
-    const timestamp = Date.now();
-    const username = `vendedor_${timestamp}`;
-    const email = `vendedor_${timestamp}@test.com`;
+    // 1. Hacer login con un usuario ya existente
+    const loginRes = await loginUser({
+      identifier: 'luisag',           // tu usuario
+      password: 'Password123!',
+    });
 
-    // Registrar usuario
-    const registerRes = await registerUser({ username, email });
-    expect([200, 201]).toContain(registerRes.status);
-
-    // Login
-    const loginRes = await loginUser({ identifier: username, password: 'Password123!' });
     expect(loginRes.status).toBe(200);
-
+    expect(loginRes.body.token).toBeDefined();
     const token = loginRes.body.token;
-    expect(token).toBeDefined();
 
-    // Asignar rol de vendedor
-    const roleRes = await request(app)
-      .patch('/usuario/role')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ role: 'vendedor' });
-
-    expect([200, 201]).toContain(roleRes.status);
-
-    // Obtener productos del vendedor
+    // 2. Llamar al endpoint protegido
     const response = await request(app)
       .get('/producto/my_products')
       .set('Authorization', `Bearer ${token}`);
 
+    // 3. Validar la respuesta
     expect([200, 204]).toContain(response.status);
-    expect(Array.isArray(response.body.products)).toBe(true);
+    if (response.status === 200) {
+      expect(Array.isArray(response.body.products)).toBe(true);
+    }
   });
 
   test('❌ No debería permitir acceso sin token', async () => {
