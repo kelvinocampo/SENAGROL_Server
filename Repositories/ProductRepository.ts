@@ -22,7 +22,7 @@ class ProductRepository {
             product.userId,
             new Date()
         ];
-
+  console.log("📦 Valores que se enviarán al INSERT:", productValues);
         await db.execute(ProductSql, productValues);
     }
 
