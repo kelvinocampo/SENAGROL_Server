@@ -65,8 +65,6 @@ class ProductService {
     // Actualizar producto
     static async updateProduct(id: number, productData: Product) {
         try {
-            console.log(productData);
-
             const existingProduct = await ProductRepository.findById(id);
             if (!existingProduct) {
                 return { success: false, message: "Producto no encontrado" };

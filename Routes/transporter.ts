@@ -6,7 +6,7 @@ import RegisterValidator from '../Middleware/Transporter/RegisterValidator';
 import verifyToken from "../Middleware/VerifyToken";
 import verifyRole from "../Middleware/VerifyTokenData";
 
-import upload, { uploadFiles } from "../Middleware/multerConfig";
+import { uploadFiles } from "../Middleware/multerConfig";
 
 import GetTransports from "../Controllers/Transporter/GetTransports";
 
@@ -17,8 +17,8 @@ const router = express.Router();
 router.post('/requestTransporter',
     uploadFiles,
     verifyToken,
-    verifyRole(["vendedor", "comprador"]), 
-    RegisterValidator.transporterValidatorParams, RegisterValidator.transporterValidator, 
+    verifyRole(["vendedor", "comprador"]),
+    RegisterValidator.transporterValidatorParams, RegisterValidator.transporterValidator,
     RequestTransporterController);
 router.get("/transports", verifyToken, verifyRole(["transportador"]), GetTransports)
 router.get("/", GetTransporters)
