@@ -11,7 +11,6 @@ const getUser = async (overrideData = {}) => {
     };
     const loggedUser = await loginUser(userData)
     const { token } = loggedUser.body
-    console.log(token);
     return request(app)
         .get('/usuario/')
         .set('Authorization', `Bearer ${token}`)

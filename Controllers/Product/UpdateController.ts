@@ -45,10 +45,6 @@ const UpdateProducts = async (req: Request, res: Response) => {
             imagenUrl,
             Number(descuento)
         );
-
-        console.log(updatedProduct);
-        
-
         await ProductService.updateProduct(Number(id_producto), updatedProduct);
 
         return res.status(200).json({ status: "Producto actualizado correctamente" });

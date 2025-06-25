@@ -68,7 +68,6 @@ describe("Iniciar Sesion", () => {
             identifier: 'usuarioInexistente',
             password: 'contraseñaIncorrecta'
         });
-        console.log(response.body)
         expect(response.status).toBe(401);
         expect(response.body.status).toBe("Usuario o contraseña incorrectos");
     });
