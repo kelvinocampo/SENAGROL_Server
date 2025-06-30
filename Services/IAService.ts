@@ -10,14 +10,26 @@ dotenv.config();
 const { APIKEY = "" } = process.env;
 const ai = new GoogleGenAI({ apiKey: APIKEY });
 
-// Tipos de respuesta posibles
-export type ResponseType = 'GENERAL' | 'BUY' | 'PRODUCT' | 'NAV';
+// Tipos de datos que la IA puede necesitar
+export type DataRequirement = {
+    needsProducts: boolean;
+    needsBuys: boolean;
+    needsRoutes: boolean;
+    responseType: 'GENERAL' | 'BUY' | 'PRODUCT' | 'NAV';
+};
 
 class IAService {
     static async getResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno" = "Ninguno", id_user: number = 0) {
         try {
-            const classifiedResponse: any = await this.classifyResponse(prompt, history, role);
-            const response = this.getResponseByType(classifiedResponse, prompt, history, role, id_user);
+            // Primero determinamos qué datos necesitamos
+            const dataRequirement = await this.analyzeDataRequirements(prompt, role);
+            
+            // Obtenemos solo los datos necesarios
+            const contextData = await this.gatherRequiredData(dataRequirement, id_user, role);
+            
+            // Generamos la respuesta con un solo prompt unificado
+            const response = await this.generateUnifiedResponse(prompt, history, role, id_user, dataRequirement, contextData);
+            
             return response;
         } catch (error) {
             console.error("Error getting AI response:", error);
@@ -25,283 +37,218 @@ class IAService {
         }
     }
 
-    static async classifyResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno") {
+    static async analyzeDataRequirements(prompt: string, role: RequiredRoles | "Ninguno"): Promise<DataRequirement> {
         try {
-            console.log(role);
-
-            // Construimos el prompt de clasificación
-            const classificationPrompt = `
-                Eres un clasificador de consultas para un sistema de comercio electrónico. 
-                Clasifica la siguiente consulta del usuario según su tipo y teniendo en cuenta el rol del usuario: ${role}.
-
-                Instrucciones:
-                1. Clasifica la consulta en uno de los tipos mencionados
-                2. Genera una respuesta breve y útil según el tipo y el rol del usuario
-                3. Responde solo con el tipo de respuesta, sin explicaciones adicionales
-
-                Tipos de respuesta:
-                - GENERAL: Para consultas sobre el negocio en general (ej. políticas, información de la empresa)
-                - PRODUCT: Para consultas sobre productos
-                - BUY: Para consultas sobre compras, transportes, o ventas (Acceso exclusivo para usuarios registrados)
-                - NAV: Para solicitudes de navegación a secciones específicas de la aplicación (Consideralo como ultimo recurso)
-
-                Consulta del usuario: "${prompt}"
-                Responde solo con el tipo de respuesta
+            const analysisPrompt = `
+                Analiza la siguiente consulta y determina qué tipo de datos necesitas para responder correctamente.
+                
+                Consulta: "${prompt}"
+                Rol del usuario: ${role}
+                
+                Responde ÚNICAMENTE con un JSON válido sin formato markdown, sin ${"```json ni ```"}. 
+                El JSON debe estar en formato plano como este ejemplo:
+                {"needsProducts": true, "needsBuys": false, "needsRoutes": false, "responseType": "PRODUCT"}
+                
+                Estructura requerida:
+                {
+                    "needsProducts": boolean,
+                    "needsBuys": boolean,
+                    "needsRoutes": boolean,
+                    "responseType": "GENERAL" | "BUY" | "PRODUCT" | "NAV"
+                }
+                
+                Criterios:
+                - needsProducts: true si la consulta menciona productos, precios, stock, catálogo, inventario
+                - needsBuys: true si la consulta menciona compras, ventas, transportes, pedidos, historial de transacciones (requiere usuario autenticado)
+                - needsRoutes: true si la consulta pide navegar, ir a una sección, abrir una página
+                - responseType: clasifica el tipo principal de respuesta necesaria
+                
+                Ejemplos:
+                - "¿Qué productos tienes?" → {"needsProducts": true, "needsBuys": false, "needsRoutes": false, "responseType": "PRODUCT"}
+                - "Mis compras del mes pasado" → {"needsProducts": false, "needsBuys": true, "needsRoutes": false, "responseType": "BUY"}
+                - "Llévame al catálogo" → {"needsProducts": false, "needsBuys": false, "needsRoutes": true, "responseType": "NAV"}
+                - "¿Cuánto costó mi última compra de tomates?" → {"needsProducts": true, "needsBuys": true, "needsRoutes": false, "responseType": "BUY"}
             `;
+
             const chat = ai.chats.create({
                 model: "gemini-2.0-flash",
-                history: history
+                history: []
             });
 
             const response: any = await chat.sendMessage({
-                message: classificationPrompt,
+                message: analysisPrompt,
             });
 
-            console.log("Response from classification:", response.text);
-
-
-            return this.CleanResponse(response.text);
+            const cleanedResponse = this.extractAndCleanJSON(response.text);
+            return JSON.parse(cleanedResponse);
         } catch (error) {
-            console.error("Error classifying response:", error);
+            console.error("Error analyzing data requirements:", error);
+            // Fallback seguro
+            return {
+                needsProducts: false,
+                needsBuys: false,
+                needsRoutes: false,
+                responseType: 'GENERAL'
+            };
         }
     }
 
-    static async getResponseByType(classifiedResponse: any, prompt: string, history: any[], role: RequiredRoles | "Ninguno" = "Ninguno", id_user: number = 0) {
-        const responseType = classifiedResponse.toUpperCase() as ResponseType;
+    static async gatherRequiredData(dataRequirement: DataRequirement, id_user: number, role: RequiredRoles | "Ninguno") {
+        const contextData: any = {
+            info: await this.formatObject(Info)  // Siempre incluimos info general
+        };
 
-        switch (responseType) {
-            case 'GENERAL':
-                return await this.getGeneralResponse(prompt, history, role);
-            case 'BUY':
-                return await this.getBuyResponse(prompt, history, id_user, role as RequiredRoles);
-            case 'PRODUCT':
-                return await this.getProductResponse(prompt, history);
-            case 'NAV':
-                return await this.getNavResponse(prompt, history, role);
-            default:
-                return "Lo siento, no puedo ayudar con esa consulta.";
+        // Obtenemos productos solo si son necesarios
+        if (dataRequirement.needsProducts) {
+            try {
+                const products = await ProductRepository.getAll();
+                contextData.products = await this.formatObject(products);
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                contextData.products = "[]";
+            }
         }
+
+        // Obtenemos compras solo si son necesarias y el usuario está autenticado
+        if (dataRequirement.needsBuys && role !== "Ninguno" && id_user > 0) {
+            try {
+                const buys = await BuyRepository.getByOwner(id_user, role as TypeOwner);
+                contextData.buys = await this.formatObject(buys);
+                contextData.buyLabel = role == "vendedor" ? "Ventas" : role == "transportador" ? "Transportes" : "Compras";
+            } catch (error) {
+                console.error("Error fetching buys:", error);
+                contextData.buys = "[]";
+            }
+        }
+
+        // Obtenemos rutas solo si son necesarias
+        if (dataRequirement.needsRoutes) {
+            contextData.routes = await this.formatObject(FRONT_ROUTES);
+        }
+
+        return contextData;
     }
 
-    static async getGeneralResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno" = "Ninguno") {
-        const chat = ai.chats.create({
-            model: "gemini-2.0-flash",
-            history: history
-        })
-        const info = await this.formatObject(Info)
-
-        const generalPrompt = `
-            Eres un asistente de IA especializado en comercio electrónico.
-            El usuario ha solicitado información general sobre el negocio.
-
-            rol del usuario: ${role}
-            Información del negocio si la necesitas:
-            ${info}
-
-            Consulta del usuario: "${prompt}"
-
-            Instrucciones:
-            1. Proporciona información general sobre el negocio
-            2. Responde solo con la información relevante
-            3. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
-            4. Responde de manera corta y concisa
-        `
-
-        const response: any = await chat.sendMessage({
-            message: generalPrompt,
-        })
-
-        return this.CleanResponse(response.text);
-    }
-
-    static async getBuyResponse(prompt: string, history: any[], id_user: number, role: RequiredRoles) {
+    static async generateUnifiedResponse(
+        prompt: string, 
+        history: any[], 
+        role: RequiredRoles | "Ninguno", 
+        id_user: number,
+        dataRequirement: DataRequirement,
+        contextData: any
+    ) {
         const chat = ai.chats.create({
             model: "gemini-2.0-flash",
             history: history
         });
 
-        const buys = await BuyRepository.getByOwner(id_user, role as TypeOwner);
-        const label = role == "vendedor" ? "Ventas" : role == "transportador" ? "Transportes" : "Compras";
-        const formattedBuys = await this.formatObject(buys);
+        const unifiedPrompt = `
+            Eres un asistente de IA especializado en comercio electrónico. Responde a la consulta del usuario de manera precisa y útil.
 
-        const response: any = await chat.sendMessage({
-            message: `
-                Eres un asistente de IA especializado en comercio electrónico.
-                El usuario ha solicitado información sobre sus ${label}.
+            INFORMACIÓN DEL CONTEXTO:
+            - Consulta del usuario: "${prompt}"
+            - Rol del usuario: ${role}
+            - ID del usuario: ${id_user}
+            - Tipo de respuesta requerido: ${dataRequirement.responseType}
 
-                Consulta del usuario: "${prompt}"
-                ID del usuario: ${id_user}
+            DATOS DISPONIBLES:
+            ${contextData.info ? `Información general del negocio:\n${contextData.info}\n` : ''}
+            ${contextData.products ? `Productos disponibles:\n${contextData.products}\n` : ''}
+            ${contextData.buys ? `${contextData.buyLabel} del usuario:\n${contextData.buys}\n` : ''}
+            ${contextData.routes ? `Rutas de navegación:\n${contextData.routes}\n` : ''}
 
-                Instrucciones:
-                1. Proporciona información detallada sobre las ${label} del usuario
-                2. Si el usuario no tiene ${label}, informa que no se encontraron ${label}
-                3. Responde en formato markdown para los links ejemplo: [Texto del enlace](URL)
-                4. No incluyas información sensible como IDs
-                5. Evalua si la consulta del usuario requiere solo una gráfica y si es así, inclúyelo siguiendo estas reglas:
-                    - Para tendencias de ${label.toLowerCase()} en el tiempo: gráfico de líneas
-                    - Para comparar montos entre ${label.toLowerCase()}: gráfico de barras
-                    - Para distribución por estado: gráfico de pie (solo si hay menos de 5 estados)
-                    - Para relación entre cantidad y precio: gráfico de dispersión
-                6. Para gráficos, sigue el formato entre [CHART] y [/CHART] en JSON con esta estructura de ejemplo:
-                    {
-                        "data": [
-                            {
-                                "fecha": "2023-01-15",
-                                "monto_total": 150.50,
-                                "estado": "completado",
-                                "producto": "Producto",
-                                "cantidad": 2
-                            },
-                            {...}
-                        ],
-                        "options": {
-                            "chartType": "bar" | "line" | "pie" | "area",
-                            "xKey": "fecha",
-                            "yKeys": ["monto_total"],
-                            "colors": ["#FF0000"],
-                            "xLabel": "Fecha",
-                            "yLabel": "Monto ($)",
-                            "stacked": false
-                        }
-                    }
+            INSTRUCCIONES ESPECÍFICAS SEGÚN EL TIPO DE RESPUESTA:
 
-                Posibles gráficos según los datos disponibles:
-                - Evolución de ${label.toLowerCase()}: línea temporal con fechas y montos
-                - Distribución por estado: gráfico de pie
-                - Relación cantidad-precio: gráfico de dispersión
-                - Comparación de montos por vendedor: gráfico de barras
+            ${dataRequirement.responseType === 'PRODUCT' ? `
+            PARA CONSULTAS DE PRODUCTOS:
+            - Proporciona información detallada de los productos solicitados
+            - Omite productos despublicados o eliminados
+            - Usa formato markdown: [Nombre del producto](/Producto/:id_producto)
+            - Si necesitas listar, incluye: nombre, descripción, precio y link
+            - Evalúa si necesitas gráficos según la consulta:
+              * Barras: para comparar valores entre productos
+              * Líneas: para tendencias temporales
+              * Pie: para proporciones (máximo 5 elementos)
+              * Area: para acumulación de valores
+            ` : ''}
 
-                Datos de ${label.toLowerCase()} relacionadas al usuario:
-                ${formattedBuys}
+            ${dataRequirement.responseType === 'BUY' ? `
+            PARA CONSULTAS DE COMPRAS/VENTAS/TRANSPORTES:
+            - Proporciona información detallada sobre ${contextData.buyLabel || 'transacciones'}
+            - Si no hay datos, informa que no se encontraron ${contextData.buyLabel || 'transacciones'}
+            - Evalúa si la consulta requiere gráficos:
+              * Líneas: para tendencias temporales con fechas y montos
+              * Barras: para comparar montos entre categorías
+              * Pie: para distribución por estado (máximo 5 estados)
+              * Dispersión: para relación cantidad-precio
+            - El monto total = precio_producto + precio_transporte
+            ` : ''}
 
-                Notas importantes:
-                - El monto total se calcula como: precio_producto + precio_transporte
-                - Para gráficos de tiempo, usa fecha_compra como eje X
-                - Para estado, usa los valores: completado, pendiente, cancelado
-                - Los nombres de productos están en producto_nombre
-                - Los nombres de vendedores están en vendedor_nombre
-                - No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
-            `
-        });
+            ${dataRequirement.responseType === 'NAV' ? `
+            PARA NAVEGACIÓN:
+            - Identifica la sección solicitada y proporciona el enlace directo
+            - Si el rol no tiene acceso, informa dónde conseguir el rol necesario (no muestres la ruta)
+            - Si no está autenticado, sugiere registro/login
+            - Usa formato markdown: [Texto del enlace](URL)
+            ` : ''}
 
-        return this.CleanResponse(response.text);
-    }
+            ${dataRequirement.responseType === 'GENERAL' ? `
+            PARA CONSULTAS GENERALES:
+            - Proporciona información general del negocio
+            - Responde de manera corta y concisa
+            ` : ''}
 
-    static async getProductResponse(prompt: string, history: any[]) {
-        const chat = ai.chats.create({
-            model: "gemini-2.0-flash",
-            history: history
-        });
-        const products = await ProductRepository.getAll();
-        const formattedProducts = await this.formatObject(products);
-
-        const response: any = await chat.sendMessage({
-            message: `
-            Eres un asistente de IA especializado en productos de comercio electrónico.
-            El usuario ha solicitado información sobre un producto específico.
-
-            Consulta del usuario: "${prompt}"
-
-            Instrucciones:
-            1. Proporciona información detallada sobre el producto solicitado
-            2. Si el producto no existe, informa que no se encontró el producto
-            3. Responde solo con la información del producto
-            4. Omite los productos despublicados o eliminados
-            5. Responde en formato markdown para los links ejemplo: [Nombre del producto](/Producto/:id_producto)
-            6. Proporciona el link del productos siendo la siguiente ruta: /Producto/:id_producto
-            7. No incluyas información sensible como números de tarjeta de crédito o datos personales o IDs
-            8. Responde de manera corta y concisa
-            9. Si es necesario listar, hazlo con el nombre, descripcion , precio y link del producto
-            10. Responde en formato markdown para el estilo de la respuesta, ejemplo: /n, **Texto**, __Texto__, - Texto, etc.
-            11. Evalua el tipo de grafica a utilizar según la información proporcionada y el contexto de la consulta del usuario, ejemplo: 
-                - Para grandes cantidades utiliza un gráfico de barras.
-                - Para mostrar tendencias a lo largo del tiempo, utiliza un gráfico de líneas.
-                - Para mostrar proporciones o porcentajes, utiliza un gráfico de pie.
-                - No usar pie para más de 5 elementos.
-            12. Si es requerido o necesario, inserta solo una gráfica siguiendo el siguiente formato:
-            13. Devuelve TODA la configuración necesaria entre [CHART] y [/CHART] en formato JSON:
-                {
-                    "data": [
-                        {"producto": "Tomate", "precio": 11, "stock": 200},
-                        {...}
-                    ],
-                    "options": {
-                        "chartType": "bar" | "line" | "pie" | "area",
-                        "xKey": "producto",
-                        "yKeys": ["precio", "stock"],
-                        "colors": ["#FF0000", "#00FF00"],
-                        "xLabel": "Productos",
-                        "yLabel": "Cantidad",
-                        "stacked": true/false (opcional para barras),
-                        "radius": number (opcional para gráficos de pie)
-                    }
-                }
-
-            Reglas para seleccionar el tipo de gráfico:
-            - Usa 'bar' para comparar valores entre categorías
-            - Usa 'line' para mostrar tendencias en el tiempo
-            - Usa 'pie' para mostrar proporciones o porcentajes
-            - Usa 'area' para mostrar acumulación de valores
-            - Usa 'scatter' para correlaciones entre dos variables
-
-            Ejemplo completo:
-            [CHART]
+            FORMATO DE GRÁFICOS (si es necesario):
+            Si determinas que se necesita un gráfico, úsalo entre [CHART] y [/CHART] en formato JSON:
             {
                 "data": [
-                    {"producto": "Tomate", "precio": 11, "stock": 200},
-                    {"producto": "Lechuga", "precio": 5, "stock": 150}
+                    {"campo1": "valor1", "campo2": valor2, ...},
+                    {...}
                 ],
                 "options": {
-                    "chartType": "bar",
-                    "xKey": "producto",
-                    "yKeys": ["precio", "stock"],
-                    "colors": ["#FF5733", "#33FF57"],
-                    "xLabel": "Productos",
-                    "yLabel": "Cantidad",
-                    "stacked": true
+                    "chartType": "bar" | "line" | "pie" | "area" | "scatter",
+                    "xKey": "campo_x",
+                    "yKeys": ["campo_y1", "campo_y2"],
+                    "colors": ["#color1", "#color2"],
+                    "xLabel": "Etiqueta X",
+                    "yLabel": "Etiqueta Y",
+                    "stacked": true/false,
+                    "radius": number
                 }
             }
-            [/CHART]
 
-            Productos disponibles:
-            ${formattedProducts}
-        `
+            REGLAS GENERALES:
+            - NO incluyas información sensible (IDs, tarjetas de crédito, datos personales)
+            - Usa formato markdown para estilo y enlaces
+            - Responde de manera concisa pero completa
+            - Si no puedes responder algo, explícalo brevemente
+
+            Responde ahora a la consulta del usuario.
+        `;
+
+        const response: any = await chat.sendMessage({
+            message: unifiedPrompt,
         });
 
         return this.CleanResponse(response.text);
     }
 
-    static async getNavResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno" = "Ninguno") {
-        const chat = ai.chats.create({
-            model: "gemini-2.0-flash",
-            history: history
-        });
-        const routes = await this.formatObject(FRONT_ROUTES);
-
-        const response: any = await chat.sendMessage({
-            message: `
-                Eres un asistente de navegación para una aplicación web de comercio electrónico.
-                El usuario ha solicitado navegar a una sección específica de la aplicación.
-
-                Consulta del usuario: "${prompt}"
-                Rol del usuario: ${role}
-
-                Instrucciones:
-                1. Identifica la sección a la que el usuario quiere navegar
-                2. Proporciona un enlace directo a esa sección
-                3. Si el rol del usuario no tiene acceso a esa sección, informa que no tiene permiso
-                4. Si el usuario no está autenticado, sugiere que se registre o inicie sesión
-                5. Responde solo con el enlace y la respuesta
-                6. Si no se puede identificar la sección, informa que no se pudo encontrar la ruta
-                7. Si no posee acceso no le muestres la ruta, muesrake donde conseguir el rol necesario
-                8. Response en formato markdown para los links ejemplo: [Texto del enlace](URL)
-
-                Rutas de navegacion de la aplicacion: 
-                ${routes}
-            `
-        })
-
-        return this.CleanResponse(response.text);
+    static extractAndCleanJSON(response: string): string {
+        // Remover bloques de código markdown ```json ... ```
+        let cleaned = response.replace(/```json\s*/gi, '').replace(/```/g, '');
+        
+        // Remover espacios y saltos de línea al inicio y final
+        cleaned = cleaned.trim();
+        
+        // Buscar el primer { y el último } para extraer solo el JSON
+        const firstBrace = cleaned.indexOf('{');
+        const lastBrace = cleaned.lastIndexOf('}');
+        
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            cleaned = cleaned.substring(firstBrace, lastBrace + 1);
+        }
+        
+        return cleaned;
     }
 
     static CleanResponse(response: string) {
