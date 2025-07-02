@@ -9,6 +9,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import TransporterDto from "../Dto/User/TransporterDto";
 import TransporterRepository from "../Repositories/TransporterRepository";
 import { DataEmail, sendResetEmail } from "../Helpers/SendResetEmail";
+import { deleteFromAzure } from "../Helpers/DeleteFile";
 
 const SECRET_KEY = process.env.KEY_TOKEN;
 
@@ -90,7 +91,7 @@ class UserService {
         return { logged: true, status: "Login exitoso", accessToken: accessToken };
     }
 
-    static async updateUserProfile(id: number, updatedData: User, dataTransporter: TransporterDto) {
+    static async updateUserProfile(id: number, updatedData: User, dataTransporter: TransporterDto, imagesName: string[]) {
         const user = await UserRepository.getByID(id);
 
         if (!user) {
@@ -100,7 +101,14 @@ class UserService {
         const updatedUser = await UserRepository.update(id, updatedData);
         const roles = await UserRepository.getUserRoles(id)
         if (roles.includes("transportador")) {
-            const updatedTransporter = await TransporterRepository.update(dataTransporter);
+            if (imagesName.length > 0) {
+                const [transporter]: any = await TransporterRepository.getById(id)
+                const images = transporter.fotos_vehiculo.split(";")
+                for (const image of images) {
+                    await deleteFromAzure(image as string, "usuario")
+                }
+            }
+            const updatedTransporter = await TransporterRepository.update(dataTransporter, imagesName);
         }
 
         return { success: true, status: "Perfil actualizado correctamente", user: updatedUser };
@@ -118,8 +126,8 @@ class UserService {
 
         const sendEmail = await sendResetEmail(dataEmail);
 
-        if(!sendEmail){
-        return { code: 500, success: false, message: "Correo no enviado." }
+        if (!sendEmail) {
+            return { code: 500, success: false, message: "Correo no enviado." }
         }
 
         return { code: 200, success: true, message: "Correo enviado correctamente." }

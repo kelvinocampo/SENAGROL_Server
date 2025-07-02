@@ -34,7 +34,7 @@ class TransporterRepository {
         return result
     }
 
-    static async update(dataTransporter: TransporterDto) {
+    static async update(dataTransporter: TransporterDto, imagesName: string[]) {
         const fields = [];
         const values = [];
 
@@ -65,6 +65,10 @@ class TransporterRepository {
 
         const sql = `UPDATE transportador SET ${fields.join(", ")} WHERE id_transportador = ?`;
         values.push(dataTransporter.userId);
+
+        imagesName.forEach(async (imageName) => {
+            await this.registerImage(imageName, dataTransporter.userId);
+        });
 
         const [result]: any = await db.execute(sql, values);
 
@@ -124,9 +128,9 @@ class TransporterRepository {
         const result = await db.execute(query, [id_transporter]);
         return result[0];
     }
-    
+
     static async getByIdSAdmin(id_transporter: number) {
-       const query = `
+        const query = `
         SELECT
             t.licencia_conduccion,
             t.soat,
@@ -140,11 +144,11 @@ class TransporterRepository {
         WHERE t.id_transportador = ?
         GROUP BY t.id_transportador;
     `;
-    const result = await db.execute(query, [id_transporter]);
-    return result[0]; // Asegúrate de que esto no es un array vacío
+        const result = await db.execute(query, [id_transporter]);
+        return result[0]; // Asegúrate de que esto no es un array vacío
     }
-    
-    
+
+
 }
 
 export default TransporterRepository;
