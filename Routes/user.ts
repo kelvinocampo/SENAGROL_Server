@@ -35,7 +35,7 @@ router.post('/refresh', RefreshAccessToken);
 router.patch('/password', verifyToken, UpdatePasswordValidator.validatorParams, UpdatePasswordValidator.validator, UpdatePasswordController);
 router.get("/", verifyToken, GetUserById);
 router.get("/all", verifyToken, GetUsers);
-router.put('/edit',uploadFiles, verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateUserProfile);
+router.post('/edit',uploadFiles, verifyToken, UpdateValidator.validatorParams, UpdateValidator.validator, UpdateUserProfile);
 router.get('/role', verifyToken, GetRole);
 router.get('/id', verifyToken, GetID);
 router.post('/recover', RecoverValidator.validatorParams, RecoverValidator.validator, RecoverUser);
