@@ -35,7 +35,6 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
         if (!exists) {
             return res.status(403).json({ status: "Usuario no encontrado con la data de este token" });
         }
-        console.log(req.body);
 
         next();
     } catch (error) {
