@@ -5,6 +5,7 @@ import TransporterDto from "../../Dto/User/TransporterDto";
 import { uploadToAzure } from "../../Helpers/uploadFile";
 
 async function updateUserProfile(req: Request, res: Response) {
+        console.log("llegue")
     try {
         const { name, username, email, phone, password, id_user,
             license, soat, vehicleCard, vehicleType, vehicleWeight

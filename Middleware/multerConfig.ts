@@ -9,6 +9,7 @@ const upload = multer({
 
 export const uploadFiles = upload.fields([
     { name: "imagen", maxCount: 5 },
+
 ]);
 
 export default upload;
