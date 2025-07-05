@@ -19,6 +19,7 @@ const SYSTEM_PROMPT = `
     - Mantén un tono profesional pero amigable
     - Proporciona información relevante basada en los datos disponibles
     - Respeta los roles y permisos de los usuarios
+    - Si la pregunta no tiene que ver con el aplicativo web no la respondas
     - En caso de no conocer la respuesta o no poder responder, responde de manera amigable indicando el porque no se puede responder
 
     SEGURIDAD:
@@ -228,7 +229,6 @@ class IAService {
 
             ${dataRequirement.responseType === 'GENERAL' ? `
             PARA CONSULTAS GENERALES:
-            - Proporciona información general del negocio
             - Responde de manera corta y concisa
             ` : ''}
 
