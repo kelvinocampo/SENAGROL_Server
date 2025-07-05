@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { HarmCategory, HarmBlockThreshold, GoogleGenAI, GenerateContentConfig } from "@google/genai";
 import dotenv from "dotenv";
 import { FRONT_ROUTES } from "../Data/FrontRoutes";
 import { Info } from "../Data/Info";
@@ -9,8 +9,28 @@ dotenv.config();
 
 const { APIKEY = "" } = process.env;
 const ai = new GoogleGenAI({ apiKey: APIKEY });
+const globalConfig: GenerateContentConfig = {
+    temperature: 0.35,
+    safetySettings: [
+        {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+        {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+    ]
+}
 
-// Tipos de datos que la IA puede necesitar
 export type DataRequirement = {
     needsProducts: boolean;
     needsBuys: boolean;
@@ -21,15 +41,12 @@ export type DataRequirement = {
 class IAService {
     static async getResponse(prompt: string, history: any[], role: RequiredRoles | "Ninguno" = "Ninguno", id_user: number = 0) {
         try {
-            // Primero determinamos qué datos necesitamos
             const dataRequirement = await this.analyzeDataRequirements(prompt, role);
-            
-            // Obtenemos solo los datos necesarios
+
             const contextData = await this.gatherRequiredData(dataRequirement, id_user, role);
-            
-            // Generamos la respuesta con un solo prompt unificado
+
             const response = await this.generateUnifiedResponse(prompt, history, role, id_user, dataRequirement, contextData);
-            
+
             return response;
         } catch (error) {
             console.error("Error getting AI response:", error);
@@ -72,7 +89,8 @@ class IAService {
 
             const chat = ai.chats.create({
                 model: "gemini-2.0-flash",
-                history: []
+                history: [],
+                config: globalConfig,
             });
 
             const response: any = await chat.sendMessage({
@@ -83,7 +101,6 @@ class IAService {
             return JSON.parse(cleanedResponse);
         } catch (error) {
             console.error("Error analyzing data requirements:", error);
-            // Fallback seguro
             return {
                 needsProducts: false,
                 needsBuys: false,
@@ -95,10 +112,9 @@ class IAService {
 
     static async gatherRequiredData(dataRequirement: DataRequirement, id_user: number, role: RequiredRoles | "Ninguno") {
         const contextData: any = {
-            info: await this.formatObject(Info)  // Siempre incluimos info general
+            info: await this.formatObject(Info)
         };
 
-        // Obtenemos productos solo si son necesarios
         if (dataRequirement.needsProducts) {
             try {
                 const products = await ProductRepository.getAll();
@@ -109,7 +125,6 @@ class IAService {
             }
         }
 
-        // Obtenemos compras solo si son necesarias y el usuario está autenticado
         if (dataRequirement.needsBuys && role !== "Ninguno" && id_user > 0) {
             try {
                 const buys = await BuyRepository.getByOwner(id_user, role as TypeOwner);
@@ -121,7 +136,6 @@ class IAService {
             }
         }
 
-        // Obtenemos rutas solo si son necesarias
         if (dataRequirement.needsRoutes) {
             contextData.routes = await this.formatObject(FRONT_ROUTES);
         }
@@ -130,16 +144,17 @@ class IAService {
     }
 
     static async generateUnifiedResponse(
-        prompt: string, 
-        history: any[], 
-        role: RequiredRoles | "Ninguno", 
+        prompt: string,
+        history: any[],
+        role: RequiredRoles | "Ninguno",
         id_user: number,
         dataRequirement: DataRequirement,
         contextData: any
     ) {
         const chat = ai.chats.create({
             model: "gemini-2.0-flash",
-            history: history
+            history: history,
+            config: globalConfig,
         });
 
         const unifiedPrompt = `
@@ -234,20 +249,17 @@ class IAService {
     }
 
     static extractAndCleanJSON(response: string): string {
-        // Remover bloques de código markdown ```json ... ```
         let cleaned = response.replace(/```json\s*/gi, '').replace(/```/g, '');
-        
-        // Remover espacios y saltos de línea al inicio y final
+
         cleaned = cleaned.trim();
-        
-        // Buscar el primer { y el último } para extraer solo el JSON
+
         const firstBrace = cleaned.indexOf('{');
         const lastBrace = cleaned.lastIndexOf('}');
-        
+
         if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
             cleaned = cleaned.substring(firstBrace, lastBrace + 1);
         }
-        
+
         return cleaned;
     }
 
