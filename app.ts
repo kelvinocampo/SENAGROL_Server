@@ -28,7 +28,7 @@ export const app = express()
     .use(bodyParser.urlencoded({ extended: true }))
     .use(cors({
         origin: FRONTEND_URL,
-        methods: 'GET,POST,PUT,PATCH,DELETE',
+        methods: 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
         allowedHeaders: 'Content-Type,Authorization',
         credentials: true
     }));
