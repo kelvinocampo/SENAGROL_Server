@@ -299,7 +299,7 @@ class BuyRepository {
     static async cancelTransport(id_user: number, id_compra: number) {
         const query = `
             UPDATE compra
-            SET id_transportador = NULL, precio_transporte = NULL
+            SET id_transportador = NULL, precio_transporte = NULL, estado = 'Pendiente'
             WHERE id_compra = ? AND estado = 'Asignada' AND (id_comprador = ? OR id_transportador = ?)
         `
         const values = [id_compra, id_user, id_user]
