@@ -24,45 +24,20 @@ INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, telefono) VALU
 ("Alberto Mendoza", "albertom", "alberto@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000019"), -- id = 19
 ("Lucía Vargas", "luciav", "lucia@example.com", "$2a$10$6TA.Dzr1jQ5yKivurwPdoeyUVkZPYr8icHm0i5axfPK6q9SXFRIWG", "3110000020"); -- id = 20
 
--- === ROLES MODIFICADOS ===
+-- === ROLES ===
 INSERT INTO administrador (id_administrador) VALUES (1);
-
--- Compradores
 INSERT INTO comprador (id_comprador, estado) VALUES 
-(1, 'Pendiente'), 
-(2, 'Activo'), 
-(3, 'Pendiente'), 
-(4, 'Pendiente'), 
-(5, 'Pendiente'), 
-(6, 'Activo'), 
-(7, 'Pendiente'), 
-(8, 'Pendiente'), 
-(9, 'Activo'), 
-(10, 'Pendiente'), 
-(11, 'Pendiente'), 
-(12, 'Activo'),
-(13, 'Activo'), 
-(14, 'Pendiente'), 
-(15, 'Pendiente'), 
-(16, 'Pendiente'),
-(17, 'Activo'), 
-(18, 'Pendiente'), 
-(19, 'Activo'), 
-(20, 'Pendiente');
+(1, 'Pendiente'), (2, 'Activo'), (3, 'Pendiente'), (4, 'Pendiente'), 
+(5, 'Pendiente'), (6, 'Activo'), (7, 'Pendiente'), (8, 'Pendiente'), 
+(9, 'Activo'), (10, 'Pendiente'), (11, 'Pendiente'), (12, 'Activo'),
+(13, 'Pendiente'), (14, 'Pendiente'), (15, 'Pendiente'), (16, 'Pendiente'),
+(17, 'Activo'), (18, 'Pendiente'), (19, 'Pendiente'), (20, 'Pendiente');
 
--- Vendedores
 INSERT INTO vendedor (id_vendedor, estado) VALUES 
-(3, 'Pendiente'), 
-(5, 'Activo'), 
-(7, 'Activo'), 
-(10, 'Pendiente'), 
-(12, 'Pendiente'), 
-(14, 'Activo'), 
-(16, 'Pendiente'), 
-(18, 'Pendiente'),
+(3, 'Activo'), (5, 'Activo'), (7, 'Activo'), (10, 'Activo'), 
+(12, 'Pendiente'), (14, 'Activo'), (16, 'Activo'), (18, 'Activo'),
 (20, 'Activo');
 
--- Transportadores
 INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_propiedad_vehiculo, tipo_vehiculo, peso_vehiculo, estado) VALUES 
 (5, 'ABC123456', 'SOAT123456', 'TPV123456', 'Camión', 3500.50, 'Activo'),
 (4, 'ABC123456', 'SOAT123456', 'TPV123456', 'Camión', 3500.50, 'Activo'),
@@ -72,7 +47,18 @@ INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_
 (15, 'MNO567890', 'SOAT567890', 'TPV567890', 'Camioneta', 2000.00, 'Activo'),
 (19, 'PQR123789', 'SOAT123789', 'TPV123789', 'Furgón', 3000.00, 'Activo');
 
--- === PRODUCTOS CON UBICACIÓN EN CIRCASIA ===
+-- === FOTOS DEL VEHÍCULO ===
+INSERT INTO foto_vehiculo (foto, id_transportador) VALUES
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 4),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 4),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 8),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 5),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 11),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 13),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 15),
+("https://www.comparaonline.com.co/blog-statics/co/uploads/2023/04/tipos-de-vehiculos-ComparaOnline-10_2024.webp", 19);
+
+-- === PRODUCTOS (30 productos) ===
 INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, despublicado, id_vendedor) VALUES
 ("Tomates Orgánicos", "Tomates frescos y orgánicos cosechados localmente", 4.618, -75.685, 100, 5, "https://upload.wikimedia.org/wikipedia/commons/8/88/Bright_red_tomato_and_cross_section02.jpg", 2.50, 0.10, 0, 3),
 ("Papas Criollas", "Papas criollas recién cosechadas", 4.619, -75.686, 200, 10, "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZTiOEK8Rs5IYoQprQ3HMEOXq2pOVnn1lOWw&s", 1.80, 0.05, 0, 3),
