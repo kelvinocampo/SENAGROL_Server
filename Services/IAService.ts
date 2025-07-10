@@ -196,7 +196,7 @@ class IAService {
 
             ${dataRequirement.responseType === 'PRODUCT' ? `
             PARA CONSULTAS DE PRODUCTOS:
-            - Permitido para cualquier rol
+            - Permitido para cualquier rol, incluso la grafica
             - Proporciona información detallada de los productos solicitados
             - Omite productos despublicados o eliminados
             - Usa formato markdown: [Nombre del producto](/Producto/:id_producto)
