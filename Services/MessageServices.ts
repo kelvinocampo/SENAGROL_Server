@@ -91,6 +91,7 @@ class MessageService {
         const deletedMessage = await MessageRepository.deleteMessage(id_user, id_message, id_chat);
 
         const message = await MessageRepository.getMessageById(id_message)
+        console.log(message.tipo, message.contenido);
         if (message.tipo != "texto") {
             await deleteFromAzure(message.contenido, "mensajes")
         }
