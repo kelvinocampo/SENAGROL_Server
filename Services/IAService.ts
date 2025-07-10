@@ -95,7 +95,7 @@ class IAService {
                 }
                 
                 Criterios:
-                - needsProducts: true si la consulta menciona productos, precios, stock, catálogo, inventario
+                - needsProducts: true si la consulta menciona productos, precios, stock, catálogo, inventario (Accesible para cualquer usuario, incluso sin rol)
                 - needsBuys: true si la consulta menciona compras, ventas, transportes, pedidos, historial de transacciones (requiere usuario autenticado)
                 - needsRoutes: true si la consulta pide navegar, ir a una sección, abrir una página
                 - responseType: clasifica el tipo principal de respuesta necesaria
