@@ -4,7 +4,8 @@ import UserService from "../../Services/UserServices";
 async function getUsers(req: Request, res: Response) {
     try {
 
-        const users = await UserService.getAll();
+        const id_user = req.body.id_user
+        const users = await UserService.getAll(id_user);
 
         return res.status(200).json({
             message: "Lista de usuarios",

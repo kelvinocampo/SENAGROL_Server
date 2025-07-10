@@ -44,7 +44,7 @@ class UserRepository {
         return result;
     }
 
-    static async getAll() {
+    static async getAll(user_id: number) {
         const sql = `
             SELECT 
                 u.*,
@@ -61,9 +61,10 @@ class UserRepository {
             LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor
             LEFT JOIN transportador t ON u.id_usuario = t.id_transportador
             LEFT JOIN comprador c ON u.id_usuario = c.id_comprador
+            WHERE u.id_usuario != ?
             GROUP BY u.id_usuario;
         `;
-        const [result] = await db.execute(sql)
+        const [result] = await db.execute(sql, [user_id])
         return result;
     }
 

@@ -43,8 +43,8 @@ class UserService {
         return userWithRoles;
     }
 
-    static async getAll() {
-        return await UserRepository.getAll();
+    static async getAll(user_id: number) {
+        return await UserRepository.getAll(user_id);
     }
 
     static async UpdatePassword(password: string, id_user: number) {
