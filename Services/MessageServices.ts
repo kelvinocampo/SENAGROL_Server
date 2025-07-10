@@ -88,9 +88,9 @@ class MessageService {
         if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
             throw new Error("No tienes permiso para eliminar mensajes en este chat");
         }
-        const deletedMessage = await MessageRepository.deleteMessage(id_user, id_message, id_chat);
 
         const [message] = await MessageRepository.getMessageById(id_message)
+        const deletedMessage = await MessageRepository.deleteMessage(id_user, id_message, id_chat);
         if (message.tipo != "texto") {
             await deleteFromAzure(message.contenido, "mensajes")
         }
