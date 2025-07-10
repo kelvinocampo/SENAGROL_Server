@@ -3,6 +3,7 @@ import Message from "../Dto/Chat/MessageDTO";
 import MessageRepository from "../Repositories/MessageRepository";
 import ChatRepository from "../Repositories/ChatRepository";
 import { getIO } from "../Config/socket";
+import { deleteFromAzure } from "../Helpers/DeleteFile";
 
 class MessageService {
     static async sendMessage(message: Message) {
@@ -87,8 +88,12 @@ class MessageService {
         if (chat.id_user1 !== id_user && chat.id_user2 !== id_user) {
             throw new Error("No tienes permiso para eliminar mensajes en este chat");
         }
-
         const deletedMessage = await MessageRepository.deleteMessage(id_user, id_message, id_chat);
+
+        const message = await MessageRepository.getMessageById(id_message)
+        if (message.tipo != "texto") {
+            await deleteFromAzure(message.contenido, "mensajes")
+        }
 
         const io = getIO();
         io.to(`chat_${id_chat}`).emit("deleted_message", {

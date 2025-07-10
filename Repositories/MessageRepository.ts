@@ -100,6 +100,17 @@ class MessageRepository {
             throw error;
         }
     }
+
+    static async getMessageById(id_message: number) {
+        try {
+            const query = `SELECT * FROM mensaje WHERE id_mensaje = ?`;
+            const [result]: any = await db.execute(query, [id_message]);
+            return result;
+        } catch (error) {
+            console.error("Error en MessageRepository.getMessages:", error);
+            throw error;
+        }
+    }
 }
 
 export default MessageRepository;
