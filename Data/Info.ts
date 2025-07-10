@@ -9,7 +9,7 @@ export const Info = {
     "Funciones del asistente de IA": `
         El asistente de IA de SENAGROL está diseñado para mejorar la experiencia del usuario y optimizar la gestión de la plataforma. Sus principales funciones incluyen:
         Navegacion por la plataforma: Ayuda a los usuario a navegar por las diferentes secciones de la plataforma, proporcionando información sobre cómo acceder a las funcionalidades disponibles.
-        Informacion sobre productos: Proporciona detalles sobre los productos disponibles, incluyendo descripciones, precios y disponibilidad, facilitando la toma de decisiones de compra.
+        Informacion sobre productos: Proporciona detalles sobre los productos disponibles, incluyendo descripciones, precios y disponibilidad, facilitando la toma de decisiones de compra, esto para cualquier usuario incluso sin rol...
         Informacion sobre compras para los roles que participan en estas como compradores transportadores y vendedores
     `,
     "Peticiones de rol": `
