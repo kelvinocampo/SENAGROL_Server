@@ -9,7 +9,7 @@ class ChatRepository {
      */
     static async getChatById(chatID: number) {
         try {
-            const [rows]: any = await db.execute(
+            const [rows]: any = await db.query(
                 'SELECT * FROM chat WHERE id_chat = ?',
                 [chatID]
             );
@@ -86,7 +86,7 @@ class ChatRepository {
         `;
 
             const values = [id_user, id_user, id_user, id_user, id_user, id_user];
-            const [rows] = await db.execute(query, values);
+            const [rows] = await db.query(query, values);
             return rows;
         } catch (error) {
             console.error("Error en ChatRepository.getChats:", error);
@@ -117,7 +117,7 @@ class ChatRepository {
                 WHERE id_chat = ?;
             `;
 
-            const [result]: any = await db.execute(query, [
+            const [result]: any = await db.query(query, [
                 id_user,
                 id_user,
                 id_chat
@@ -156,7 +156,7 @@ class ChatRepository {
                 WHERE id_chat = ?;
             `;
             const values = [id_user, id_user, id_chat];
-            const [result] = await db.execute(query, values);
+            const [result] = await db.query(query, values);
             return result;
         } catch (error) {
             console.error("Error en ChatRepository.blockChat:", error);
@@ -186,7 +186,7 @@ class ChatRepository {
                 WHERE id_chat = ?;
             `;
             const values = [id_user, id_user, id_chat];
-            const [result] = await db.execute(query, values);
+            const [result] = await db.query(query, values);
             return result;
         } catch (error) {
             console.error("Error en ChatRepository.unblockChat:", error);
@@ -207,7 +207,7 @@ class ChatRepository {
                 VALUES (?, ?, ?);
             `;
             const values = [id_user1, id_user2, new Date()];
-            const [result] = await db.execute(query, values);
+            const [result] = await db.query(query, values);
             return result;
         } catch (error) {
             console.error("Error en ChatRepository.initChat:", error);
@@ -226,7 +226,7 @@ class ChatRepository {
             SELECT * FROM chat 
             WHERE (id_user1 = ? AND id_user2 = ?) OR (id_user1 = ? AND id_user2 = ?)
         `;
-        const [result] = await db.execute(query, [id_user1, id_user2, id_user2, id_user1]);
+        const [result] = await db.query(query, [id_user1, id_user2, id_user2, id_user1]);
         return result;
     }
 
@@ -242,7 +242,7 @@ class ChatRepository {
             WHERE id_chat = ?;
         `;
         const values = [new Date(), id_chat];
-        const [result] = await db.execute(query, values);
+        const [result] = await db.query(query, values);
         return result;
     }
 
@@ -268,7 +268,7 @@ class ChatRepository {
                 WHERE id_chat = ?;
             `;
             const values = [id_user, id_user, id_chat];
-            const [result] = await db.execute(query, values);
+            const [result] = await db.query(query, values);
             return result;
         } catch (error) {
             console.error("Error en ChatRepository.unDeleteChat:", error);

@@ -15,7 +15,7 @@ class VendedorService {
 
     static async aprobarSolicitud(adminId: number, userId: number) {
         // Verificar si el usuario que aprueba es administrador
-        const [adminCheck]: any = await db.execute(
+        const [adminCheck]: any = await db.query(
             "SELECT * FROM administrador WHERE id_administrador = ?", 
             [adminId]
         );
@@ -25,7 +25,7 @@ class VendedorService {
         }
 
         // Verificar si la solicitud existe y está pendiente
-        const [solicitud]: any = await db.execute(
+        const [solicitud]: any = await db.query(
             "SELECT * FROM vendedor WHERE id_vendedor = ? AND estado = 'Pendiente'", 
             [userId]
         );
@@ -35,7 +35,7 @@ class VendedorService {
         }
 
         // Aprobar la solicitud de vendedor
-        await db.execute(
+        await db.query(
             "UPDATE vendedor SET estado = 'Activo' WHERE id_vendedor = ?", 
             [userId]
         );
@@ -45,7 +45,7 @@ class VendedorService {
 
     static async rechazarSolicitud(adminId: number, userId: number) {
 
-        const [adminCheck]: any = await db.execute(
+        const [adminCheck]: any = await db.query(
             "SELECT * FROM administrador WHERE id_administrador = ?", 
             [adminId]
         );
@@ -55,7 +55,7 @@ class VendedorService {
         }
 
         // Verificar si la solicitud existe y está pendiente
-        const [solicitud]: any = await db.execute(
+        const [solicitud]: any = await db.query(
             "SELECT * FROM vendedor WHERE id_vendedor = ? AND estado = 'Pendiente'", 
             [userId]
         );
@@ -65,7 +65,7 @@ class VendedorService {
         }
 
         // Rechazar la solicitud eliminando el registro de vendedor
-        await db.execute(
+        await db.query(
             "DELETE FROM vendedor WHERE id_vendedor = ?", 
             [userId]
         );

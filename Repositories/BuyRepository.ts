@@ -48,7 +48,7 @@ class BuyRepository {
             usuario ut ON t.id_transportador = ut.id_usuario
         ${whereSentence}
         `;
-        const [result]: any = await db.execute(query, [id_user])
+        const [result]: any = await db.query(query, [id_user])
         return result;
     }
 
@@ -58,7 +58,7 @@ class BuyRepository {
         SET nombre_${typeOwner}_eliminado = ?
         WHERE c.id_${typeOwner} = ? AND c.nombre_${typeOwner}_eliminado IS NULL
         `;
-        const [result]: any = await db.execute(query, [name, id_user])
+        const [result]: any = await db.query(query, [name, id_user])
         return result;
     }
 
@@ -69,7 +69,7 @@ class BuyRepository {
 
         WHERE c.id_transportador = ? AND estado = 'Asignada'
         `;
-        const [result]: any = await db.execute(query, [id_user, id_user])
+        const [result]: any = await db.query(query, [id_user, id_user])
         return result;
     }
 
@@ -78,7 +78,7 @@ class BuyRepository {
         DELETE FROM compra
         WHERE id_vendedor = ? AND estado = 'Pendiente'
         `;
-        const [result]: any = await db.execute(query, [id_user, id_user])
+        const [result]: any = await db.query(query, [id_user, id_user])
         return result;
     }
 
@@ -123,7 +123,7 @@ class BuyRepository {
         WHERE
             c.id_comprador = ? OR c.id_vendedor = ? OR c.id_transportador = ?
         `;
-        const [result]: any = await db.execute(query, [id_user, id_user, id_user])
+        const [result]: any = await db.query(query, [id_user, id_user, id_user])
         return result;
     }
 
@@ -168,7 +168,7 @@ class BuyRepository {
         WHERE
             c.id_producto = ?
         `;
-        const [result]: any = await db.execute(query, [id_producto])
+        const [result]: any = await db.query(query, [id_producto])
         return result;
     }
 
@@ -178,7 +178,7 @@ class BuyRepository {
             SET id_transportador = ?, estado = ?, precio_transporte = ?
             WHERE id_compra = ?
         `
-        const [result]: any = await db.execute(query, [id_transportador, "Asignada", precio_transporte, id_compra])
+        const [result]: any = await db.query(query, [id_transportador, "Asignada", precio_transporte, id_compra])
         return result;
     }
 
@@ -188,7 +188,7 @@ class BuyRepository {
             FROM compra
             WHERE id_compra = ? AND(id_comprador = ? OR id_vendedor = ?)
         `
-        const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
+        const [result]: any = await db.query(query, [id_compra, id_user, id_user])
         return result;
     }
 
@@ -205,7 +205,7 @@ class BuyRepository {
         `
         const values: any = [estado, id_compra, id_user]
         if (estado === "Entregada") values.push(dateSend)
-        const [result]: any = await db.execute(query, values)
+        const [result]: any = await db.query(query, values)
         return result;
     }
 
@@ -248,7 +248,7 @@ class BuyRepository {
         LEFT JOIN 
             usuario ut ON t.id_transportador = ut.id_usuario
         `;
-        const [result]: any = await db.execute(query)
+        const [result]: any = await db.query(query)
         return result;
     }
 
@@ -292,7 +292,7 @@ class BuyRepository {
             usuario ut ON t.id_transportador = ut.id_usuario
         WHERE c.id_compra = ?
         `;
-        const [result]: any = await db.execute(query, [id_compra])
+        const [result]: any = await db.query(query, [id_compra])
         return result;
     }
 
@@ -303,7 +303,7 @@ class BuyRepository {
             WHERE id_compra = ? AND estado = 'Asignada' AND (id_comprador = ? OR id_transportador = ?)
         `
         const values = [id_compra, id_user, id_user]
-        const [result] = await db.execute(query, values)
+        const [result] = await db.query(query, values)
         return result
     }
 
@@ -314,7 +314,7 @@ class BuyRepository {
             LEFT JOIN producto p ON c.id_producto = p.id_producto
             WHERE c.id_compra = ? AND (c.id_comprador = ? OR c.id_transportador = ?)
         `
-        const [result]: any = await db.execute(query, [id_compra, id_user, id_user])
+        const [result]: any = await db.query(query, [id_compra, id_user, id_user])
         return result;
     }
 }

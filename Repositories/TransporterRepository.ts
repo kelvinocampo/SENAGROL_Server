@@ -5,7 +5,7 @@ class TransporterRepository {
     static async register(transporter: TransporterDto, imagesName: string[]) {
         // 0. Verificar si ya es transportador
         const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
-        const [existingTransporter]: any = await db.execute(checkSql, [transporter.userId]);
+        const [existingTransporter]: any = await db.query(checkSql, [transporter.userId]);
 
         if (existingTransporter.length > 0) {
             throw new Error("El usuario ya está registrado como transportador");
@@ -25,7 +25,7 @@ class TransporterRepository {
             transporter.vehicleWeight
         ];
 
-        const [result] = await db.execute(transporterSql, transporterValues);
+        const [result] = await db.query(transporterSql, transporterValues);
 
         imagesName.forEach(async (imageName) => {
             await this.registerImage(imageName, transporter.userId);
@@ -70,7 +70,7 @@ class TransporterRepository {
             await this.registerImage(imageName, dataTransporter.userId);
         });
 
-        const [result]: any = await db.execute(sql, values);
+        const [result]: any = await db.query(sql, values);
 
         if (result.affectedRows > 0) {
             return { success: true, status: "Perfil actualizado correctamente" };
@@ -87,7 +87,7 @@ class TransporterRepository {
             `;
         const imageValues = [imageName, id_user];
 
-        return await db.execute(imageSql, imageValues);
+        return await db.query(imageSql, imageValues);
     }
 
     static async getTransporters() {
@@ -107,7 +107,7 @@ class TransporterRepository {
         WHERE t.estado = 'Activo'
         GROUP BY u.id_usuario;
         `;
-        const result = await db.execute(query);
+        const result = await db.query(query);
         return result[0];
     }
 
@@ -125,7 +125,7 @@ class TransporterRepository {
         WHERE t.estado = 'Activo' AND t.id_transportador = ?
         GROUP BY t.id_transportador;
         `;
-        const result = await db.execute(query, [id_transporter]);
+        const result = await db.query(query, [id_transporter]);
         return result[0];
     }
 
@@ -144,7 +144,7 @@ class TransporterRepository {
         WHERE t.id_transportador = ?
         GROUP BY t.id_transportador;
     `;
-        const result = await db.execute(query, [id_transporter]);
+        const result = await db.query(query, [id_transporter]);
         return result[0]; // Asegúrate de que esto no es un array vacío
     }
 

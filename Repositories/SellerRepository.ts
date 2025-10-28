@@ -3,7 +3,7 @@ import db from "../Config/configDB";
 class SellerRepository {
     static async requestSeller(userId: number) {
         // Verificar si ya tiene registro como vendedor
-        const [existingSeller]: any = await db.execute(
+        const [existingSeller]: any = await db.query(
             "SELECT estado FROM vendedor WHERE id_vendedor = ?", 
             [userId]
         );
@@ -16,7 +16,7 @@ class SellerRepository {
         }
     
         // Insertar nueva solicitud de vendedor con estado 'Pendiente'
-        await db.execute(
+        await db.query(
             "INSERT INTO vendedor (id_vendedor, estado) VALUES (?, 'Pendiente')", 
             [userId]
         );

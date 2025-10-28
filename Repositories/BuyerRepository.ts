@@ -5,7 +5,7 @@ class BuyerRepository {
         const sql = `INSERT INTO comprador (id_comprador) 
                      VALUES (?)`;
         const values = [id_comprador];
-        const [result]: any = await db.execute(sql, values);
+        const [result]: any = await db.query(sql, values);
         return result;
     }
 }

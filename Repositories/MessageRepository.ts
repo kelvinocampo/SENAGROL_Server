@@ -19,7 +19,7 @@ class MessageRepository {
                 message.editado ? 1 : 0
             ];
 
-            const [result]: any = await db.execute(query, values);
+            const [result]: any = await db.query(query, values);
             const id_mensaje = result.insertId;
 
             return {
@@ -47,7 +47,7 @@ class MessageRepository {
                 WHERE id_mensaje = ? AND tipo = "texto"
             `;
 
-            const [result]: any = await db.execute(query, [
+            const [result]: any = await db.query(query, [
                 message.editado ? 1 : 0,
                 message.contenido,
                 id_message
@@ -73,7 +73,7 @@ class MessageRepository {
                 AND id_chat = ?
             `;
 
-            const [result]: any = await db.execute(query, [
+            const [result]: any = await db.query(query, [
                 id_user, 
                 id_message, 
                 id_chat
@@ -93,7 +93,7 @@ class MessageRepository {
     static async getMessages(id_chat: number) {
         try {
             const query = `SELECT * FROM mensaje WHERE id_chat = ?`;
-            const [result]: any = await db.execute(query, [id_chat]);
+            const [result]: any = await db.query(query, [id_chat]);
             return result;
         } catch (error) {
             console.error("Error en MessageRepository.getMessages:", error);
@@ -104,7 +104,7 @@ class MessageRepository {
     static async getMessageById(id_message: number) {
         try {
             const query = `SELECT * FROM mensaje WHERE id_mensaje = ?`;
-            const [result]: any = await db.execute(query, [id_message]);
+            const [result]: any = await db.query(query, [id_message]);
             return result;
         } catch (error) {
             console.error("Error en MessageRepository.getMessages:", error);

@@ -13,7 +13,7 @@ class UserRepository {
             UNION
             SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ? AND estado = 'Activo';
         `;
-        const result: any = await db.execute(sql, [userId, userId, userId, userId]);
+        const result: any = await db.query(sql, [userId, userId, userId, userId]);
 
         const roles = (result[0].map((row: any) => row.role)).join(" ");
         return roles;
@@ -26,21 +26,21 @@ class UserRepository {
             VALUES (?, ?, ?, ?, ?)
         `;
         const values = [user.name, user.username, user.email, user.password, user.phoneNumber];
-        const [result]: any = await db.execute(sql, values);
+        const [result]: any = await db.query(sql, values);
         return result.insertId;
     }
 
     static async getByID(id: number) {
         const sql = 'SELECT * FROM usuario WHERE id_usuario = ?';
         const values = [id];
-        const [result]: any = await db.execute(sql, values);
+        const [result]: any = await db.query(sql, values);
         return result;
     }
 
     static async getByEmail(email: string) {
         const sql = 'SELECT * FROM usuario WHERE correo = ?';
         const values = [email];
-        const [result]: any = await db.execute(sql, values);
+        const [result]: any = await db.query(sql, values);
         return result;
     }
 
@@ -64,7 +64,7 @@ class UserRepository {
             WHERE u.id_usuario != ?
             GROUP BY u.id_usuario;
         `;
-        const [result] = await db.execute(sql, [user_id])
+        const [result] = await db.query(sql, [user_id])
         return result;
     }
 
@@ -95,14 +95,14 @@ class UserRepository {
                OR (t.id_transportador IS NOT NULL)
             GROUP BY u.id_usuario;
         `;
-        const [result] = await db.execute(sql);
+        const [result] = await db.query(sql);
         return result;
     }
 
     static async UpdatePassword(password: string, id_user: number,) {
         const sql = 'UPDATE usuario SET contraseña = ? WHERE id_usuario = ?';
         const values = [password, id_user];
-        return await db.execute(sql, values);
+        return await db.query(sql, values);
     }
 
     static async findByEmailOrUsername(identifier: string) {
@@ -112,7 +112,7 @@ class UserRepository {
         `;
         const values = [identifier, identifier];
 
-        const result: any = await db.execute(sql, values);
+        const result: any = await db.query(sql, values);
 
         if (result[0].length > 0) {
             return result[0][0];
@@ -153,7 +153,7 @@ class UserRepository {
         const sql = `UPDATE usuario SET ${fields.join(", ")} WHERE id_usuario = ?`;
         values.push(id);
 
-        const [result]: any = await db.execute(sql, values);
+        const [result]: any = await db.query(sql, values);
 
         if (result.affectedRows > 0) {
             return { success: true, status: "Perfil actualizado correctamente" };

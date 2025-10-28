@@ -3,7 +3,7 @@ import { RequiredRoles } from "../Middleware/VerifyTokenData";
 
 class AdminRepository {
   static async ActiveSeller(userId: number) {
-    const [solicitud]: any = await db.execute(
+    const [solicitud]: any = await db.query(
       "SELECT * FROM vendedor WHERE id_vendedor = ? AND estado = 'Pendiente'",
       [userId]
     );
@@ -16,10 +16,10 @@ class AdminRepository {
     const deactivateAdminSql = `UPDATE administrador SET estado = 'Pendiente' WHERE id_administrador = ?`;
     const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
 
-    await db.execute(deactivateAdminSql, [userId]);
-    await db.execute(deactivateBuyerSql, [userId]);
+    await db.query(deactivateAdminSql, [userId]);
+    await db.query(deactivateBuyerSql, [userId]);
 
-    await db.execute(
+    await db.query(
       "UPDATE vendedor SET estado = 'Activo' WHERE id_vendedor = ?",
       [userId]
     );
@@ -28,7 +28,7 @@ class AdminRepository {
   }
 
   static async ActiveTransporter(userId: number) {
-    const [solicitud]: any = await db.execute(
+    const [solicitud]: any = await db.query(
       "SELECT * FROM transportador WHERE id_transportador = ? AND estado = 'Pendiente'",
       [userId]
     );
@@ -41,10 +41,10 @@ class AdminRepository {
     const deactivateAdminSql = `UPDATE administrador SET estado = 'Pendiente' WHERE id_administrador = ?`;
     const deactivateBuyerSql = `UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`;
 
-    await db.execute(deactivateAdminSql, [userId]);
-    await db.execute(deactivateBuyerSql, [userId]);
+    await db.query(deactivateAdminSql, [userId]);
+    await db.query(deactivateBuyerSql, [userId]);
 
-    await db.execute(
+    await db.query(
       "UPDATE transportador SET estado = 'Activo' WHERE id_transportador = ?",
       [userId]
     );
@@ -54,12 +54,12 @@ class AdminRepository {
   static async CreateAdmin(userId: number) {
     try {
       // Desactivar otros roles si existen
-      await db.execute(`UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`, [userId]);
-      await db.execute(`UPDATE transportador SET estado = 'Pendiente' WHERE id_transportador = ?`, [userId]);
-      await db.execute(`UPDATE vendedor SET estado = 'Pendiente' WHERE id_vendedor = ?`, [userId]);
+      await db.query(`UPDATE comprador SET estado = 'Pendiente' WHERE id_comprador = ?`, [userId]);
+      await db.query(`UPDATE transportador SET estado = 'Pendiente' WHERE id_transportador = ?`, [userId]);
+      await db.query(`UPDATE vendedor SET estado = 'Pendiente' WHERE id_vendedor = ?`, [userId]);
 
       // Verificar si ya existe una solicitud pendiente
-      const [solicitud]: any = await db.execute(
+      const [solicitud]: any = await db.query(
         "INSERT INTO administrador (id_administrador, estado) VALUES (?, 'Activo') ON DUPLICATE KEY UPDATE estado = 'Activo'",
         [userId]
       );
@@ -82,7 +82,7 @@ class AdminRepository {
         `;
     const values = [id_delete_user];
 
-    const [result] = await db.execute(query, values);
+    const [result] = await db.query(query, values);
     return result;
   }
 
@@ -93,10 +93,10 @@ class AdminRepository {
       SET estado = "Pendiente" 
       WHERE id_${role} = ? AND estado = "Activo"
     `;
-    const [result] = await db.execute(query, [id_deactivate_user]);
+    const [result] = await db.query(query, [id_deactivate_user]);
 
     // Verificar si el usuario tiene algún otro rol activo
-    const [rolesActivos]: any = await db.execute(`
+    const [rolesActivos]: any = await db.query(`
     SELECT 
       (SELECT estado FROM administrador WHERE id_administrador = ? AND estado = 'Activo') AS admin_activo,
       (SELECT estado FROM vendedor WHERE id_vendedor = ? AND estado = 'Activo') AS vendedor_activo,
@@ -111,7 +111,7 @@ class AdminRepository {
 
     // Si no tiene ningún otro rol activo, dejar el rol de comprador como activo
     if (!tieneRolActivo) {
-      await db.execute(
+      await db.query(
         `UPDATE comprador SET estado = 'Activo' WHERE id_comprador = ?`,
         [id_deactivate_user]
       );
