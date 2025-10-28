@@ -303,7 +303,7 @@ class BuyRepository {
             WHERE id_compra = ? AND estado = 'Asignada' AND (id_comprador = ? OR id_transportador = ?)
         `
         const values = [id_compra, id_user, id_user]
-        const [result] = await db.query(query, values)
+        const result = await db.query(query, values)
         return result
     }
 

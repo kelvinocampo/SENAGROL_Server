@@ -64,7 +64,7 @@ class UserRepository {
             WHERE u.id_usuario != ?
             GROUP BY u.id_usuario;
         `;
-        const [result] = await db.query(sql, [user_id])
+        const result = await db.query(sql, [user_id])
         return result;
     }
 
@@ -95,7 +95,7 @@ class UserRepository {
                OR (t.id_transportador IS NOT NULL)
             GROUP BY u.id_usuario;
         `;
-        const [result] = await db.query(sql);
+        const result = await db.query(sql);
         return result;
     }
 

@@ -25,7 +25,7 @@ class TransporterRepository {
             transporter.vehicleWeight
         ];
 
-        const [result] = await db.query(transporterSql, transporterValues);
+        const result = await db.query(transporterSql, transporterValues);
 
         imagesName.forEach(async (imageName) => {
             await this.registerImage(imageName, transporter.userId);
@@ -108,7 +108,7 @@ class TransporterRepository {
         GROUP BY u.id_usuario;
         `;
         const result = await db.query(query);
-        return result[0];
+        return result.rows[0];
     }
 
     static async getById(id_transporter: number) {
@@ -126,7 +126,7 @@ class TransporterRepository {
         GROUP BY t.id_transportador;
         `;
         const result = await db.query(query, [id_transporter]);
-        return result[0];
+        return result.rows[0];
     }
 
     static async getByIdSAdmin(id_transporter: number) {
@@ -145,7 +145,7 @@ class TransporterRepository {
         GROUP BY t.id_transportador;
     `;
         const result = await db.query(query, [id_transporter]);
-        return result[0]; // Asegúrate de que esto no es un array vacío
+        return result.rows[0]; // Asegúrate de que esto no es un array vacío
     }
 
 
