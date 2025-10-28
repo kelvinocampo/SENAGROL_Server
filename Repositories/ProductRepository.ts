@@ -1,4 +1,3 @@
-import { log } from 'console';
 import db from '../Config/configDB';
 import Product from '../Dto/Product/ProductsCreate';
 
@@ -22,8 +21,8 @@ class ProductRepository {
             product.userId,
             new Date()
         ];
-  console.log("📦 Valores que se enviarán al INSERT:", productValues);
-        await db.execute(ProductSql, productValues);
+        console.log("📦 Valores que se enviarán al INSERT:", productValues);
+        await db.query(ProductSql, productValues);
     }
 
     static async restoreQuantity(id_producto: number, cantidad: number) {
@@ -33,17 +32,17 @@ class ProductRepository {
             WHERE id_producto = ?
         `;
         const values = [cantidad, id_producto];
-        const [result]: any = await db.execute(sql, values);
+        const result = await db.query(sql, values);
         return result;
     }
 
     static async deleteProductsBySeller(id_user: number) {
         const sql = `
         UPDATE producto
-        SET eliminado = 1
+        SET eliminado = true
         WHERE id_vendedor = ?
         `;
-        const [result]: any = await db.execute(sql, [id_user]);
+        const result = await db.query(sql, [id_user]);
         return result;
     }
 
@@ -54,7 +53,7 @@ class ProductRepository {
             WHERE id_producto = ?
         `;
         const values = [cantidad, id_producto];
-        const [result]: any = await db.execute(sql, values);
+        const result = await db.query(sql, values);
         return result;
     }
 
@@ -64,13 +63,13 @@ class ProductRepository {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const values = [id_producto, id_user, cantidad, new Date(), id_vendedor, "Pendiente", latitud, longitud, precio_unidad];
-        const [result]: any = await db.execute(sql, values);
+        const result = await db.query(sql, values);
         return result;
     }
 
     static async findById(id: number) {
-        const checkSql = `SELECT * FROM producto WHERE id_producto = ? AND (despublicado = 0 OR eliminado = 0)`;
-        const [result]: any = await db.execute(checkSql, [id]);
+        const checkSql = `SELECT * FROM producto WHERE id_producto = ? AND (despublicado = false OR eliminado = false)`;
+        const { rows: result } = await db.query(checkSql, [id]);
         return result.length ? result[0] : null;
     }
 
@@ -83,7 +82,7 @@ class ProductRepository {
         `;
         const values = [productData.Precio, productData.Description, productData.latitud, productData.longitud,
         productData.quantity, productData.MinimumQuantity, productData.imagen, productData.Discount]
-        await db.execute(updateSql, [...values, id]);
+        await db.query(updateSql, [...values, id]);
     }
 
     static async getAll() {
@@ -94,10 +93,10 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.despublicado = 0 AND p.eliminado = 0
+        WHERE p.despublicado = false AND p.eliminado = false
         `;
-        const [products]: any = await db.execute(sql);
-        return products;
+        const products = await db.query(sql);
+        return products.rows;
     }
 
     static async getAllAdmin() {
@@ -109,8 +108,8 @@ class ProductRepository {
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
         `;
-        const [products]: any = await db.execute(sql);
-        return products;
+        const products = await db.query(sql);
+        return products.rows;
     }
 
     static async get(id_product: number) {
@@ -121,10 +120,10 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.id_producto = ? AND (p.despublicado = 0 OR p.eliminado = 0)
+        WHERE p.id_producto = ? AND (p.despublicado = false OR p.eliminado = false)
         `;
-        const [product]: any = await db.execute(sql, [id_product]);
-        return product;
+        const product = await db.query(sql, [id_product]);
+        return product.rows;
     }
 
     static async getWithDiscount() {
@@ -135,11 +134,11 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.descuento > 0 AND (p.despublicado = 0 OR p.eliminado = 0)
+        WHERE p.descuento > 0 AND (p.despublicado = false OR p.eliminado = false)
         ORDER BY p.descuento DESC
         `;
-        const [products]: any = await db.execute(sql);
-        return products;
+        const products = await db.query(sql);
+        return products.rows;
     }
 
     static async getBySeller(id_user: number) {
@@ -150,16 +149,16 @@ class ProductRepository {
         FROM producto p
         JOIN vendedor v ON p.id_vendedor = v.id_vendedor
         JOIN usuario u ON v.id_vendedor = u.id_usuario 
-        WHERE p.id_vendedor = ? AND p.eliminado = 0
+        WHERE p.id_vendedor = ? AND p.eliminado = false
         `;
-        const [products]: any = await db.execute(sql, [id_user]);
-        return products;
+        const products = await db.query(sql, [id_user]);
+        return products.rows;
     }
 
     // Obtener el vendedor de un producto específico
     static async findProductOwner(productId: number) {
-        const query = `SELECT id_vendedor FROM producto WHERE id_producto = ? AND eliminado = 0`;
-        const [result]: any = await db.execute(query, [productId]);
+        const query = `SELECT id_vendedor FROM producto WHERE id_producto = ? AND eliminado = false`;
+        const { rows: result } = await db.query(query, [productId]);
         return result.length ? result[0].id_vendedor : null;
     }
 
@@ -167,29 +166,29 @@ class ProductRepository {
     static async deleteProduct(productId: number) {
         const query = `
         UPDATE producto
-        SET eliminado = 1
+        SET eliminado = true
         WHERE id_producto = ?`;
-        const [result]: any = await db.execute(query, [productId]);
-        return result;
+        const { rowCount } = await db.query(query, [productId]);
+        return rowCount;
     }
 
     static async unpublishProduct(id_producto: number) {
         const query = `
         UPDATE producto
-        SET despublicado = 1
+        SET despublicado = true
         WHERE id_producto = ?
         `;
-        const [result]: any = await db.execute(query, [id_producto]);
-        return result;
+        const { rowCount } = await db.query(query, [id_producto]);
+        return rowCount;
     }
     static async publishProduct(id_producto: number) {
         const query = `
         UPDATE producto
-        SET despublicado = 0
+        SET despublicado = false
         WHERE id_producto = ?
         `;
-        const [result]: any = await db.execute(query, [id_producto]);
-        return result;
+        const rowCount = await db.query(query, [id_producto]);
+        return rowCount;
     }
 }
 

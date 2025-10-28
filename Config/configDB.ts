@@ -1,32 +1,26 @@
-import mysql from 'mysql2';
-import dotenv from "dotenv";
+import pkg from 'pg';
+import dotenv from 'dotenv';
 dotenv.config();
 
-const { DB_HOST, DB_USERNAME, DB_PASSWORD, DB_DATABASE } = process.env;
+const { Pool } = pkg;
 
-// Creación del pool de conexiones
-const db = mysql.createPool({
-    host: DB_HOST,
-    user: DB_USERNAME,
-    password: DB_PASSWORD,
-    database: DB_DATABASE,
-    ssl: {
-        rejectUnauthorized: true,
-    },
-    connectionLimit: 10, // Número máximo de conexiones en el pool
-    queueLimit: 0 // Número máximo de solicitudes en cola (0 significa sin límite)
+const pool = new Pool({
+  connectionString: process.env.SUPABASE_DB_URL,
+  ssl: { rejectUnauthorized: false },
+  max: 10, // Máximo de conexiones simultáneas
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000
 });
 
-// Verificación de la conexión
-db.getConnection((err, conn) => {
-    if (err) {
-        console.error('Error al conectar a la base de datos:', err);
-        process.exit(1); // Detener la aplicación si no se puede conectar
-    } else {
-        console.log('Conexión a la base de datos establecida correctamente');
-        conn.release(); // Liberar la conexión de vuelta al pool
-    }
-});
+// Verificar conexión
+pool.connect()
+  .then(client => {
+    console.log('✅ Conexión a la base de datos Supabase (PostgreSQL) establecida correctamente');
+    client.release();
+  })
+  .catch(err => {
+    console.error('❌ Error al conectar a la base de datos Supabase:', err.message);
+    process.exit(1);
+  });
 
-// Exportar el pool de conexiones con soporte para Promesas
-export default db.promise();
+export default pool;
