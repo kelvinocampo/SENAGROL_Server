@@ -124,7 +124,7 @@ class AdminRepository {
   static async deactivateRole(id_deactivate_user: number, role: Omit<RequiredRoles, "comprador">) {
     // Desactivar el rol especificado solo si está activo
     const { data, error } = await supabase
-      .from(role)
+      .from(role as string)
       .update({ estado: 'Pendiente' })
       .eq(`id_${role}`, id_deactivate_user)
       .eq('estado', 'Activo')
