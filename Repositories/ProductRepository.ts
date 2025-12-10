@@ -1,194 +1,340 @@
-import db from '../Config/configDB';
+import supabase from '../Config/configDB';
 import Product from '../Dto/Product/ProductsCreate';
 
 class ProductRepository {
 
     static async createProduct(product: Product) {
-        const ProductSql = `
-            INSERT INTO producto (nombre, descripcion, latitud, longitud, cantidad, cantidad_minima_compra, imagen, precio_unidad, descuento, id_vendedor, fecha_publicacion)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        const productValues = [
-            product.Nombre,
-            product.Description,
-            product.latitud,
-            product.longitud,
-            product.quantity,
-            product.MinimumQuantity,
-            product.imagen,
-            product.Precio,
-            product.Discount,
-            product.userId,
-            new Date()
-        ];
-        console.log("📦 Valores que se enviarán al INSERT:", productValues);
-        await db.query(ProductSql, productValues);
+        const { error } = await supabase
+            .from('producto')
+            .insert({
+                nombre: product.Nombre,
+                descripcion: product.Description,
+                latitud: product.latitud,
+                longitud: product.longitud,
+                cantidad: product.quantity,
+                cantidad_minima_compra: product.MinimumQuantity,
+                imagen: product.imagen,
+                precio_unidad: product.Precio,
+                descuento: product.Discount,
+                id_vendedor: product.userId,
+                fecha_publicacion: new Date().toISOString()
+            });
+
+        if (error) {
+            console.error('Error creating product:', error);
+            throw error;
+        }
     }
 
     static async restoreQuantity(id_producto: number, cantidad: number) {
-        const sql = `
-            UPDATE producto
-            SET cantidad = cantidad + ?
-            WHERE id_producto = ?
-        `;
-        const values = [cantidad, id_producto];
-        const result = await db.query(sql, values);
-        return result;
+        // Primero obtener la cantidad actual
+        const { data: currentProduct } = await supabase
+            .from('producto')
+            .select('cantidad')
+            .eq('id_producto', id_producto)
+            .single();
+
+        if (!currentProduct) {
+            throw new Error('Product not found');
+        }
+
+        const { data, error } = await supabase
+            .from('producto')
+            .update({ cantidad: currentProduct.cantidad + cantidad })
+            .eq('id_producto', id_producto)
+            .select();
+
+        if (error) {
+            console.error('Error restoring quantity:', error);
+            throw error;
+        }
+
+        return data;
     }
 
     static async deleteProductsBySeller(id_user: number) {
-        const sql = `
-        UPDATE producto
-        SET eliminado = true
-        WHERE id_vendedor = ?
-        `;
-        const result = await db.query(sql, [id_user]);
-        return result;
+        const { data, error } = await supabase
+            .from('producto')
+            .update({ eliminado: true })
+            .eq('id_vendedor', id_user)
+            .select();
+
+        if (error) {
+            console.error('Error deleting products by seller:', error);
+            throw error;
+        }
+
+        return data;
     }
 
     static async editQuantity(id_producto: number, cantidad: number) {
-        const sql = `
-            UPDATE producto
-            SET cantidad = cantidad - ?
-            WHERE id_producto = ?
-        `;
-        const values = [cantidad, id_producto];
-        const result = await db.query(sql, values);
-        return result;
+        // Primero obtener la cantidad actual
+        const { data: currentProduct } = await supabase
+            .from('producto')
+            .select('cantidad')
+            .eq('id_producto', id_producto)
+            .single();
+
+        if (!currentProduct) {
+            throw new Error('Product not found');
+        }
+
+        const { data, error } = await supabase
+            .from('producto')
+            .update({ cantidad: currentProduct.cantidad - cantidad })
+            .eq('id_producto', id_producto)
+            .select();
+
+        if (error) {
+            console.error('Error editing quantity:', error);
+            throw error;
+        }
+
+        return data;
     }
 
     static async buy(id_vendedor: number, id_producto: number, id_user: number, cantidad: number, latitud: number, longitud: number, precio_unidad: number) {
-        const sql = `
-            INSERT INTO compra (id_producto, id_comprador, cantidad, fecha_compra, id_vendedor, estado, latitud_comprador, longitud_comprador, precio_producto)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        const values = [id_producto, id_user, cantidad, new Date(), id_vendedor, "Pendiente", latitud, longitud, precio_unidad];
-        const result = await db.query(sql, values);
-        return result;
+        const { data, error } = await supabase
+            .from('compra')
+            .insert({
+                id_producto,
+                id_comprador: id_user,
+                cantidad,
+                fecha_compra: new Date().toISOString(),
+                id_vendedor,
+                estado: "Pendiente",
+                latitud_comprador: latitud,
+                longitud_comprador: longitud,
+                precio_producto: precio_unidad
+            })
+            .select();
+
+        if (error) {
+            console.error('Error creating buy:', error);
+            throw error;
+        }
+
+        return data;
     }
 
     static async findById(id: number) {
-        const checkSql = `SELECT * FROM producto WHERE id_producto = ? AND (despublicado = false OR eliminado = false)`;
-        const { rows: result } = await db.query(checkSql, [id]);
-        return result.length ? result[0] : null;
+        const { data, error } = await supabase
+            .from('producto')
+            .select('*')
+            .eq('id_producto', id)
+            .eq('despublicado', false)
+            .eq('eliminado', false)
+            .single();
+
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error finding product by id:', error);
+            return null;
+        }
+
+        return data;
     }
 
     static async update(id: number, productData: Product) {
-        const updateSql = `
-            UPDATE producto 
-            SET precio_unidad = ?, descripcion = ?, latitud = ?, longitud = ?, 
-                cantidad = ?, cantidad_minima_compra = ?, imagen = ?, descuento = ?
-            WHERE id_producto = ?
-        `;
-        const values = [productData.Precio, productData.Description, productData.latitud, productData.longitud,
-        productData.quantity, productData.MinimumQuantity, productData.imagen, productData.Discount]
-        await db.query(updateSql, [...values, id]);
+        const { error } = await supabase
+            .from('producto')
+            .update({
+                precio_unidad: productData.Precio,
+                descripcion: productData.Description,
+                latitud: productData.latitud,
+                longitud: productData.longitud,
+                cantidad: productData.quantity,
+                cantidad_minima_compra: productData.MinimumQuantity,
+                imagen: productData.imagen,
+                descuento: productData.Discount
+            })
+            .eq('id_producto', id);
+
+        if (error) {
+            console.error('Error updating product:', error);
+            throw error;
+        }
     }
 
     static async getAll() {
-        const sql = `
-        SELECT 
-            p.*, 
-            u.nombre AS nombre_vendedor
-        FROM producto p
-        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.despublicado = false AND p.eliminado = false
-        `;
-        const products = await db.query(sql);
-        return products.rows;
+        const { data, error } = await supabase
+            .from('producto')
+            .select(`
+                *,
+                vendedor!inner(id_vendedor, usuario!inner(nombre))
+            `)
+            .eq('despublicado', false)
+            .eq('eliminado', false);
+
+        if (error) {
+            console.error('Error getting all products:', error);
+            throw error;
+        }
+
+        // Formatear respuesta para mantener compatibilidad
+        const products = data?.map(p => ({
+            ...p,
+            nombre_vendedor: p.vendedor?.usuario?.nombre
+        })) || [];
+
+        return products;
     }
 
     static async getAllAdmin() {
-        const sql = `
-        SELECT 
-            p.*, 
-            u.nombre AS nombre_vendedor
-        FROM producto p
-        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario
-        `;
-        const products = await db.query(sql);
-        return products.rows;
+        const { data, error } = await supabase
+            .from('producto')
+            .select(`
+                *,
+                vendedor!inner(id_vendedor, usuario!inner(nombre))
+            `);
+
+        if (error) {
+            console.error('Error getting all products for admin:', error);
+            throw error;
+        }
+
+        // Formatear respuesta para mantener compatibilidad
+        const products = data?.map(p => ({
+            ...p,
+            nombre_vendedor: p.vendedor?.usuario?.nombre
+        })) || [];
+
+        return products;
     }
 
     static async get(id_product: number) {
-        const sql = `
-        SELECT 
-            p.*, 
-            u.nombre AS nombre_vendedor
-        FROM producto p
-        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.id_producto = ? AND (p.despublicado = false OR p.eliminado = false)
-        `;
-        const product = await db.query(sql, [id_product]);
-        return product.rows;
+        const { data, error } = await supabase
+            .from('producto')
+            .select(`
+                *,
+                vendedor!inner(id_vendedor, usuario!inner(nombre))
+            `)
+            .eq('id_producto', id_product)
+            .or('despublicado.eq.false,eliminado.eq.false')
+            .single();
+
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error getting product:', error);
+            return [];
+        }
+
+        if (!data) return [];
+
+        return [{
+            ...data,
+            nombre_vendedor: data.vendedor?.usuario?.nombre
+        }];
     }
 
     static async getWithDiscount() {
-        const sql = `
-        SELECT 
-            p.*,
-            u.nombre AS nombre_vendedor
-        FROM producto p
-        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario
-        WHERE p.descuento > 0 AND (p.despublicado = false OR p.eliminado = false)
-        ORDER BY p.descuento DESC
-        `;
-        const products = await db.query(sql);
-        return products.rows;
+        const { data, error } = await supabase
+            .from('producto')
+            .select(`
+                *,
+                vendedor!inner(id_vendedor, usuario!inner(nombre))
+            `)
+            .gt('descuento', 0)
+            .or('despublicado.eq.false,eliminado.eq.false')
+            .order('descuento', { ascending: false });
+
+        if (error) {
+            console.error('Error getting products with discount:', error);
+            throw error;
+        }
+
+        // Formatear respuesta para mantener compatibilidad
+        const products = data?.map(p => ({
+            ...p,
+            nombre_vendedor: p.vendedor?.usuario?.nombre
+        })) || [];
+
+        return products;
     }
 
     static async getBySeller(id_user: number) {
-        const sql = `
-        SELECT 
-            p.*,
-            u.nombre AS nombre_vendedor
-        FROM producto p
-        JOIN vendedor v ON p.id_vendedor = v.id_vendedor
-        JOIN usuario u ON v.id_vendedor = u.id_usuario 
-        WHERE p.id_vendedor = ? AND p.eliminado = false
-        `;
-        const products = await db.query(sql, [id_user]);
-        return products.rows;
+        const { data, error } = await supabase
+            .from('producto')
+            .select(`
+                *,
+                vendedor!inner(id_vendedor, usuario!inner(nombre))
+            `)
+            .eq('id_vendedor', id_user)
+            .eq('eliminado', false);
+
+        if (error) {
+            console.error('Error getting products by seller:', error);
+            throw error;
+        }
+
+        // Formatear respuesta para mantener compatibilidad
+        const products = data?.map(p => ({
+            ...p,
+            nombre_vendedor: p.vendedor?.usuario?.nombre
+        })) || [];
+
+        return products;
     }
 
     // Obtener el vendedor de un producto específico
     static async findProductOwner(productId: number) {
-        const query = `SELECT id_vendedor FROM producto WHERE id_producto = ? AND eliminado = false`;
-        const { rows: result } = await db.query(query, [productId]);
-        return result.length ? result[0].id_vendedor : null;
+        const { data, error } = await supabase
+            .from('producto')
+            .select('id_vendedor')
+            .eq('id_producto', productId)
+            .eq('eliminado', false)
+            .single();
+
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error finding product owner:', error);
+            return null;
+        }
+
+        return data?.id_vendedor || null;
     }
 
     // Eliminar el producto si el vendedor es el dueño
     static async deleteProduct(productId: number) {
-        const query = `
-        UPDATE producto
-        SET eliminado = true
-        WHERE id_producto = ?`;
-        const { rowCount } = await db.query(query, [productId]);
-        return rowCount;
+        const { data, error } = await supabase
+            .from('producto')
+            .update({ eliminado: true })
+            .eq('id_producto', productId)
+            .select();
+
+        if (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+        }
+
+        return data?.length || 0;
     }
 
     static async unpublishProduct(id_producto: number) {
-        const query = `
-        UPDATE producto
-        SET despublicado = true
-        WHERE id_producto = ?
-        `;
-        const { rowCount } = await db.query(query, [id_producto]);
-        return rowCount;
+        const { data, error } = await supabase
+            .from('producto')
+            .update({ despublicado: true })
+            .eq('id_producto', id_producto)
+            .select();
+
+        if (error) {
+            console.error('Error unpublishing product:', error);
+            throw error;
+        }
+
+        return data?.length || 0;
     }
+
     static async publishProduct(id_producto: number) {
-        const query = `
-        UPDATE producto
-        SET despublicado = false
-        WHERE id_producto = ?
-        `;
-        const rowCount = await db.query(query, [id_producto]);
-        return rowCount;
+        const { data, error } = await supabase
+            .from('producto')
+            .update({ despublicado: false })
+            .eq('id_producto', id_producto)
+            .select();
+
+        if (error) {
+            console.error('Error publishing product:', error);
+            throw error;
+        }
+
+        return data?.length || 0;
     }
 }
 

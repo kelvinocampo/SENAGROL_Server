@@ -1,35 +1,36 @@
 // Repositories/MessageRepository.ts
-import db from "../Config/configDB";
+import supabase from "../Config/configDB";
 import Message from "../Dto/Chat/MessageDTO";
 
 class MessageRepository {
     static async createMessage(message: Message) {
         try {
-            const query = `
-                INSERT INTO mensaje 
-                (contenido, tipo, fecha_envio, id_chat, id_user, editado) 
-                VALUES (?, ?, ?, ?, ?, ?)
-            `;
-            const values = [
-                message.contenido,
-                message.tipo,
-                message.fecha_envio,
-                message.id_chat,
-                message.id_user,
-                message.editado ? 1 : 0
-            ];
+            const { data, error } = await supabase
+                .from('mensaje')
+                .insert({
+                    contenido: message.contenido,
+                    tipo: message.tipo,
+                    fecha_envio: message.fecha_envio,
+                    id_chat: message.id_chat,
+                    id_user: message.id_user,
+                    editado: message.editado ? 1 : 0
+                })
+                .select()
+                .single();
 
-            const [result]: any = await db.query(query, values);
-            const id_mensaje = result.insertId;
+            if (error) {
+                console.error("Error en MessageRepository.createMessage:", error);
+                throw error;
+            }
 
             return {
-                id_mensaje,
-                contenido: message.contenido,
-                tipo: message.tipo,
-                fecha_envio: message.fecha_envio,
-                id_chat: message.id_chat,
-                id_user: message.id_user,
-                editado: message.editado
+                id_mensaje: data.id_mensaje,
+                contenido: data.contenido,
+                tipo: data.tipo,
+                fecha_envio: data.fecha_envio,
+                id_chat: data.id_chat,
+                id_user: data.id_user,
+                editado: data.editado
             };
 
         } catch (error) {
@@ -40,20 +41,18 @@ class MessageRepository {
 
     static async updateTextMessage(message: Message, id_message: number) {
         try {
-            const query = `
-                UPDATE mensaje
-                SET editado = ?,
-                    contenido = ?
-                WHERE id_mensaje = ? AND tipo = "texto"
-            `;
+            const { data, error } = await supabase
+                .from('mensaje')
+                .update({
+                    editado: message.editado ? 1 : 0,
+                    contenido: message.contenido
+                })
+                .eq('id_mensaje', id_message)
+                .eq('tipo', 'texto')
+                .select()
+                .single();
 
-            const [result]: any = await db.query(query, [
-                message.editado ? 1 : 0,
-                message.contenido,
-                id_message
-            ]);
-
-            if (result.affectedRows === 0) {
+            if (error || !data) {
                 throw new Error('No se encontró el mensaje de texto para actualizar');
             }
 
@@ -66,24 +65,24 @@ class MessageRepository {
 
     static async deleteMessage(id_user: number, id_message: number, id_chat: number) {
         try {
-            const query = `
-                DELETE FROM mensaje
-                WHERE id_user = ?
-                AND id_mensaje = ?
-                AND id_chat = ?
-            `;
+            const { data, error } = await supabase
+                .from('mensaje')
+                .delete()
+                .eq('id_user', id_user)
+                .eq('id_mensaje', id_message)
+                .eq('id_chat', id_chat)
+                .select();
 
-            const [result]: any = await db.query(query, [
-                id_user, 
-                id_message, 
-                id_chat
-            ]);
+            if (error) {
+                console.error("Error en MessageRepository.deleteMessage:", error);
+                throw error;
+            }
 
-            if (result.affectedRows === 0) {
+            if (!data || data.length === 0) {
                 throw new Error('No se encontró el mensaje para eliminar');
             }
 
-            return { affectedRows: result.affectedRows };
+            return { affectedRows: data.length };
         } catch (error) {
             console.error("Error en MessageRepository.deleteMessage:", error);
             throw error;
@@ -92,9 +91,17 @@ class MessageRepository {
 
     static async getMessages(id_chat: number) {
         try {
-            const query = `SELECT * FROM mensaje WHERE id_chat = ?`;
-            const [result]: any = await db.query(query, [id_chat]);
-            return result;
+            const { data, error } = await supabase
+                .from('mensaje')
+                .select('*')
+                .eq('id_chat', id_chat);
+
+            if (error) {
+                console.error("Error en MessageRepository.getMessages:", error);
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error("Error en MessageRepository.getMessages:", error);
             throw error;
@@ -103,9 +110,17 @@ class MessageRepository {
 
     static async getMessageById(id_message: number) {
         try {
-            const query = `SELECT * FROM mensaje WHERE id_mensaje = ?`;
-            const [result]: any = await db.query(query, [id_message]);
-            return result;
+            const { data, error } = await supabase
+                .from('mensaje')
+                .select('*')
+                .eq('id_mensaje', id_message);
+
+            if (error) {
+                console.error("Error en MessageRepository.getMessages:", error);
+                throw error;
+            }
+
+            return data || [];
         } catch (error) {
             console.error("Error en MessageRepository.getMessages:", error);
             throw error;

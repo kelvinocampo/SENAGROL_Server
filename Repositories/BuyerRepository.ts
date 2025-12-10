@@ -1,12 +1,18 @@
-import db from '../Config/configDB';
+import supabase from '../Config/configDB';
 
 class BuyerRepository {
     static async add(id_comprador: number) {
-        const sql = `INSERT INTO comprador (id_comprador) 
-                     VALUES (?)`;
-        const values = [id_comprador];
-        const [result]: any = await db.query(sql, values);
-        return result;
+        const { data, error } = await supabase
+            .from('comprador')
+            .insert({ id_comprador })
+            .select();
+
+        if (error) {
+            console.error('Error adding buyer:', error);
+            throw error;
+        }
+
+        return data;
     }
 }
 

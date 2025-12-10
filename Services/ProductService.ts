@@ -29,12 +29,14 @@ class ProductService {
             if (cantidad <= 0 || cantidad > existingProduct.cantidad || cantidad < existingProduct.cantidad_minima_compra) {
                 return { success: false, message: "Cantidad no válida" };
             }
+
             const editQuantity = await ProductRepository.editQuantity(id_producto, cantidad);
-            if (!editQuantity) {
+            if (!editQuantity || editQuantity.length === 0) {
                 return { success: false, message: "Error al actualizar la cantidad del producto" };
             }
+
             const result = await ProductRepository.buy(existingProduct.id_vendedor, id_producto, id_user, cantidad, latitud, longitud, (existingProduct.precio_unidad * cantidad));
-            if (!result) {
+            if (!result || result.length === 0) {
                 return { success: false, message: "Error al realizar la compra" };
             }
 
@@ -113,9 +115,5 @@ class ProductService {
         return { success: true, message: "Producto eliminado correctamente." };
     }
 }
-
-
-
-
 
 export default ProductService;

@@ -1,26 +1,35 @@
-import pkg from 'pg';
+import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
-const { Pool } = pkg;
+const { SUPABASE_DB_URL: supabaseUrl = "", SUPABASE_ANON_KEY: supabaseAnonKey = "" } = process.env;
 
-const pool = new Pool({
-  connectionString: process.env.SUPABASE_DB_URL,
-  ssl: { rejectUnauthorized: false },
-  max: 10, // Máximo de conexiones simultáneas
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000
-});
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Error de configuración: Las variables SUPABASE_DB_URL o SUPABASE_ANON_KEY no están definidas en el archivo .env.');
+  process.exit(1);
+}
 
-// Verificar conexión
-pool.connect()
-  .then(client => {
-    console.log('✅ Conexión a la base de datos Supabase (PostgreSQL) establecida correctamente');
-    client.release();
-  })
-  .catch(err => {
-    console.error('❌ Error al conectar a la base de datos Supabase:', err.message);
-    process.exit(1);
-  });
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export default pool;
+// Verificar conexión al iniciar
+(async () => {
+  try {
+    // Test simple de conexión
+    const { error } = await supabase.from('usuario').select('id_usuario').limit(1);
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = tabla vacía, es OK
+      console.error(`❌ Error de conexión a Supabase: ${error.message}`);
+    } else {
+      console.log('✅ Conexión a Supabase establecida correctamente.');
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      console.error(`❌ Error con mensaje: ${err.message}`);
+    } else {
+      console.error(`❌ Error desconocido: ${String(err)}`);
+    }
+  }
+})();
+
+export default supabase;

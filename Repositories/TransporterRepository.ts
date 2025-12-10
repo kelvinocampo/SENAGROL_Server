@@ -1,78 +1,92 @@
-import db from '../Config/configDB';
+import supabase from '../Config/configDB';
 import TransporterDto from '../Dto/User/TransporterDto';
 
 class TransporterRepository {
     static async register(transporter: TransporterDto, imagesName: string[]) {
         // 0. Verificar si ya es transportador
-        const checkSql = `SELECT * FROM transportador WHERE id_transportador = ?`;
-        const [existingTransporter]: any = await db.query(checkSql, [transporter.userId]);
+        const { data: existingTransporter, error: checkError } = await supabase
+            .from('transportador')
+            .select('*')
+            .eq('id_transportador', transporter.userId);
 
-        if (existingTransporter.length > 0) {
+        if (checkError) {
+            console.error('Error checking transporter:', checkError);
+            throw checkError;
+        }
+
+        if (existingTransporter && existingTransporter.length > 0) {
             throw new Error("El usuario ya está registrado como transportador");
         }
 
         // 2. Insertar en la tabla de transportadores
-        const transporterSql = `
-            INSERT INTO transportador (id_transportador, licencia_conduccion, soat, tarjeta_propiedad_vehiculo, tipo_vehiculo, peso_vehiculo)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `;
-        const transporterValues = [
-            transporter.userId,
-            transporter.license,
-            transporter.soat,
-            transporter.vehicleCard,
-            transporter.vehicleType,
-            transporter.vehicleWeight
-        ];
+        const { error: insertError } = await supabase
+            .from('transportador')
+            .insert({
+                id_transportador: transporter.userId,
+                licencia_conduccion: transporter.license,
+                soat: transporter.soat,
+                tarjeta_propiedad_vehiculo: transporter.vehicleCard,
+                tipo_vehiculo: transporter.vehicleType,
+                peso_vehiculo: transporter.vehicleWeight
+            });
 
-        const result = await db.query(transporterSql, transporterValues);
+        if (insertError) {
+            console.error('Error inserting transporter:', insertError);
+            throw insertError;
+        }
 
-        imagesName.forEach(async (imageName) => {
-            await this.registerImage(imageName, transporter.userId);
-        });
+        // Insertar imágenes en paralelo
+        if (imagesName.length > 0) {
+            await Promise.all(imagesName.map(imageName =>
+                this.registerImage(imageName, transporter.userId)
+            ));
+        }
 
-        return result
+        return { success: true };
     }
 
     static async update(dataTransporter: TransporterDto, imagesName: string[]) {
-        const fields = [];
-        const values = [];
+        const updateObj: any = {};
 
         if (dataTransporter.license) {
-            fields.push("licencia_conduccion = ?");
-            values.push(dataTransporter.license);
+            updateObj.licencia_conduccion = dataTransporter.license;
         }
         if (dataTransporter.soat) {
-            fields.push("soat = ?");
-            values.push(dataTransporter.soat);
+            updateObj.soat = dataTransporter.soat;
         }
         if (dataTransporter.vehicleCard) {
-            fields.push("tarjeta_propiedad_vehiculo = ?");
-            values.push(dataTransporter.vehicleCard);
+            updateObj.tarjeta_propiedad_vehiculo = dataTransporter.vehicleCard;
         }
         if (dataTransporter.vehicleType) {
-            fields.push("tipo_vehiculo = ?");
-            values.push(dataTransporter.vehicleType);
+            updateObj.tipo_vehiculo = dataTransporter.vehicleType;
         }
         if (dataTransporter.vehicleWeight) {
-            fields.push("peso_vehiculo = ?");
-            values.push(dataTransporter.vehicleWeight);
+            updateObj.peso_vehiculo = dataTransporter.vehicleWeight;
         }
 
-        if (fields.length === 0) {
+        if (Object.keys(updateObj).length === 0) {
             throw new Error("No se proporcionaron datos para actualizar");
         }
 
-        const sql = `UPDATE transportador SET ${fields.join(", ")} WHERE id_transportador = ?`;
-        values.push(dataTransporter.userId);
+        // Insertar nuevas imágenes en paralelo
+        if (imagesName.length > 0) {
+            await Promise.all(imagesName.map(imageName =>
+                this.registerImage(imageName, dataTransporter.userId)
+            ));
+        }
 
-        imagesName.forEach(async (imageName) => {
-            await this.registerImage(imageName, dataTransporter.userId);
-        });
+        const { data, error } = await supabase
+            .from('transportador')
+            .update(updateObj)
+            .eq('id_transportador', dataTransporter.userId)
+            .select();
 
-        const [result]: any = await db.query(sql, values);
+        if (error) {
+            console.error('Error updating transporter:', error);
+            throw error;
+        }
 
-        if (result.affectedRows > 0) {
+        if (data && data.length > 0) {
             return { success: true, status: "Perfil actualizado correctamente" };
         } else {
             return { success: false, status: "No se encontraron cambios o usuario no encontrado" };
@@ -80,72 +94,120 @@ class TransporterRepository {
     }
 
     static async registerImage(imageName: string, id_user: number) {
-        // 3. Insertar imagen del vehículo en la tabla foto_vehiculo
-        const imageSql = `
-                INSERT INTO foto_vehiculo (foto, id_transportador)
-                VALUES (?, ?)
-            `;
-        const imageValues = [imageName, id_user];
+        const { error } = await supabase
+            .from('foto_vehiculo')
+            .insert({
+                foto: imageName,
+                id_transportador: id_user
+            });
 
-        return await db.query(imageSql, imageValues);
+        if (error) {
+            console.error('Error registering vehicle image:', error);
+            throw error;
+        }
+
+        return { success: true };
     }
 
     static async getTransporters() {
-        const query = `
-        SELECT 
-            u.id_usuario,
-            u.nombre,
-            u.nombre_usuario,
-            u.correo,
-            u.telefono,
-            t.tipo_vehiculo,
-            t.peso_vehiculo,
-            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
-        FROM transportador t
-        JOIN usuario u ON u.id_usuario = t.id_transportador
-        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
-        WHERE t.estado = 'Activo'
-        GROUP BY u.id_usuario;
-        `;
-        const result = await db.query(query);
-        return result.rows[0];
+        // Obtener transportadores activos
+        const { data: transportadores, error: transportadoresError } = await supabase
+            .from('transportador')
+            .select(`
+                *,
+                usuario!inner(id_usuario, nombre, nombre_usuario, correo, telefono)
+            `)
+            .eq('estado', 'Activo');
+
+        if (transportadoresError) {
+            console.error('Error getting transporters:', transportadoresError);
+            throw transportadoresError;
+        }
+
+        if (!transportadores) return [];
+
+        // Para cada transportador, obtener sus fotos
+        const transportadoresConFotos = await Promise.all(transportadores.map(async (t) => {
+            const { data: fotos } = await supabase
+                .from('foto_vehiculo')
+                .select('foto')
+                .eq('id_transportador', t.id_transportador);
+
+            const fotosVehiculo = fotos ? fotos.map(f => f.foto).join(',') : '';
+
+            return {
+                id_usuario: t.usuario.id_usuario,
+                nombre: t.usuario.nombre,
+                nombre_usuario: t.usuario.nombre_usuario,
+                correo: t.usuario.correo,
+                telefono: t.usuario.telefono,
+                tipo_vehiculo: t.tipo_vehiculo,
+                peso_vehiculo: t.peso_vehiculo,
+                fotos_vehiculo: fotosVehiculo
+            };
+        }));
+
+        return transportadoresConFotos;
     }
 
     static async getById(id_transporter: number) {
-        const query = `
-        SELECT
-            t.licencia_conduccion,
-            t.soat,
-            t.tarjeta_propiedad_vehiculo,
-            t.tipo_vehiculo,
-            t.peso_vehiculo,
-            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
-        FROM transportador t
-        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
-        WHERE t.estado = 'Activo' AND t.id_transportador = ?
-        GROUP BY t.id_transportador;
-        `;
-        const result = await db.query(query, [id_transporter]);
-        return result.rows[0];
+        const { data: transportador, error: transportadorError } = await supabase
+            .from('transportador')
+            .select('*')
+            .eq('id_transportador', id_transporter)
+            .eq('estado', 'Activo')
+            .single();
+
+        if (transportadorError || !transportador) {
+            return [];
+        }
+
+        // Obtener fotos del vehículo
+        const { data: fotos } = await supabase
+            .from('foto_vehiculo')
+            .select('foto')
+            .eq('id_transportador', id_transporter);
+
+        const fotosVehiculo = fotos ? fotos.map(f => f.foto).join(',') : '';
+
+        return [{
+            licencia_conduccion: transportador.licencia_conduccion,
+            soat: transportador.soat,
+            tarjeta_propiedad_vehiculo: transportador.tarjeta_propiedad_vehiculo,
+            tipo_vehiculo: transportador.tipo_vehiculo,
+            peso_vehiculo: transportador.peso_vehiculo,
+            fotos_vehiculo: fotosVehiculo
+        }];
     }
 
     static async getByIdSAdmin(id_transporter: number) {
-        const query = `
-        SELECT
-            t.licencia_conduccion,
-            t.soat,
-            t.tarjeta_propiedad_vehiculo,
-            t.tipo_vehiculo,
-            t.peso_vehiculo,
-            t.estado,  -- Incluye el estado en los resultados
-            GROUP_CONCAT(f.foto SEPARATOR ',') AS fotos_vehiculo
-        FROM transportador t
-        LEFT JOIN foto_vehiculo f ON f.id_transportador = t.id_transportador
-        WHERE t.id_transportador = ?
-        GROUP BY t.id_transportador;
-    `;
-        const result = await db.query(query, [id_transporter]);
-        return result.rows[0]; // Asegúrate de que esto no es un array vacío
+        const { data: transportador, error: transportadorError } = await supabase
+            .from('transportador')
+            .select('*')
+            .eq('id_transportador', id_transporter)
+            .single();
+
+        if (transportadorError || !transportador) {
+            return [];
+        }
+
+        // Obtener fotos del vehículo
+        const { data: fotos } = await supabase
+            .from('foto_vehiculo')
+            .select('foto')
+            .eq('id_transportador', id_transporter);
+
+        const fotosVehiculo = fotos ? fotos.map(f => f.foto).join(',') : '';
+
+        return [{
+            licencia_conduccion: transportador.licencia_conduccion,
+            soat: transportador.soat,
+            tarjeta_propiedad_vehiculo: transportador.tarjeta_propiedad_vehiculo,
+            tipo_vehiculo: transportador.tipo_vehiculo,
+            peso_vehiculo: transportador.peso_vehiculo,
+            estado: transportador.estado,
+            fotos_vehiculo: fotosVehiculo
+        }];
     }
 
 

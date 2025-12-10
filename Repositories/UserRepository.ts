@@ -1,161 +1,223 @@
-import db from '../Config/configDB';
+import supabase from '../Config/configDB';
 import User from '../Dto/User/UserDto';
 
 class UserRepository {
 
     static async getUserRoles(userId: number) {
-        const sql = `
-            SELECT 'vendedor' AS role FROM vendedor WHERE id_vendedor = ? AND estado = 'Activo'
-            UNION
-            SELECT 'administrador' AS role FROM administrador WHERE id_administrador = ? AND estado = 'Activo'
-            UNION
-            SELECT 'transportador' AS role FROM transportador WHERE id_transportador = ? AND estado = 'Activo'
-            UNION
-            SELECT 'comprador' AS role FROM comprador WHERE id_comprador = ? AND estado = 'Activo';
-        `;
-        const result: any = await db.query(sql, [userId, userId, userId, userId]);
+        // Convertir UNION queries a múltiples consultas paralelas
+        const [vendedorResult, adminResult, transportadorResult, compradorResult] = await Promise.all([
+            supabase.from('vendedor').select('id_vendedor').eq('id_vendedor', userId).eq('estado', 'Activo').single(),
+            supabase.from('administrador').select('id_administrador').eq('id_administrador', userId).eq('estado', 'Activo').single(),
+            supabase.from('transportador').select('id_transportador').eq('id_transportador', userId).eq('estado', 'Activo').single(),
+            supabase.from('comprador').select('id_comprador').eq('id_comprador', userId).eq('estado', 'Activo').single()
+        ]);
 
-        const roles = (result[0].map((row: any) => row.role)).join(" ");
-        return roles;
+        const roles: string[] = [];
+        if (vendedorResult.data) roles.push('vendedor');
+        if (adminResult.data) roles.push('administrador');
+        if (transportadorResult.data) roles.push('transportador');
+        if (compradorResult.data) roles.push('comprador');
+
+        return roles.join(' ');
     }
 
 
     static async add(user: User) {
-        const sql = `
-            INSERT INTO usuario (nombre, nombre_usuario, correo, contraseña, telefono) 
-            VALUES (?, ?, ?, ?, ?)
-        `;
-        const values = [user.name, user.username, user.email, user.password, user.phoneNumber];
-        const [result]: any = await db.query(sql, values);
-        return result.insertId;
+        const { data, error } = await supabase
+            .from('usuario')
+            .insert({
+                nombre: user.name,
+                nombre_usuario: user.username,
+                correo: user.email,
+                contraseña: user.password,
+                telefono: user.phoneNumber
+            })
+            .select('id_usuario')
+            .single();
+
+        if (error) {
+            console.error('Error adding user:', error);
+            throw error;
+        }
+
+        return data.id_usuario;
     }
 
     static async getByID(id: number) {
-        const sql = 'SELECT * FROM usuario WHERE id_usuario = ?';
-        const values = [id];
-        const [result]: any = await db.query(sql, values);
-        return result;
+        const { data, error } = await supabase
+            .from('usuario')
+            .select('*')
+            .eq('id_usuario', id);
+
+        if (error) {
+            console.error('Error getting user by ID:', error);
+            throw error;
+        }
+
+        return data || [];
     }
 
     static async getByEmail(email: string) {
-        const sql = 'SELECT * FROM usuario WHERE correo = ?';
-        const values = [email];
-        const [result]: any = await db.query(sql, values);
-        return result;
+        const { data, error } = await supabase
+            .from('usuario')
+            .select('*')
+            .eq('correo', email);
+
+        if (error) {
+            console.error('Error getting user by email:', error);
+            throw error;
+        }
+
+        return data || [];
     }
 
     static async getAll(user_id: number) {
-        const sql = `
-            SELECT 
-                u.*,
-                TRIM(BOTH ',' FROM 
-                    CONCAT_WS(',',
-                        IF(a.id_administrador IS NOT NULL, 'Administrador', NULL),
-                        IF(v.id_vendedor IS NOT NULL AND v.estado = 'Activo', 'Vendedor', NULL),
-                        IF(t.id_transportador IS NOT NULL AND t.estado = 'Activo', 'Transportador', NULL),
-                        IF(c.id_comprador IS NOT NULL AND c.estado = 'Activo', 'Comprador', NULL)
-                    )
-                ) AS roles
-            FROM usuario u
-            LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
-            LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor
-            LEFT JOIN transportador t ON u.id_usuario = t.id_transportador
-            LEFT JOIN comprador c ON u.id_usuario = c.id_comprador
-            WHERE u.id_usuario != ?
-            GROUP BY u.id_usuario;
-        `;
-        const result = await db.query(sql, [user_id])
-        return result;
+        // Obtener todos los usuarios excepto el actual
+        const { data: usuarios, error: usuariosError } = await supabase
+            .from('usuario')
+            .select('*')
+            .neq('id_usuario', user_id);
+
+        if (usuariosError) {
+            console.error('Error getting all users:', usuariosError);
+            throw usuariosError;
+        }
+
+        if (!usuarios) return [];
+
+        // Para cada usuario, obtener sus roles
+        const usuariosConRoles = await Promise.all(usuarios.map(async (usuario) => {
+            const [admin, vendedor, transportador, comprador] = await Promise.all([
+                supabase.from('administrador').select('id_administrador').eq('id_administrador', usuario.id_usuario).single(),
+                supabase.from('vendedor').select('id_vendedor, estado').eq('id_vendedor', usuario.id_usuario).single(),
+                supabase.from('transportador').select('id_transportador, estado').eq('id_transportador', usuario.id_usuario).single(),
+                supabase.from('comprador').select('id_comprador, estado').eq('id_comprador', usuario.id_usuario).single()
+            ]);
+
+            const roles: string[] = [];
+            if (admin.data) roles.push('Administrador');
+            if (vendedor.data && vendedor.data.estado === 'Activo') roles.push('Vendedor');
+            if (transportador.data && transportador.data.estado === 'Activo') roles.push('Transportador');
+            if (comprador.data && comprador.data.estado === 'Activo') roles.push('Comprador');
+
+            return {
+                ...usuario,
+                roles: roles.join(',')
+            };
+        }));
+
+        return usuariosConRoles;
     }
 
     static async getAllAdmin() {
-        const sql = `
-            SELECT 
-                u.*,
-                IF(a.id_administrador IS NOT NULL, 
-                    IF(a.estado = 'Activo', 'Activo', 'Inactivo'), 
-                    'No disponible') AS rol_administrador,
-                IF(c.id_comprador IS NOT NULL, 
-                    IF(c.estado = 'Activo', 'Activo', 'Inactivo'), 
-                    'No disponible') AS rol_comprador,
-                IF(v.id_vendedor IS NOT NULL, 
-                    IF(v.estado = 'Activo', 'Activo', 'Inactivo'), 
-                    'No disponible') AS rol_vendedor,
-                IF(t.id_transportador IS NOT NULL, 
-                    IF(t.estado = 'Activo', 'Activo', 'Inactivo'), 
-                    'No disponible') AS rol_transportador
-            FROM usuario u
-            LEFT JOIN administrador a ON u.id_usuario = a.id_administrador
-            LEFT JOIN comprador c ON u.id_usuario = c.id_comprador
-            LEFT JOIN vendedor v ON u.id_usuario = v.id_vendedor
-            LEFT JOIN transportador t ON u.id_usuario = t.id_transportador
-            WHERE (a.id_administrador IS NOT NULL)
-               OR (c.id_comprador IS NOT NULL)
-               OR (v.id_vendedor IS NOT NULL)
-               OR (t.id_transportador IS NOT NULL)
-            GROUP BY u.id_usuario;
-        `;
-        const result = await db.query(sql);
-        return result;
+        // Obtener todos los usuarios
+        const { data: usuarios, error: usuariosError } = await supabase
+            .from('usuario')
+            .select('*');
+
+        if (usuariosError) {
+            console.error('Error getting all users for admin:', usuariosError);
+            throw usuariosError;
+        }
+
+        if (!usuarios) return [];
+
+        // Para cada usuario, obtener el estado de cada rol
+        const usuariosConRoles = await Promise.all(usuarios.map(async (usuario) => {
+            const [admin, vendedor, transportador, comprador] = await Promise.all([
+                supabase.from('administrador').select('id_administrador, estado').eq('id_administrador', usuario.id_usuario).single(),
+                supabase.from('vendedor').select('id_vendedor, estado').eq('id_vendedor', usuario.id_usuario).single(),
+                supabase.from('transportador').select('id_transportador, estado').eq('id_transportador', usuario.id_usuario).single(),
+                supabase.from('comprador').select('id_comprador, estado').eq('id_comprador', usuario.id_usuario).single()
+            ]);
+
+            // Solo incluir usuarios que tengan al menos un rol
+            if (!admin.data && !vendedor.data && !transportador.data && !comprador.data) {
+                return null;
+            }
+
+            return {
+                ...usuario,
+                rol_administrador: admin.data ? admin.data.estado : 'No disponible',
+                rol_comprador: comprador.data ? comprador.data.estado : 'No disponible',
+                rol_vendedor: vendedor.data ? vendedor.data.estado : 'No disponible',
+                rol_transportador: transportador.data ? transportador.data.estado : 'No disponible'
+            };
+        }));
+
+        // Filtrar nulls
+        return usuariosConRoles.filter(u => u !== null);
     }
 
     static async UpdatePassword(password: string, id_user: number,) {
-        const sql = 'UPDATE usuario SET contraseña = ? WHERE id_usuario = ?';
-        const values = [password, id_user];
-        return await db.query(sql, values);
+        const { data, error } = await supabase
+            .from('usuario')
+            .update({ contraseña: password })
+            .eq('id_usuario', id_user)
+            .select();
+
+        if (error) {
+            console.error('Error updating password:', error);
+            throw error;
+        }
+
+        return data;
     }
 
     static async findByEmailOrUsername(identifier: string) {
-        const sql = `
-            SELECT * FROM usuario 
-            WHERE correo = ? OR nombre_usuario = ?
-        `;
-        const values = [identifier, identifier];
+        const { data, error } = await supabase
+            .from('usuario')
+            .select('*')
+            .or(`correo.eq.${identifier},nombre_usuario.eq.${identifier}`)
+            .limit(1);
 
-        const result: any = await db.query(sql, values);
+        if (error) {
+            console.error('Error finding user by email or username:', error);
+            throw error;
+        }
 
-        if (result[0].length > 0) {
-            return result[0][0];
+        if (data && data.length > 0) {
+            return data[0];
         }
 
         return null;
     }
 
     static async update(id: number, updatedData: User) {
-
-        const fields = [];
-        const values = [];
+        const updateObj: any = {};
 
         if (updatedData.name) {
-            fields.push("nombre = ?");
-            values.push(updatedData.name);
+            updateObj.nombre = updatedData.name;
         }
 
         if (updatedData.username) {
-            fields.push("nombre_usuario = ?");
-            values.push(updatedData.username);
+            updateObj.nombre_usuario = updatedData.username;
         }
 
         if (updatedData.email) {
-            fields.push("correo = ?");
-            values.push(updatedData.email);
+            updateObj.correo = updatedData.email;
         }
 
         if (updatedData.phoneNumber) {
-            fields.push("telefono = ?");
-            values.push(updatedData.phoneNumber);
+            updateObj.telefono = updatedData.phoneNumber;
         }
 
-        if (fields.length === 0) {
+        if (Object.keys(updateObj).length === 0) {
             throw new Error("No se proporcionaron datos para actualizar");
         }
 
-        const sql = `UPDATE usuario SET ${fields.join(", ")} WHERE id_usuario = ?`;
-        values.push(id);
+        const { data, error } = await supabase
+            .from('usuario')
+            .update(updateObj)
+            .eq('id_usuario', id)
+            .select();
 
-        const [result]: any = await db.query(sql, values);
+        if (error) {
+            console.error('Error updating user:', error);
+            throw error;
+        }
 
-        if (result.affectedRows > 0) {
+        if (data && data.length > 0) {
             return { success: true, status: "Perfil actualizado correctamente" };
         } else {
             return { success: false, status: "No se encontraron cambios o usuario no encontrado" };

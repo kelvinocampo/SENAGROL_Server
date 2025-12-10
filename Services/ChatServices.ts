@@ -91,19 +91,21 @@ class ChatService {
         }
 
         const existUser2 = await UserRepository.getByID(id_user2)
-        if (!existUser2) {
+        // UserRepository.getByID retorna array
+        if (!existUser2 || existUser2.length === 0) {
             return { code: 404, status: false, message: "El usuario para iniciar conversacion no existe" };
         }
 
         const existingChat: any = await ChatRepository.getChatByUsers(id_user1, id_user2);
-        if (existingChat.length) {
+        if (existingChat && existingChat.length > 0) {
             await ChatRepository.unDeleteChat(id_user1, existingChat[0].id_chat);
             return { code: 200, status: true, message: "Chat ya existe", chat: existingChat[0].id_chat };
         }
 
         const result: any = await ChatRepository.initChat(id_user1, id_user2);
-        if (result.insertId) {
-            return { code: 200, status: true, message: "Chat creado", chat: result.insertId };
+        // Supabase retorna array con el objeto insertado
+        if (result && result.length > 0 && result[0].id_chat) {
+            return { code: 200, status: true, message: "Chat creado", chat: result[0].id_chat };
         } else {
             return { code: 500, status: false, message: "Error al crear el chat" };
         }

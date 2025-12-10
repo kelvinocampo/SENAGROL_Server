@@ -26,16 +26,20 @@ class UserService {
     static async getByID(id: number) {
         const roles = await UserRepository.getUserRoles(id);
         const user = await UserRepository.getByID(id);
-        if (!user) {
+
+        // UserRepository.getByID ahora retorna un array
+        if (!user || user.length === 0) {
             return null;
         }
+
         let userWithRoles = {
-            ...user,
+            ...user[0], // Acceder al primer elemento del array
             roles: roles,
         };
+
         if (roles.includes("transportador")) {
             const getDataTransporter: any = await TransporterRepository.getById(id)
-            if (getDataTransporter.length > 0) {
+            if (getDataTransporter && getDataTransporter.length > 0) {
                 const dataTransporter = getDataTransporter[0];
                 userWithRoles = { ...userWithRoles, ...dataTransporter }
             }
@@ -94,7 +98,8 @@ class UserService {
     static async updateUserProfile(id: number, updatedData: User, dataTransporter: TransporterDto, imagesName: string[]) {
         const user = await UserRepository.getByID(id);
 
-        if (!user) {
+        // UserRepository.getByID ahora retorna un array
+        if (!user || user.length === 0) {
             return { success: false, status: "Usuario no encontrado" };
         }
 
@@ -102,10 +107,12 @@ class UserService {
         const roles = await UserRepository.getUserRoles(id)
         if (roles.includes("transportador")) {
             if (imagesName.length > 0) {
-                const [transporter]: any = await TransporterRepository.getById(id)
-                const images = transporter.fotos_vehiculo.split(";")
-                for (const image of images) {
-                    await deleteFromAzure(image as string, "usuario")
+                const transporter: any = await TransporterRepository.getById(id)
+                if (transporter && transporter.length > 0) {
+                    const images = transporter[0].fotos_vehiculo.split(";")
+                    for (const image of images) {
+                        await deleteFromAzure(image as string, "usuario")
+                    }
                 }
             }
             const updatedTransporter = await TransporterRepository.update(dataTransporter, imagesName);
@@ -116,10 +123,13 @@ class UserService {
 
     static async recoverUser(email: string) {
         const result: any = await UserRepository.getByEmail(email)
-        if (result.length === 0) {
+
+        // UserRepository.getByEmail ahora retorna un array directamente
+        if (!result || result.length === 0) {
             return { code: 400, success: false, message: "Usuario no encontrado" }
         }
-        const [user] = result
+
+        const user = result[0]
         const roles = await UserRepository.getUserRoles(user.id_usuario)
         const token = generateToken({ id: user.id_usuario, roles: roles }, SECRET_KEY, 60)
         const dataEmail: DataEmail = { email: user.correo, token: token }

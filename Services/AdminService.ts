@@ -21,9 +21,6 @@ class AdminService {
             return { success: false, message: "No se pudo procesar la solicitud para este usuario." };
         }
 
-        // Si result tiene affectedRows
-
-
         // Si result ya contiene message y success
         return result;
     }
@@ -58,30 +55,34 @@ class AdminService {
         if (isDelivered) {
             // Cambiar el nombre del usuario en la compra 
             const rolesList = roles.split(" ")
-            const [dataUser] = await UserRepository.getByID(id_delete_user)
-            const name = dataUser.nombre
-            rolesList.forEach(async (role: string) => {
-                if (role === "vendedor") {
-                    const updateName = await BuyRepository.setNameDeletedUser(id_delete_user, "vendedor", name)
-                }
-                if (role === "comprador") {
-                    const updateName = await BuyRepository.setNameDeletedUser(id_delete_user, "comprador", name)
-                }
-                if (role === "transportador") {
-                    const updateName = await BuyRepository.setNameDeletedUser(id_delete_user, "transportador", name)
-                }
-            })
+            const dataUser = await UserRepository.getByID(id_delete_user)
+            if (dataUser && dataUser.length > 0) {
+                const name = dataUser[0].nombre
+                rolesList.forEach(async (role: string) => {
+                    if (role === "vendedor") {
+                        const updateName = await BuyRepository.setNameDeletedUser(id_delete_user, "vendedor", name)
+                    }
+                    if (role === "comprador") {
+                        const updateName = await BuyRepository.setNameDeletedUser(id_delete_user, "comprador", name)
+                    }
+                    if (role === "transportador") {
+                        const updateName = await BuyRepository.setNameDeletedUser(id_delete_user, "transportador", name)
+                    }
+                })
+            }
         }
 
         const result: any = await AdminRepository.deleteUser(id_delete_user)
-        if (result.affectedRows > 0) return { status: 200, message: `Usuario eliminado` }
-        if (result.affectedRows == 0) return { status: 404, message: `Usuario con la ID ${id_delete_user} no encontrado` }
+        // Supabase retorna array, verificar length
+        if (result && result.length > 0) return { status: 200, message: `Usuario eliminado` }
+        return { status: 404, message: `Usuario con la ID ${id_delete_user} no encontrado` }
     }
 
     static async deactivateRole(id_deactivate_user: number, role: string) {
         const result: any = await AdminRepository.deactivateRole(id_deactivate_user, role as Omit<RequiredRoles, "comprador">)
-        if (result.affectedRows > 0) return { message: `Usuario ya no posee el rol indicado` }
-        if (result.affectedRows == 0) return { message: `Usuario no encontrado con el rol indicado` }
+        // Supabase retorna array
+        if (result && result.length > 0) return { message: `Usuario ya no posee el rol indicado` }
+        return { message: `Usuario no encontrado con el rol indicado` }
     }
     static async getProducts() {
         const result = await ProductRepository.getAllAdmin()

@@ -6,13 +6,19 @@ const hashids = new Hashids(process.env.KEY_TOKEN, 5, '0123456789ABCDEFGHIJKLMNO
 
 class BuyService {
     static async generateCode(id_compra: number, id_user: number) {
-        const [result] = await BuyRepository.generateCode(id_compra, id_user);
+        const result = await BuyRepository.generateCode(id_compra, id_user);
 
+        // BuyRepository.generateCode ahora retorna un array
+        if (!result || result.length === 0) {
+            throw new Error("Compra no encontrada o sin permiso.");
+        }
+
+        const buy = result[0];
         let estadoNumerico: number;
 
-        if (result.estado === "Asignada") {
+        if (buy.estado === "Asignada") {
             estadoNumerico = 1; // inicia
-        } else if (result.estado === "En Proceso") {
+        } else if (buy.estado === "En Proceso") {
             estadoNumerico = 2; // termina
         } else {
             throw new Error("Estado no válido para generar código.");
@@ -22,8 +28,8 @@ class BuyService {
         const codigo = hashids.encode(id_compra, estadoNumerico);
 
         return {
-            id_compra: result.id_compra,
-            estado: result.estado,
+            id_compra: buy.id_compra,
+            estado: buy.estado,
             codigo: codigo
         };
     }
@@ -36,7 +42,8 @@ class BuyService {
         }
 
         const result = await BuyRepository.receiveCodeBuy(Number(id_compra), estado, id_user);
-        if (result.affectedRows === 0) {
+        // Supabase retorna array
+        if (!result || result.length === 0) {
             return { success: false, message: "No se pudo actualizar el estado." };
         }
         return { success: true, message: "Estado actualizado." };
@@ -44,7 +51,7 @@ class BuyService {
 
     static async cancelTransport(id_user: number, id_compra: number) {
         const getBuy: any = await BuyRepository.getById(id_compra)
-        if (getBuy.length === 0) {
+        if (!getBuy || getBuy.length === 0) {
             return { code: 400, success: false, message: "compra no encontrada" }
         }
         if (getBuy[0].estado != "Asignada") {
@@ -52,7 +59,8 @@ class BuyService {
         }
 
         const result: any = await BuyRepository.cancelTransport(id_user, id_compra)
-        if (result.affectedRows === 0) {
+        // Supabase retorna array
+        if (!result || result.length === 0) {
             return { code: 400, success: false, message: "transporte no cancelado" }
         }
         return { code: 200, success: true, message: "Transporte Cancelado" }
@@ -60,12 +68,12 @@ class BuyService {
 
     static async getLocation(id_user: number, id_compra: number) {
         const getBuy: any = await BuyRepository.getById(id_compra)
-        if (getBuy.length === 0) {
+        if (!getBuy || getBuy.length === 0) {
             return { code: 400, success: false, message: "compra no encontrada" }
         }
 
         const result: any = await BuyRepository.getLocation(id_user, id_compra)
-        if (result.length === 0) {
+        if (!result || result.length === 0) {
             return { code: 400, success: false, message: "No se pudo obtener la ubicación." }
         }
         return { code: 200, success: true, message: result[0] }
@@ -73,7 +81,7 @@ class BuyService {
 
     static async getAddress(lat: number, lon: number) {
         const result: any = await getAddressByCoords(lat, lon)
-        if (result.length === 0) {
+        if (!result || result.length === 0) {
             return { code: 400, success: false, message: "No se pudo obtener la dirección." }
         }
         return { code: 200, success: true, message: result }
